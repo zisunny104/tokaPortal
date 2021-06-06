@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.powernukkit.bedrock.network:raknet:1.6.15-PN2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/powernukkit/bedrock/network/raknet/1.6.15-PN2/raknet-1.6.15-PN2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/powernukkit/bedrock/network/raknet/1.6.15-PN2/raknet-1.6.15-PN2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/powernukkit/bedrock/network/raknet/1.6.15-PN2/raknet-1.6.15-PN2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

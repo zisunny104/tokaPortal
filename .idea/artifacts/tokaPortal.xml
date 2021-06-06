@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="tokaPortal">
+    <output-path>$USER_HOME$/Documents/prjToka/Nukkit/plugins</output-path>
+    <root id="archive" name="tokaPortal.jar">
+      <element id="module-output" name="tokaPortal" />
+    </root>
+  </artifact>
+</component>
