@@ -11,30 +11,32 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="zero" level="project" />
-    <orderEntry type="library" name="Maven: org.powernukkit:powernukkit:1.3.1.4-PN" level="project" />
-    <orderEntry type="library" name="Maven: org.powernukkit.bedrock.network:raknet:1.6.15-PN2" level="project" />
-    <orderEntry type="library" name="Maven: org.powernukkit.bedrock.network:bedrock-network-common:1.6.15-PN" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-unix-common:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-kqueue:osx-x86_64:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.38.Final" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.trove4j:experimental:3.1.0" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.trove4j:core:3.1.0" level="project" />
+    <orderEntry type="library" name="BirthPoint1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.powernukkit:powernukkit:1.5.0.0-PN" level="project" />
+    <orderEntry type="library" name="Maven: org.powernukkit.bedrock.network:raknet:1.6.25-PN.2" level="project" />
+    <orderEntry type="library" name="Maven: org.powernukkit.bedrock.network:bedrock-network-common:1.6.25-PN.2" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-unix-common:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport-native-kqueue:osx-x86_64:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.52.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.52.Final" level="project" />
     <orderEntry type="library" name="Maven: org.powernukkit.fastutil:fastutil-lite:8.1.1" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:24.1.1-jre" level="project" />
-    <orderEntry type="library" name="Maven: org.checkerframework:checker-compat-qual:2.0.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.1.3" level="project" />
-    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.4" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.16" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:29.0-jre" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
+    <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.11.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.3.4" level="project" />
+    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.6" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.26" level="project" />
     <orderEntry type="library" name="Maven: org.powernukkit.bedrock.leveldb:bedrock-leveldb:0.11.0-PN" level="project" />
     <orderEntry type="library" name="Maven: org.powernukkit.bedrock.leveldb:bedrock-leveldb-api:0.11.0-PN" level="project" />
+    <orderEntry type="library" name="Maven: io.sentry:sentry:4.3.0" level="project" />
+    <orderEntry type="library" name="Maven: io.sentry:sentry-log4j2:4.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.nimbusds:nimbus-jose-jwt:7.9" level="project" />
     <orderEntry type="library" name="Maven: com.github.stephenc.jcip:jcip-annotations:1.0-1" level="project" />
     <orderEntry type="library" name="Maven: net.minidev:json-smart:2.3" level="project" />

@@ -215,17 +215,17 @@ public class PortalWindow implements Listener {
                         }
 
                         case TITLE_PORTAL_TPA_ACCEPT: {
-                            Player Fplayer = Portal.getTpaFrom(player);
-                            PlayerInfo Fpli = getPlayerInfo(Fplayer);
+                            Player fromPlayer = Portal.getTpaFrom(player);
+                            PlayerInfo fromPli = getPlayerInfo(fromPlayer);
                             if (button.equals(BUTTON_YES)) {
-                                if (Fplayer.isOnline()) {
-                                    portal(Fplayer, player.getLocation(), player.getName());
-                                    Fpli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r".replace("%1", player.getName()));
+                                if (fromPlayer.isOnline()) {
+                                    portal(fromPlayer, player.getLocation(), player.getName());
+                                    fromPli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r".replace("%1", player.getName()));
                                     delTpaMap(player);
                                 }
                             } else if (button.equals(BUTTON_NO)) {
-                                Fpli.sendText("§a[傳送]§b玩家§e %1 §b取消你的傳送要求§r".replace("%1", player.getName()));
-                                Chat.sendBroadcast("[DEBUG]玩家" + Fplayer.getName() + "的傳送要求已被" + player.getName() + "取消");
+                                fromPli.sendText("§a[傳送]§b玩家§e %1 §b取消你的傳送要求§r".replace("%1", player.getName()));
+                                Chat.sendBroadcast("[DEBUG]玩家" + fromPlayer.getName() + "的傳送要求已被" + player.getName() + "取消");
                                 delTpaMap(player);
                             }
                         }

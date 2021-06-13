@@ -17,6 +17,7 @@ public class PlayerPortalEvent extends Event implements Cancellable {
     protected String toInfo;
     protected Location from;
     protected Location to;
+    protected boolean canBack;
 
     public PlayerPortalEvent(PlayerInfo pli, String fromInfo, String toInfo, Location from, Location to) {
         this.player = pli.getPlayer();
@@ -25,6 +26,16 @@ public class PlayerPortalEvent extends Event implements Cancellable {
         this.toInfo = toInfo;
         this.from = from;
         this.to = to;
+        this.canBack = true;
+    }
+    public PlayerPortalEvent(PlayerInfo pli, String fromInfo, String toInfo, Location from, Location to, boolean canBack) {
+        this.player = pli.getPlayer();
+        this.pli = pli;
+        this.fromInfo = fromInfo;
+        this.toInfo = toInfo;
+        this.from = from;
+        this.to = to;
+        this.canBack = canBack;
     }
 
     public Player getPlayer() {
@@ -49,6 +60,10 @@ public class PlayerPortalEvent extends Event implements Cancellable {
 
     public Location getTo() {
         return to;
+    }
+
+    public boolean canBack(){
+        return canBack;
     }
 
     public String toString() {

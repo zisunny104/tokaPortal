@@ -3,6 +3,7 @@ package dev.toka.pl.tokaPortal;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
+import cn.nukkit.event.player.PlayerDeathEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.scheduler.NukkitRunnable;
@@ -14,6 +15,7 @@ import prj.toka.zero.ser.portal.teleportPoint.teleportPoint;
 import prj.toka.zero.ser.region.Region;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,11 +23,11 @@ import static dev.toka.pl.tokaPortal.PortalWindow.sendPortalTpaAcceptWindow;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 import static prj.toka.zero.ser.portal.teleportPoint.teleportPoint.getPoint;
 import static prj.toka.zero.ser.region.Region.getRegion;
-import static prj.toka.zero.utils.Utils.TIP_TYPE_PORTMD_INT;
 import static prj.toka.zero.utils.Utils.callEvent;
 
 public class Portal implements Listener {
     private static final HashMap<Player, Player> tpaMap = new HashMap<>();
+    private static final HashMap<Player, ArrayList<Location>> backMap = new HashMap<>();
 
     public static void toPoint(String pointName, Player player) {
         toPoint(getPoint(pointName), player);
@@ -57,23 +59,23 @@ public class Portal implements Listener {
         portal(player, region.getTpr(), region.getInfo());
     }
 
-    public static void Tpa(Player Fplayer, Player Tplayer) {
-        PlayerInfo Fpli = getPlayerInfo(Fplayer);
-        PlayerInfo Tpli = getPlayerInfo(Tplayer);
-        if (QuanXian.isHighQuanXian(Fplayer) && !QuanXian.isTopQuanXian(Tplayer)) {
-            Fpli.sendText("§a[傳送]§b即將傳送至玩家§e %1 §b身邊§r".replace("%1", Tplayer.getName()));
-            Tpli.sendText("§a[傳送]§b玩家§e %1 §b即將傳送到你身邊!§r".replace("%1", Fplayer.getName()));
+    public static void Tpa(Player fromPlayer, Player toPlayer) {
+        PlayerInfo fromPli = getPlayerInfo(fromPlayer);
+        PlayerInfo toPli = getPlayerInfo(toPlayer);
+        if (QuanXian.isHighQuanXian(fromPlayer) && !QuanXian.isTopQuanXian(toPlayer)) {
+            fromPli.sendText("§a[傳送]§b即將傳送至玩家§e %1 §b身邊§r".replace("%1", toPlayer.getName()));
+            toPli.sendText("§a[傳送]§b玩家§e %1 §b即將傳送到你身邊!§r".replace("%1", fromPlayer.getName()));
             (new NukkitRunnable() {
                 public void run() {
-                    portal(Fplayer, Tplayer.getLocation(), Tpli.getName());
-                    Fpli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r".replace("%1", Tplayer.getName()));
+                    portal(fromPlayer, toPlayer.getLocation(), toPli.getName());
+                    fromPli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r".replace("%1", toPlayer.getName()));
                     this.cancel();
                 }
             }).runTaskLater(Main.getInstance(), 30);
         } else {
-            tpaMap.put(Tplayer, Fplayer);
-            Fpli.sendText("§a[傳送]§b您已發送傳送要求給§e %1 §b請等待對方回應§r".replace("%1", Tplayer.getName()));
-            sendPortalTpaAcceptWindow(Tplayer);
+            tpaMap.put(toPlayer, fromPlayer);
+            fromPli.sendText("§a[傳送]§b您已發送傳送要求給§e %1 §b請等待對方回應§r".replace("%1", toPlayer.getName()));
+            sendPortalTpaAcceptWindow(toPlayer);
         }
 
     }
@@ -83,12 +85,12 @@ public class Portal implements Listener {
         player.transfer(address);
     }
 
-    public static Player getTpaFrom(Player Tplayer) {
-        return tpaMap.get(Tplayer);
+    public static Player getTpaFrom(Player toPlayer) {
+        return tpaMap.get(toPlayer);
     }
 
-    public static void delTpaMap(Player Tplayer) {
-        tpaMap.remove(Tplayer);
+    public static void delTpaMap(Player toPlayer) {
+        tpaMap.remove(toPlayer);
     }
 
     public static void portal(Player player, Location location) {
@@ -97,9 +99,10 @@ public class Portal implements Listener {
 
     public static void portal(Player player, Location location, String title) {
         PlayerInfo pli = getPlayerInfo(player);
+        pli.sendText("§a[傳送]§e傳送進行中 請不要隨意移動!");
         CompletableFuture.runAsync(() -> player.teleport(location));
         pli.setInPortalStatus();
-        pli.setTipType(TIP_TYPE_PORTMD_INT);
+        //pli.setTipType(TIP_TYPE_PORTMD_INT);
         player.sendTitle(title, "§b正在傳送...", 1, 20, 5);
         callEvent(new PlayerPortalEvent(pli, pli.getRegion().getInfo(), title, player.getLocation(), location));
         Effect effectBLINDNESS = Effect.getEffect(Effect.BLINDNESS).setVisible(false).setAmplifier(0).setDuration(40);
@@ -110,14 +113,72 @@ public class Portal implements Listener {
                 player.teleport(location);
                 player.addEffect(effectREGENERATION);
                 pli.setDefTipType();
+                pli.sendText("§a[傳送]§e傳送完成!");
                 pli.setOutPortalStatus();
                 this.cancel();
             }
         }).runTaskLater(Main.getInstance(), 20);
     }
 
+    public static void addBackLocation(Player player, Location loc) {
+        if(!canBack(player)){
+            backMap.put(player, new ArrayList<>());
+        }
+        ArrayList<Location> backList = backMap.get(player);
+        backList.add(loc);
+        if (backList.size() > 5) {
+            backList.remove(0);
+        }
+        backMap.put(player, backList);
+    }
+
+    public static Location getBackLocation(Player player) {
+        return getBackLocation(player, true);
+    }
+
+    public static Location getBackLocation(Player player, boolean removeLast) {
+        ArrayList<Location> backList = backMap.get(player);
+        Location loc = backList.get(backList.size() - 1);
+        if (removeLast) {
+            backList.remove(backList.size() - 1);
+        }
+        backMap.put(player, backList);
+        return loc;
+    }
+
+    public static boolean canBack(Player player) {
+        ArrayList<Location> backList = backMap.get(player);
+        return backList != null && !backList.isEmpty();
+    }
+
+    public static void backToLastPortalLocation(Player player) {
+        PlayerInfo pli = getPlayerInfo(player);
+
+        if (pli.isPortalStatus()) {
+            pli.sendText("§a[傳送]§b請等待冷卻時間結束後, \n再次進行傳送");
+            return;
+        }
+        if (canBack(player)) {
+            Location loc = getBackLocation(player);
+            callEvent(new PlayerPortalEvent(pli, "目前位置", "前次傳送位置", player.getLocation(), loc, false));
+            player.teleport(loc);
+            pli.sendText("§a[傳送]§b已返回前次傳送地點");
+        } else {
+            pli.sendText("§a[傳送]§b請先進行§e傳送§b(?)");
+        }
+    }
+
     @EventHandler
-    public void setLastPortalLocation(PlayerPortalEvent event){
-        event.getPli().setDeathLocation(event.getFrom());
+    public void setLastPortalLocation(PlayerPortalEvent event) {
+        if(!event.canBack()){
+            return;
+        }
+        addBackLocation(event.getPlayer(), event.getFrom());
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        addBackLocation(player, player.getLocation());
     }
 }
