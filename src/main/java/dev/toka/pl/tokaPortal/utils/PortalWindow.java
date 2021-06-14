@@ -1,4 +1,4 @@
-package dev.toka.pl.tokaPortal;
+package dev.toka.pl.tokaPortal.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
@@ -19,7 +19,7 @@ import prj.toka.zero.ser.land.Land;
 import prj.toka.zero.ser.portal.teleportPoint.teleportPoint;
 import prj.toka.zero.ser.region.Region;
 
-import static dev.toka.pl.tokaPortal.Portal.*;
+import static dev.toka.pl.tokaPortal.utils.Portal.*;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 import static prj.toka.zero.player.citypass.CityPass.sendCityPassForm;
 import static prj.toka.zero.utils.Utils.getPlayerNameList;

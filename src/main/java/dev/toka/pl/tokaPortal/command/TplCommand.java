@@ -8,7 +8,7 @@ import cn.nukkit.Player;
 import prj.toka.zero.player.PlayerInfo;
 import prj.toka.zero.ser.land.Land;
 
-import static dev.toka.pl.tokaPortal.PortalWindow.sendPortalLandListWindow;
+import static dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalLandListWindow;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 import static prj.toka.zero.ser.land.Land.getLand;
 import static prj.toka.zero.ser.land.Land.toLand;

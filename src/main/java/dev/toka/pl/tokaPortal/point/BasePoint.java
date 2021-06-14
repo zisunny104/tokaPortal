@@ -11,4 +11,6 @@ public interface BasePoint {
     String getCreator();
 
     Location getLocation();
+
+
 }

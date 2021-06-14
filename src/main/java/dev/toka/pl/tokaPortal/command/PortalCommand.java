@@ -4,7 +4,7 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.level.Location;
 import cn.nukkit.Player;
-import dev.toka.pl.tokaPortal.PortalWindow;
+import dev.toka.pl.tokaPortal.utils.PortalWindow;
 import prj.toka.zero.player.PlayerInfo;
 import prj.toka.zero.ser.portal.teleportPoint.teleportPoint;
 

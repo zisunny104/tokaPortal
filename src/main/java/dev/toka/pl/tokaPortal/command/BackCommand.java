@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 
-import static dev.toka.pl.tokaPortal.Portal.backToLastPortalLocation;
+import static dev.toka.pl.tokaPortal.utils.Portal.backToLastPortalLocation;
 
 public class BackCommand extends Command {
     public BackCommand() {

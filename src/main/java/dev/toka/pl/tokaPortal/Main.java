@@ -1,13 +1,20 @@
 package dev.toka.pl.tokaPortal;
 
+import cn.nukkit.Server;
 import cn.nukkit.event.Listener;
+import cn.nukkit.level.Location;
 import cn.nukkit.plugin.PluginBase;
-import dev.toka.pl.tokaPortal.command.*;
 import dev.toka.pl.tokaPortal.bstats.MetricsLite;
+import dev.toka.pl.tokaPortal.command.*;
+import dev.toka.pl.tokaPortal.provider.IDataProvider;
+import dev.toka.pl.tokaPortal.provider.YamlDataProvider;
+import dev.toka.pl.tokaPortal.utils.Portal;
+import dev.toka.pl.tokaPortal.utils.PortalWindow;
 
 public class Main extends PluginBase implements Listener {
 
     private static Main instance;
+    private static IDataProvider provider;
 
     @Override
     public void onLoad() {
@@ -18,7 +25,7 @@ public class Main extends PluginBase implements Listener {
     public void onEnable() {
         this.getLogger().info("[prj_Toka]載入完成 傳送");
         instance = this;
-        
+
         MetricsLite metricsLite = new MetricsLite(this);
         if (metricsLite.isEnabled()) {
             getLogger().info("[bStats]已允許傳送資料");
@@ -26,6 +33,8 @@ public class Main extends PluginBase implements Listener {
 
         this.registerEvents();
         this.registerCommandMap();
+
+        reload();
     }
 
     @Override
@@ -53,5 +62,23 @@ public class Main extends PluginBase implements Listener {
 
     public static Main getInstance() {
         return instance;
+    }
+
+    public static IDataProvider getProvider() {
+        return provider;
+    }
+
+    public void reload() {
+        //Utils.init(this);
+        //ConfigProvider.init(this);
+        //TODO:經濟串接
+        //Economy.init(this,ConfigProvider.getString("PreferEconomy"));
+        //TODO:增加多種存儲格式
+        provider = new YamlDataProvider(this);
+
+        //ConfigProvider.set("Provider",provider.getName());
+        //ConfigProvider.set("PreferEconomy",Economy.getApi().toString());
+        //getLogger().notice(Utils.translate("current.provider",provider.getName()));
+        //getLogger().notice(Utils.translate("current.economy",Economy.getApi().toString()));
     }
 }

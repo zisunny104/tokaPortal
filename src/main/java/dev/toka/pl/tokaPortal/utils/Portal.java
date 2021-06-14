@@ -1,4 +1,4 @@
-package dev.toka.pl.tokaPortal;
+package dev.toka.pl.tokaPortal.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.toka.pl.tokaPortal.PortalWindow.sendPortalTpaAcceptWindow;
+import static dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalTpaAcceptWindow;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 import static prj.toka.zero.ser.portal.teleportPoint.teleportPoint.getPoint;
 import static prj.toka.zero.ser.region.Region.getRegion;

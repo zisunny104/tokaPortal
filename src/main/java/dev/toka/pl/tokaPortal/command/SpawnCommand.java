@@ -3,7 +3,7 @@ package dev.toka.pl.tokaPortal.command;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
-import dev.toka.pl.tokaPortal.Portal;
+import dev.toka.pl.tokaPortal.utils.Portal;
 import prj.toka.zero.player.PlayerInfo;
 
 import static prj.toka.zero.player.Players.getPlayerInfo;

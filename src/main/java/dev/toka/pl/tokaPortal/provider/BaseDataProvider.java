@@ -1,0 +1,82 @@
+package dev.toka.pl.tokaPortal.provider;
+
+import cn.nukkit.level.Location;
+import dev.toka.pl.tokaPortal.Main;
+import dev.toka.pl.tokaPortal.point.HomePoint;
+
+import java.util.HashMap;
+
+public abstract class BaseDataProvider implements IDataProvider {
+
+    public Main main;
+
+    public static HashMap<Integer, HomePoint> homes = new HashMap<>();
+    //TODO:WARP MAP
+
+    public BaseDataProvider(Main main) {
+        this.main = main;
+        reload();
+    }
+
+    @Override
+    public int addHomePoint(String name, String creator, Location loc) {
+        int id = homes.size();
+        homes.put(id, new HomePoint(this, id, name, "home", creator, loc));
+        save();
+        return id;
+    }
+
+    @Override
+    public HomePoint getHomePoint(int id) {
+        return homes.getOrDefault(id, null);
+    }
+
+    @Override
+    public HomePoint getHomePoint(String name) {
+        for (HomePoint home : homes.values()) {
+            if (home.getName().equals(name)) {
+                return home;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean delHomePoint(Object val) {
+        int id = 0;
+        if (val instanceof HomePoint) {
+            id = ((HomePoint) val).getId();
+        }
+        if (!(val instanceof Integer)) {
+            throw new IllegalArgumentException("Invalid val,this function only accepts HomePoint/int.");
+        }
+        id = (int) val;
+        if (!homes.containsKey(id)) {
+            return false;
+        }
+        homes.remove(id);
+        save();
+        return true;
+    }
+
+
+    public IDataProvider reload() {
+        return reload(false);
+    }
+
+    @Override
+    public abstract IDataProvider reload(boolean save);
+
+    @Override
+    public abstract IDataProvider save();
+
+    public IDataProvider close() {
+        return close(true);
+    }
+
+    @Override
+    public abstract IDataProvider close(boolean save);
+
+    @Override
+    public abstract String getName();
+}

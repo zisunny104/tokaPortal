@@ -4,11 +4,11 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
-import dev.toka.pl.tokaPortal.PortalWindow;
+import dev.toka.pl.tokaPortal.utils.PortalWindow;
 import prj.toka.zero.player.PlayerInfo;
 import prj.toka.zero.ser.portal.teleportPoint.teleportPoint;
 
-import static dev.toka.pl.tokaPortal.Portal.toPoint;
+import static dev.toka.pl.tokaPortal.utils.Portal.toPoint;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 import static prj.toka.zero.ser.portal.teleportPoint.teleportPoint.getPoint;
 

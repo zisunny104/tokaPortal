@@ -5,7 +5,7 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
 
-import static dev.toka.pl.tokaPortal.Portal.Tpa;
+import static dev.toka.pl.tokaPortal.utils.Portal.Tpa;
 
 public class TpaCommand extends Command {
 
