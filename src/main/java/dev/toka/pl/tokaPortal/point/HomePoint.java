@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.point;
 
+import cn.nukkit.Player;
 import cn.nukkit.level.Location;
 import cn.nukkit.utils.ConfigSection;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
@@ -72,6 +73,17 @@ public class HomePoint implements BasePoint {
     @Override
     public Location getLocation() {
         return loc;
+    }
+
+    @Override
+    public boolean isCreator(Object creator){
+        if(creator instanceof Player){
+            creator = ((Player) creator).getName();
+        }
+        if(creator instanceof String){
+            return this.creator == creator;
+        }
+        return false;
     }
 
     public ConfigSection getRawData() {

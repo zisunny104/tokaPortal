@@ -12,5 +12,5 @@ public interface BasePoint {
 
     Location getLocation();
 
-
+    boolean isCreator(Object creator);
 }

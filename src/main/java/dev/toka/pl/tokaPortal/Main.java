@@ -1,11 +1,12 @@
 package dev.toka.pl.tokaPortal;
 
-import cn.nukkit.Server;
+import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
-import cn.nukkit.level.Location;
+import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.plugin.PluginBase;
 import dev.toka.pl.tokaPortal.bstats.MetricsLite;
 import dev.toka.pl.tokaPortal.command.*;
+import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
 import dev.toka.pl.tokaPortal.provider.YamlDataProvider;
 import dev.toka.pl.tokaPortal.utils.Portal;
@@ -51,9 +52,11 @@ public class Main extends PluginBase implements Listener {
 
     private void registerCommandMap() {
         this.getServer().getCommandMap().register("back", new BackCommand());
+        this.getServer().getCommandMap().register("home", new HomeCommand());
         this.getServer().getCommandMap().register("portal", new PortalCommand());
         this.getServer().getCommandMap().register("spawn", new SpawnCommand());
         this.getServer().getCommandMap().register("tpa", new TpaCommand());
+        this.getServer().getCommandMap().register("tph", new TphCommand());
         this.getServer().getCommandMap().register("tpl", new TplCommand());
         this.getServer().getCommandMap().register("tpp", new TppCommand());
         this.getServer().getCommandMap().register("tpw", new TpwCommand());
@@ -81,4 +84,17 @@ public class Main extends PluginBase implements Listener {
         //getLogger().notice(Utils.translate("current.provider",provider.getName()));
         //getLogger().notice(Utils.translate("current.economy",Economy.getApi().toString()));
     }
+
+    @EventHandler
+    public void onPlayerFormResponded(PlayerFormRespondedEvent event) {
+        if (event.getWindow() instanceof BaseForm) {
+            BaseForm form = (BaseForm) event.getWindow();
+            if (event.getResponse() != null) {
+                form.onFormResponse(event);
+            } else {
+                form.onFormClose(event);
+            }
+        }
+    }
+
 }

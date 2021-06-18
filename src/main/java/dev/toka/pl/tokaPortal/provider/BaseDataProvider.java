@@ -1,10 +1,13 @@
 package dev.toka.pl.tokaPortal.provider;
 
+import cn.nukkit.Player;
 import cn.nukkit.level.Location;
 import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class BaseDataProvider implements IDataProvider {
 
@@ -19,10 +22,16 @@ public abstract class BaseDataProvider implements IDataProvider {
     }
 
     @Override
-    public int addHomePoint(String name, String creator, Location loc) {
-        int id = homes.size();
-        homes.put(id, new HomePoint(this, id, name, "home", creator, loc));
-        save();
+    public int addHomePoint(String name, Object creator, Location loc) {
+        int id = -1;
+        if (creator instanceof Player) {
+            creator = ((Player) creator).getName();
+        }
+        if ((creator instanceof String)) {
+            id = homes.size();
+            homes.put(id, new HomePoint(this, id, name, "home", (String) creator, loc));
+            save();
+        }
         return id;
     }
 
@@ -39,6 +48,15 @@ public abstract class BaseDataProvider implements IDataProvider {
             }
         }
         return null;
+    }
+
+    @Override
+    public HomePoint[] getHomePointsByCreator(Object creator) {
+        List<HomePoint> result = new ArrayList<>();
+        for (HomePoint home : homes.values()) {
+            if (home.isCreator(creator)) result.add(home);
+        }
+        return result.toArray(new HomePoint[result.size()]);
     }
 
     @Override
