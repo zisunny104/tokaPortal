@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerDeathEvent;
+import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.scheduler.NukkitRunnable;
@@ -174,6 +175,14 @@ public class Portal implements Listener {
             return;
         }
         addBackLocation(event.getPlayer(), event.getFrom());
+    }
+
+    @EventHandler
+    public void setLastPortalLocation(PlayerTeleportEvent event) {
+        if(event.getPlayer().isOp()){
+            event.getPlayer().sendMessage("[DEBUG]設定返回點 "+ event.getFrom().toString());
+            addBackLocation(event.getPlayer(), event.getFrom());
+        }
     }
 
     @EventHandler
