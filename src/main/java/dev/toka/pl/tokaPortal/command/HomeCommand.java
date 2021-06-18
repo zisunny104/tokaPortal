@@ -10,6 +10,7 @@ import dev.toka.pl.tokaPortal.form.HomeSetForm;
 import prj.toka.zero.player.PlayerInfo;
 
 import static dev.toka.pl.tokaPortal.Main.getProvider;
+import static dev.toka.pl.tokaPortal.utils.Portal.homeEditMap;
 import static dev.toka.pl.tokaPortal.utils.Portal.setHome;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 
@@ -24,37 +25,41 @@ public class HomeCommand extends Command {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);
-            if (!player.getName().equals("Ethan940114") || pli.isTopQuanXian()) {
+            if (player.getName().equals("Ethan940114") || pli.isTopQuanXian()) {
+                //TODO 刪掉
+                if (args.length > 0) {
+                    switch (args[0].toLowerCase()) {
+                        case "set":
+                            if (args.length == 2) {
+                                player.sendMessage("[DEBUG]args.length" + args.length);
+                                setHome(player, args[1]);
+                            } else {
+                                player.showFormWindow(new HomeSetForm());
+                            }
+                            break;
+                        case "del":
+                            if (args[1] != null) {
+                                homeEditMap.put(player, getProvider().getHomePoint(args[1]));
+                                player.showFormWindow(new HomeDelForm(player));
+                            } else {
+                                player.showFormWindow(new HomeEditListForm(player));
+                            }
+                            break;
+                        case "edit":
+                            player.showFormWindow(new HomeEditListForm(player));
+                            break;
+                        case "list":
+                        default:
+                            player.showFormWindow(new HomeListForm(player));
+                    }
+                } else {
+                    player.showFormWindow(new HomeListForm(player));
+                }
+                return true;
+            } else {
                 player.sendMessage("[傳送]實驗功能 尚未開發完成!");
                 return false;
             }
-            if (args.length > 0) {
-                switch (args[0].toLowerCase()) {
-                    case "set":
-                        if (args[1] != null) {
-                            setHome(player, args[1]);
-                        } else {
-                            player.showFormWindow(new HomeSetForm());
-                        }
-                        break;
-                    case "del":
-                        if (args[1] != null) {
-                            player.showFormWindow(new HomeDelForm(getProvider().getHomePoint(args[1])));
-                        } else {
-                            player.showFormWindow(new HomeEditListForm(player));
-                        }
-                        break;
-                    case "edit":
-                        player.showFormWindow(new HomeEditListForm(player));
-                        break;
-                    case "list":
-                    default:
-                        player.showFormWindow(new HomeListForm(player));
-                }
-            } else {
-                player.showFormWindow(new HomeListForm(player));
-            }
-            return true;
         } else {
             sender.sendMessage("僅供遊戲內使用");
             return false;

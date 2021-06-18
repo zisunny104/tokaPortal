@@ -5,7 +5,7 @@ name: tokaPortal
 main: dev.toka.pl.tokaPortal.Main
 
 #插件版本
-version: "1.0.3"
+version: "1.0.5"
 
 #核心API版本
 api: ["1.0.11"]

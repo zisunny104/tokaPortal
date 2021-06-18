@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.toka.pl.tokaPortal.Main.getProvider;
+import static dev.toka.pl.tokaPortal.utils.Portal.homeEditMap;
 import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_EDIT;
 
 public class HomeEditListForm extends FormWindowCustom implements BaseForm {
@@ -36,7 +37,8 @@ public class HomeEditListForm extends FormWindowCustom implements BaseForm {
             if (name == null) {
                 return;
             }
-            player.showFormWindow(new HomeEditForm(getProvider().getHomePoint(name)));
+            homeEditMap.put(player, getProvider().getHomePoint(name));
+            player.showFormWindow(new HomeEditForm(player));//TODO　超問號的問題 下次處理
         }
     }
 

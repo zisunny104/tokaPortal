@@ -7,15 +7,17 @@ import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindowSimple;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 
+import static dev.toka.pl.tokaPortal.utils.Portal.homeEditMap;
 import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_EDIT;
 
 public class HomeEditForm extends FormWindowSimple implements BaseForm {
 
     HomePoint home;
 
-    public HomeEditForm(HomePoint home) {
-        super(TITLE_PORTAL_HOME_EDIT, "[" + home.getName() + "]\n" + home.getLocation().toString());
-        this.home = home;
+    public HomeEditForm(Player player) {
+        super(TITLE_PORTAL_HOME_EDIT, "");
+        this.home = homeEditMap.get(player);
+        this.setContent("[" + home.getName() + "]\n" + home.getLocation().toString());
         this.addButton(new ElementButton("更改名稱"));
         this.addButton(new ElementButton("刪除住家"));
         this.addButton(new ElementButton("返回列表"));
@@ -27,12 +29,15 @@ public class HomeEditForm extends FormWindowSimple implements BaseForm {
         String button = ((FormResponseSimple) event.getResponse()).getClickedButton().getText();
         switch (button) {
             case "刪除住家":
-                player.showFormWindow(new HomeDelForm(home));
+                player.showFormWindow(new HomeDelForm(player));
                 break;
             case "更改名稱":
                 player.sendMessage("[傳送]這項功能還沒有被寫出來喔((");
             case "返回列表":
             default:
+                if (homeEditMap.get(player) != null) {
+                    homeEditMap.remove(player);
+                }
                 player.showFormWindow(new HomeEditListForm(player));
         }
     }

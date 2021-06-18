@@ -9,11 +9,10 @@ import dev.toka.pl.tokaPortal.utils.Utils;
 import static dev.toka.pl.tokaPortal.utils.Utils.encodeLocation;
 
 public class HomePoint implements BasePoint {
-    private IDataProvider provider;
-
     int id = -1, x, y, z, yaw, pitch;
     String name, type, creator, level;
     Location loc;
+    private IDataProvider provider;
 
     public HomePoint() {
 
@@ -39,7 +38,8 @@ public class HomePoint implements BasePoint {
         this.provider = provider;
 
         this.name = data.getString("name");
-        this.level = data.getString("type");
+        this.type = data.getString("type");
+        this.creator = data.getString("creator");
         Location loc = Utils.parseLocation(data.getSection("loc"));
         this.x = (int) loc.x;
         this.y = (int) loc.y;
@@ -76,12 +76,12 @@ public class HomePoint implements BasePoint {
     }
 
     @Override
-    public boolean isCreator(Object creator){
-        if(creator instanceof Player){
+    public boolean isCreator(Object creator) {
+        if (creator instanceof Player) {
             creator = ((Player) creator).getName();
         }
-        if(creator instanceof String){
-            return this.creator == creator;
+        if (creator instanceof String) {
+            return this.creator.equals(creator);
         }
         return false;
     }
@@ -91,6 +91,7 @@ public class HomePoint implements BasePoint {
             {
                 set("name", name);
                 set("type", type);
+                set("creator", creator);
                 set("loc", encodeLocation(loc));
             }
         };

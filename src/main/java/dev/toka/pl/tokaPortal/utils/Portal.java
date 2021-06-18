@@ -29,9 +29,10 @@ import static prj.toka.zero.ser.region.Region.getRegion;
 import static prj.toka.zero.utils.Utils.callEvent;
 
 public class Portal implements Listener {
+    public static final ArrayList<String> canAddHomeRegionList = new ArrayList<>();
     private static final HashMap<Player, Player> tpaMap = new HashMap<>();
     private static final HashMap<Player, ArrayList<Location>> backMap = new HashMap<>();
-    public static final ArrayList<String> canAddHomeRegionList = new ArrayList<>();
+    public static HashMap<Player, HomePoint> homeEditMap = new HashMap<>();
 
     static {//可以新增住家的區域(Region)列表
         canAddHomeRegionList.add("v1");
@@ -195,22 +196,6 @@ public class Portal implements Listener {
         }
     }
 
-    @EventHandler
-    public void setLastPortalLocation(PlayerPortalEvent event) {
-        if (!event.canBack()) {
-            return;
-        }
-        addBackLocation(event.getPlayer(), event.getFrom());
-    }
-
-    @EventHandler
-    public void setLastPortalLocation(PlayerTeleportEvent event) {
-        if (event.getPlayer().isOp()) {
-            event.getPlayer().sendMessage("[DEBUG]設定返回點 " + event.getFrom().toString());
-            addBackLocation(event.getPlayer(), event.getFrom());
-        }
-    }
-
     public static void setHome(Player player, String name) {
         PlayerInfo pli = getPlayerInfo(player);
         if (name == null || name.equals("")) {
@@ -221,10 +206,12 @@ public class Portal implements Listener {
             pli.sendText("[傳送]已存在此名稱的住家，請更換一個名稱後再試。");
             return;
         }
-        if (canAddHomeRegionList.contains(pli.getRegion().getName())) {
-            getProvider().addHomePoint(name, player, player.getLocation());
-            pli.sendText("[傳送]已成功設定住家'%name'!".replace("%name", name));
-            return;
+        if (pli.getRegion() != null) {
+            if (canAddHomeRegionList.contains(pli.getRegion().getName())) {
+                getProvider().addHomePoint(name, player, player.getLocation());
+                pli.sendText("[傳送]已成功設定住家'%name'!".replace("%name", name));
+                return;
+            }
         }
         pli.sendText("[傳送]此區域無法設置住家。");
     }
@@ -245,6 +232,22 @@ public class Portal implements Listener {
             return;
         }
         pli.sendText("[傳送]發生未知的錯誤!本次並未造成任何修改。");
+    }
+
+    @EventHandler
+    public void setLastPortalLocation(PlayerPortalEvent event) {
+        if (!event.canBack()) {
+            return;
+        }
+        addBackLocation(event.getPlayer(), event.getFrom());
+    }
+
+    @EventHandler
+    public void setLastPortalLocation(PlayerTeleportEvent event) {
+        if (event.getPlayer().isOp()) {
+            event.getPlayer().sendMessage("[DEBUG]設定返回點 " + event.getFrom().toString());
+            addBackLocation(event.getPlayer(), event.getFrom());
+        }
     }
 
     @EventHandler

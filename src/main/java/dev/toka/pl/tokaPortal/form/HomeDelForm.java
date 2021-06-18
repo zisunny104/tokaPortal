@@ -8,15 +8,17 @@ import cn.nukkit.form.window.FormWindowSimple;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.delHome;
+import static dev.toka.pl.tokaPortal.utils.Portal.homeEditMap;
 import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_DEL;
 
 public class HomeDelForm extends FormWindowSimple implements BaseForm {
 
     HomePoint home;
 
-    public HomeDelForm(HomePoint home) {
-        super(TITLE_PORTAL_HOME_DEL, "確認要刪除住家' %name '嗎?".replace("%name", home.getName()));
-        this.home = home;
+    public HomeDelForm(Player player) {
+        super(TITLE_PORTAL_HOME_DEL, "");
+        this.home = homeEditMap.get(player);
+        this.setContent("確認要刪除住家' %name '嗎?".replace("%name", home.getName()));
         this.addButton(new ElementButton("確定"));
         this.addButton(new ElementButton("取消"));
     }
@@ -31,6 +33,9 @@ public class HomeDelForm extends FormWindowSimple implements BaseForm {
                 break;
             case "取消":
             default:
+        }
+        if (homeEditMap.get(player) != null) {
+            homeEditMap.remove(player);
         }
     }
 

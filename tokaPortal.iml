@@ -11,6 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="zero" level="project" />
+    <orderEntry type="library" name="BirthPoint1.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.powernukkit:powernukkit:1.5.0.0-PN" level="project" />
     <orderEntry type="library" name="Maven: org.powernukkit.bedrock.network:raknet:1.6.25-PN.2" level="project" />
     <orderEntry type="library" name="Maven: org.powernukkit.bedrock.network:bedrock-network-common:1.6.25-PN.2" level="project" />

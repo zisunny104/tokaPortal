@@ -32,21 +32,23 @@ public class TphCommand extends Command {
         Player player = (Player) sender;
         PlayerInfo pli = getPlayerInfo(player);
         IDataProvider provider = getProvider();
-        if(!player.getName().equals("Ethan940114") || pli.isTopQuanXian()){
+        if (player.getName().equals("Ethan940114") || pli.isTopQuanXian()) {
+            //TODO 刪掉
+            if (args.length > 0) {
+                String name = args[0];
+                HomePoint home = provider.getHomePoint(name);
+                if (home != null) {
+                    toPoint(home, player);
+                    pli.sendText("[傳送]已傳送至住家 " + name);
+                    return true;
+                }
+                pli.sendText("[傳送]住家 " + name + " 無法傳送(不存在)");
+            } else {
+                player.showFormWindow(new HomeListForm(player));
+            }
+        } else {
             player.sendMessage("[傳送]實驗功能 尚未開發完成!");
             return false;
-        }
-        if (args.length > 0) {
-            String name = args[0];
-            HomePoint home = provider.getHomePoint(name);
-            if (home != null) {
-                toPoint(home, player);
-                pli.sendText("[傳送]已傳送至住家 " + name);
-                return true;
-            }
-            pli.sendText("[傳送]住家 " + name + " 無法傳送(不存在)");
-        } else {
-            player.showFormWindow(new HomeListForm(player));
         }
         return false;
     }
