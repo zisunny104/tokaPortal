@@ -1,10 +1,11 @@
-package dev.toka.pl.tokaPortal.form;
+package dev.toka.pl.tokaPortal.form.home;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.window.FormWindowCustom;
+import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.utils.Portal;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.toka.pl.tokaPortal.Main.getProvider;
+import static dev.toka.pl.tokaPortal.utils.Portal.toPoint;
 import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_LIST;
 
 public class HomeListForm extends FormWindowCustom implements BaseForm {
@@ -37,7 +39,7 @@ public class HomeListForm extends FormWindowCustom implements BaseForm {
             if (name == null) {
                 return;
             }
-            Portal.toPoint(getProvider().getHomePoint(name), player);
+            toPoint(getProvider().getHomePoint(name), player);
         }
     }
 

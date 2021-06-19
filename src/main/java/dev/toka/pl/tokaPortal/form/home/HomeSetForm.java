@@ -1,8 +1,9 @@
-package dev.toka.pl.tokaPortal.form;
+package dev.toka.pl.tokaPortal.form.home;
 
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.window.FormWindowCustom;
+import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.utils.Utils;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.setHome;

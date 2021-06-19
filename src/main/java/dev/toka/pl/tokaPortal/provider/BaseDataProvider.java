@@ -61,9 +61,9 @@ public abstract class BaseDataProvider implements IDataProvider {
 
     @Override
     public boolean delHomePoint(Object val) {
-        int id = 0;
+        int id = -1;
         if (val instanceof HomePoint) {
-            id = ((HomePoint) val).getId();
+            val = ((HomePoint) val).getId();
         }
         if (!(val instanceof Integer)) {
             throw new IllegalArgumentException("Invalid val,this function only accepts HomePoint/int.");

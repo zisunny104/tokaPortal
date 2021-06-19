@@ -216,17 +216,19 @@ public class Portal implements Listener {
         pli.sendText("[傳送]此區域無法設置住家。");
     }
 
-    public static void delHome(Player player, Object home) {
+    public static void delHome(Player player, String name) {
         PlayerInfo pli = getPlayerInfo(player);
-        if (home instanceof String) {
-            HomePoint point = getProvider().getHomePoint((String) home);
-            if (point == null) {
-                pli.sendText("[傳送]找不到要刪除的住家!");
-                return;
-            }
-            home = point;
+        HomePoint point = getProvider().getHomePoint(name);
+        if (point == null) {
+            pli.sendText("[傳送]找不到要刪除的住家!");
+            return;
         }
-        if (home instanceof HomePoint) {
+        delHome(player, point);
+    }
+
+    public static void delHome(Player player, HomePoint home) {
+        PlayerInfo pli = getPlayerInfo(player);
+        if (home != null && home.isCreator(player)) {
             getProvider().delHomePoint(home);
             pli.sendText("[傳送]成功刪除住家!");
             return;
@@ -239,20 +241,28 @@ public class Portal implements Listener {
         if (!event.canBack()) {
             return;
         }
+        if (event.getPlayer().isOp()) {
+            event.getPlayer().sendMessage("[DEBUG]設定返回點 " + event.getFrom().toString());
+        }
         addBackLocation(event.getPlayer(), event.getFrom());
     }
 
     @EventHandler
     public void setLastPortalLocation(PlayerTeleportEvent event) {
         if (event.getPlayer().isOp()) {
-            event.getPlayer().sendMessage("[DEBUG]設定返回點 " + event.getFrom().toString());
-            addBackLocation(event.getPlayer(), event.getFrom());
+            if (event.getFrom() == getBackLocation(event.getPlayer()).getLocation()) {
+                event.getPlayer().sendMessage("[DEBUG]設定返回點 " + event.getFrom().toString());
+                addBackLocation(event.getPlayer(), event.getFrom());
+            }
         }
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+        if (player.isOp()) {
+            player.sendMessage("[DEBUG]設定返回點 " + player.getLocation());
+        }
         addBackLocation(player, player.getLocation());
     }
 }

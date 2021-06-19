@@ -16,7 +16,8 @@ public class Utils {
     public static final String TITLE_PORTAL_HOME_LIST = "=住家列表=";
     public static final String TITLE_PORTAL_HOME_SET = "=設定住家=";
     public static final String TITLE_PORTAL_HOME_DEL = "=刪除住家=";
-    public static final String TITLE_PORTAL_HOME_EDIT = "=編輯住家=";
+    public static final String TITLE_PORTAL_HOME_EDIT_LIST = "=編輯住家=";
+    public static final String TITLE_PORTAL_HOME_EDIT = "編輯住家[%name]";
     public static final String TITLE_PORTAL_PLAYER_LIST = "=玩家列表=";
     public static final String TITLE_PORTAL_PLAYER_NONE = "=現無玩家=";
     public static final String TITLE_PORTAL_TPA_ACCEPT = "=傳送同意=";

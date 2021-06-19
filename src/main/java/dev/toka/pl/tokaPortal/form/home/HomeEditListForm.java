@@ -1,10 +1,11 @@
-package dev.toka.pl.tokaPortal.form;
+package dev.toka.pl.tokaPortal.form.home;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.window.FormWindowCustom;
+import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 
 import java.util.Arrays;
@@ -12,13 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.toka.pl.tokaPortal.Main.getProvider;
-import static dev.toka.pl.tokaPortal.utils.Portal.homeEditMap;
-import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_EDIT;
+import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_EDIT_LIST;
 
 public class HomeEditListForm extends FormWindowCustom implements BaseForm {
 
     public HomeEditListForm(Player player) {
-        super(TITLE_PORTAL_HOME_EDIT);
+        super(TITLE_PORTAL_HOME_EDIT_LIST);
         HomePoint[] homes = getProvider().getHomePointsByCreator(player);
         if (homes.length > 0) {
             List<String> homeNames = Arrays.stream(homes).map(HomePoint::getName).collect(Collectors.toList());
@@ -37,8 +37,7 @@ public class HomeEditListForm extends FormWindowCustom implements BaseForm {
             if (name == null) {
                 return;
             }
-            homeEditMap.put(player, getProvider().getHomePoint(name));
-            player.showFormWindow(new HomeEditForm(player));//TODO　超問號的問題 下次處理
+            player.showFormWindow(new HomeEditForm(name));//TODO　超問號的問題 下次處理
         }
     }
 

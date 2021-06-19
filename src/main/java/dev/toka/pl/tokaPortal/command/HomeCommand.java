@@ -3,14 +3,12 @@ package dev.toka.pl.tokaPortal.command;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import dev.toka.pl.tokaPortal.form.HomeDelForm;
-import dev.toka.pl.tokaPortal.form.HomeEditListForm;
-import dev.toka.pl.tokaPortal.form.HomeListForm;
-import dev.toka.pl.tokaPortal.form.HomeSetForm;
+import dev.toka.pl.tokaPortal.form.home.HomeDelForm;
+import dev.toka.pl.tokaPortal.form.home.HomeEditListForm;
+import dev.toka.pl.tokaPortal.form.home.HomeListForm;
+import dev.toka.pl.tokaPortal.form.home.HomeSetForm;
 import prj.toka.zero.player.PlayerInfo;
 
-import static dev.toka.pl.tokaPortal.Main.getProvider;
-import static dev.toka.pl.tokaPortal.utils.Portal.homeEditMap;
 import static dev.toka.pl.tokaPortal.utils.Portal.setHome;
 import static prj.toka.zero.player.Players.getPlayerInfo;
 
@@ -38,9 +36,8 @@ public class HomeCommand extends Command {
                             }
                             break;
                         case "del":
-                            if (args[1] != null) {
-                                homeEditMap.put(player, getProvider().getHomePoint(args[1]));
-                                player.showFormWindow(new HomeDelForm(player));
+                            if (args.length == 2) {
+                                player.showFormWindow(new HomeDelForm(args[1]));
                             } else {
                                 player.showFormWindow(new HomeEditListForm(player));
                             }
