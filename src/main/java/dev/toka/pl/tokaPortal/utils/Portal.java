@@ -93,7 +93,7 @@ public class Portal implements Listener {
         if (fromPli.isTopQuanXian()) {
             toPli.sendText("§a[傳送]§b玩家§e %1 §b即將傳送到你身邊!§r"
                     .replace("%1", fromPlayer.getName()));
-            portal(fromPlayer, toPlayer.getLocation(), toPli.getName());
+            portal(fromPlayer, toPlayer.getLocation(), toPlayer.getName());
             fromPli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r"
                     .replace("%1", toPlayer.getName()));
             return;
@@ -140,9 +140,8 @@ public class Portal implements Listener {
     public static void portal(Player player, Location location, String title) {
         PlayerInfo pli = getPlayerInfo(player);
         PlayerPortalEvent ev = new PlayerPortalEvent(
-                pli, pli.getRegion().getInfo(), title, player.getLocation(), location);
-        callEvent(ev);
-        if (!ev.isCancelled()) {
+                pli, pli.getRegionInfo(), title, player.getLocation(), location);
+        if (callEvent(ev)) {
             CompletableFuture.runAsync(() -> player.teleport(location));
             player.sendTitle(title, "§b正在傳送...", 1, 20, 5);
             Effect effectBLINDNESS = getEffect(BLINDNESS).setVisible(false)

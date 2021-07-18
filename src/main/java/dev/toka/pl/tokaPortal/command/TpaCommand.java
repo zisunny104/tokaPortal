@@ -18,9 +18,9 @@ public class TpaCommand extends Command {
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             if (args.length > 0) {
-                Player Tplayer = Server.getInstance().getPlayer(args[0]);
-                if (Tplayer != null) {
-                    Tpa(player, Tplayer);
+                Player toPlayer = Server.getInstance().getPlayer(args[0]);
+                if (toPlayer != null) {
+                    Tpa(player, toPlayer);
                 }
             } else {
                 sender.sendMessage("§a[傳送]§b用法: §e'/tpa <玩家代號>'§r");
