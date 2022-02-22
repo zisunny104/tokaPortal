@@ -10,12 +10,21 @@ import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
 import dev.toka.pl.tokaPortal.provider.YamlDataProvider;
 import dev.toka.pl.tokaPortal.utils.Portal;
+import dev.toka.pl.tokaPortal.utils.PortalHistory;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
 
 public class Main extends PluginBase implements Listener {
 
     private static Main instance;
     private static IDataProvider provider;
+
+    public static Main getInstance() {
+        return instance;
+    }
+
+    public static IDataProvider getProvider() {
+        return provider;
+    }
 
     @Override
     public void onLoad() {
@@ -46,13 +55,14 @@ public class Main extends PluginBase implements Listener {
     private void registerEvents() {
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new Portal(), this);
+        this.getServer().getPluginManager().registerEvents(new PortalHistory(), this);
         this.getServer().getPluginManager().registerEvents(new PortalWindow(), this);
     }
-
 
     private void registerCommandMap() {
         this.getServer().getCommandMap().register("back", new BackCommand());
         this.getServer().getCommandMap().register("home", new HomeCommand());
+        this.getServer().getCommandMap().register("next", new NextCommand());
         this.getServer().getCommandMap().register("portal", new PortalCommand());
         this.getServer().getCommandMap().register("spawn", new SpawnCommand());
         this.getServer().getCommandMap().register("tpa", new TpaCommand());
@@ -61,14 +71,6 @@ public class Main extends PluginBase implements Listener {
         this.getServer().getCommandMap().register("tpp", new TppCommand());
         this.getServer().getCommandMap().register("tpw", new TpwCommand());
         this.getServer().getCommandMap().register("wild", new WildCommand());
-    }
-
-    public static Main getInstance() {
-        return instance;
-    }
-
-    public static IDataProvider getProvider() {
-        return provider;
     }
 
     public void reload() {
@@ -96,7 +98,6 @@ public class Main extends PluginBase implements Listener {
             }
         }
     }
-
 
 
 }

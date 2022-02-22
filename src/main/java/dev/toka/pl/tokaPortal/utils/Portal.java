@@ -1,9 +1,7 @@
 package dev.toka.pl.tokaPortal.utils;
 
 import cn.nukkit.Player;
-import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerDeathEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.scheduler.NukkitRunnable;
@@ -31,7 +29,6 @@ import static prj.toka.zero.utils.Utils.callEvent;
 public class Portal implements Listener {
     public static final ArrayList<String> canAddHomeRegionList = new ArrayList<>();
     private static final HashMap<Player, Player> tpaMap = new HashMap<>();
-    private static final HashMap<Player, ArrayList<Location>> backMap = new HashMap<>();
     public static HashMap<Player, HomePoint> homeEditMap = new HashMap<>();
 
     static {//可以新增住家的區域(Region)列表
@@ -150,59 +147,6 @@ public class Portal implements Listener {
         }
     }
 
-    public static void addBackLocation(Player player, Location loc) {
-        if (!canBack(player)) {
-            backMap.put(player, new ArrayList<>());
-        }
-        ArrayList<Location> backList = backMap.get(player);
-        backList.add(loc);
-        if (backList.size() > 5) {
-            backList.remove(0);
-        }
-        backMap.put(player, backList);
-    }
-
-    public static Location getBackLocation(Player player) {
-        return getBackLocation(player, true);
-    }
-
-    public static Location getBackLocation(Player player, boolean removeLast) {
-        ArrayList<Location> backList = backMap.get(player);
-        Location loc = backList.get(backList.size() - 1);
-        if (removeLast) {
-            backList.remove(backList.size() - 1);
-        }
-        backMap.put(player, backList);
-        return loc;
-    }
-
-    public static boolean canBack(Player player) {
-        ArrayList<Location> backList = backMap.get(player);
-        return backList != null && !backList.isEmpty();
-    }
-
-    public static void backToLastPortalLocation(Player player) {
-        PlayerInfo pli = getPlayerInfo(player);
-
-        if (pli.isPortalStatus()) {
-            pli.sendText("§a[傳送]§b請等待冷卻時間結束後, \n再次進行傳送");
-            return;
-        }
-        if (canBack(player)) {
-            Location loc = getBackLocation(player);
-            PlayerPortalEvent ev = new PlayerPortalEvent(
-                    pli, "目前位置", "前次傳送位置",
-                    player.getLocation(), loc, false);
-            callEvent(ev);
-            if (!ev.isCancelled()) {
-                player.teleport(loc);
-                pli.sendText("§a[傳送]§b已返回前次傳送地點");
-            }
-        } else {
-            pli.sendText("§a[傳送]§b請先進行§e傳送§b(?)");
-        }
-    }
-
     public static void setHome(Player player, String name) {
         PlayerInfo pli = getPlayerInfo(player);
         if (name == null || name.equals("")) {
@@ -241,17 +185,5 @@ public class Portal implements Listener {
             return;
         }
         pli.sendText("[傳送]發生未知的錯誤!本次並未造成任何修改。");
-    }
-
-    @EventHandler
-    public void setLastPortalLocation(PlayerPortalEvent event) {
-        if (!event.canBack()) return;
-        addBackLocation(event.getPlayer(), event.getFrom());
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        addBackLocation(player, player.getLocation());
     }
 }
