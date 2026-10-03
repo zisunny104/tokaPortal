@@ -3,50 +3,32 @@ package dev.toka.pl.tokaPortal.point;
 import cn.nukkit.Player;
 import cn.nukkit.level.Location;
 import cn.nukkit.utils.ConfigSection;
-import dev.toka.pl.tokaPortal.provider.IDataProvider;
 import dev.toka.pl.tokaPortal.utils.Utils;
 
-import static dev.toka.pl.tokaPortal.utils.Utils.encodeLocation;
-
 public class HomePoint implements BasePoint {
-    int id = -1, x, y, z, yaw, pitch;
-    String name, type, creator, level;
-    Location loc;
-    private IDataProvider provider;
+    private final int id;
+    private final String name, type, creator, level;
+    private final Location loc;
+    private ConfigSection original = new ConfigSection();
 
-    public HomePoint() {
-
-    }
-
-    public HomePoint(IDataProvider provider, int id, String name, String type, String creator, Location loc) {
-        this.provider = provider;
+    public HomePoint(int id, String name, String type, String creator, Location loc) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.creator = creator;
-        this.x = (int) loc.x;
-        this.y = (int) loc.y;
-        this.z = (int) loc.z;
-        this.yaw = (int) loc.yaw;
-        this.pitch = (int) loc.getPitch();
-        this.level = loc.getLevelName();
+        this.level = loc.getLevel().getName();
         this.loc = loc;
     }
 
-    public HomePoint(IDataProvider provider, int id, ConfigSection data) {
+    public HomePoint(int id, ConfigSection data) {
+        this.original = new ConfigSection(data);
         this.id = id;
-        this.provider = provider;
 
         this.name = data.getString("name");
         this.type = data.getString("type");
         this.creator = data.getString("creator");
         Location loc = Utils.parseLocation(data.getSection("loc"));
-        this.x = (int) loc.x;
-        this.y = (int) loc.y;
-        this.z = (int) loc.z;
-        this.yaw = (int) loc.yaw;
-        this.pitch = (int) loc.getPitch();
-        this.level = loc.getLevelName();
+        this.level = data.getSection("loc").getString("level");
         this.loc = loc;
     }
 
@@ -87,13 +69,19 @@ public class HomePoint implements BasePoint {
     }
 
     public ConfigSection getRawData() {
-        return new ConfigSection() {
-            {
-                set("name", name);
-                set("type", type);
-                set("creator", creator);
-                set("loc", encodeLocation(loc));
-            }
-        };
+        ConfigSection data = new ConfigSection(original);
+        data.set("name", name);
+        data.set("type", type);
+        data.set("creator", creator);
+        ConfigSection oldPosition = original.getSection("loc");
+        ConfigSection position = oldPosition == null ? new ConfigSection() : new ConfigSection(oldPosition);
+        position.set("x", loc.x);
+        position.set("y", loc.y);
+        position.set("z", loc.z);
+        position.set("yaw", loc.yaw);
+        position.set("pitch", loc.pitch);
+        position.set("level", level);
+        data.set("loc", position);
+        return data;
     }
 }

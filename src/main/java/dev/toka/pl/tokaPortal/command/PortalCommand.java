@@ -5,11 +5,11 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.level.Location;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
-import prj.toka.zero.player.PlayerInfo;
-import prj.toka.zero.ser.portal.teleportPoint.teleportPoint;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint;
 
-import static prj.toka.zero.player.Players.getPlayerInfo;
-import static prj.toka.zero.ser.portal.teleportPoint.teleportPoint.*;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint.*;
 
 public class PortalCommand extends Command {
 
@@ -27,21 +27,28 @@ public class PortalCommand extends Command {
                 switch (args[0].toLowerCase()) {
                     case "tpp":
                     case "point": {
+                        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(player,
+                                dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINTS,
+                                dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINT_MANAGEMENT)) return false;
+                        if (args.length < 2) { player.sendMessage("/portal point <set|del> <名稱> [類型]"); return false; }
                         if (args[1] != null) {
                             switch (args[1].toLowerCase()) {
                                 case "add":
                                 case "set": {
-                                    if (args[2] != null) {
+                                    if (args.length > 2) {
                                         String name = args[2];
                                         String type = "point";
                                         String info = name;
                                         Location location = player.getLocation();
-                                        if (args[3] != null) {
+                                        if (args.length > 3) {
                                             type = args[3];
                                         }
 
                                         if (getPoint(name) == null) {
-                                            setTeleportPoint(name, pl, type, info, location);
+                                            if (!setTeleportPoint(name, pl, type, info, location)) {
+                                                player.sendMessage("[傳送]傳送點建立失敗，整合功能已關閉。");
+                                                return false;
+                                            }
                                             pli.sendText("[傳送]傳送點 %name 建立成功"
                                                     .replace("%name", name));
                                         } else {
@@ -54,12 +61,15 @@ public class PortalCommand extends Command {
                                 }
 
                                 case "del": {
-                                    if (args[2] != null) {
+                                    if (args.length > 2) {
                                         String name = args[2];
                                         teleportPoint point = getPoint(name);
                                         if (point != null) {
                                             if (point.getCreator().equals(pl) || player.isOp()) {
-                                                delTeleportPoint(point);
+                                                if (!delTeleportPoint(point)) {
+                                                    player.sendMessage("[傳送]傳送點刪除失敗，整合功能已關閉。");
+                                                    return false;
+                                                }
                                                 pli.sendText("[傳送]傳送點 %name 成功移除"
                                                         .replace("%name", name));
                                             } else {
@@ -79,29 +89,7 @@ public class PortalCommand extends Command {
                     }
 
                     case "server": {
-                        if (args[1] != null) {
-                            switch (args[1].toLowerCase()) {
-                                case "add":
-                                case "set": {
-                                    if (args.length >= 4) {
-                                        String address = args[2];
-                                        int rawPort = Integer.parseInt(args[3]), port;
-                                        if (rawPort < 65535 && rawPort > 1) {
-                                            port = Integer.parseInt(args[3]);
-                                            pli.sendText("[]暫不支持寫入的喔這樣");
-                                        } else {
-                                            pli.sendText("[]無效port的啦");
-                                        }
-
-                                    }
-                                    break;
-                                }
-
-                                case "del": {
-                                    //TODO
-                                }
-                            }
-                        }
+                        player.sendMessage("[傳送]尚未提供跨伺服器目的地管理功能。");
                         break;
                     }
 

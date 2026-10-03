@@ -1,16 +1,15 @@
 package dev.toka.pl.tokaPortal.command;
 
-import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
-import prj.toka.zero.player.PlayerInfo;
-import prj.toka.zero.ser.portal.teleportPoint.teleportPoint;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.toPoint;
-import static prj.toka.zero.player.Players.getPlayerInfo;
-import static prj.toka.zero.ser.portal.teleportPoint.teleportPoint.getPoint;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint.getPoint;
 
 public class TppCommand extends Command {
     public TppCommand() {
@@ -20,7 +19,9 @@ public class TppCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        Player player = Server.getInstance().getPlayer(sender.getName());
+        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINTS)) return false;
+        if (!(sender instanceof Player)) { sender.sendMessage("[傳送]請在遊戲內進行"); return false; }
+        Player player = (Player) sender;
         PlayerInfo pli = getPlayerInfo(player);
         if (args.length > 0) {
             String name = args[0];

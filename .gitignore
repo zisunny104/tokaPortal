@@ -1,2 +1,34 @@
-# Project exclude paths
+# Maven / Java build output
 /target/
+/out/
+/output/
+*.class
+
+# Downloaded build tools, dependencies and isolated test servers
+/.build-tools/
+
+# IntelliJ personal settings and generated project files
+*.iml
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/usage.statistics.xml
+/.idea/dataSources.local.xml
+/.idea/httpRequests/
+/.idea/shelf/
+/.idea/libraries/
+/.idea/artifacts/
+
+# Local logs, crash reports and editor temporary files
+*.log
+hs_err_pid*
+replay_pid*
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Local environment credentials
+.env
+.env.*
+!.env.example

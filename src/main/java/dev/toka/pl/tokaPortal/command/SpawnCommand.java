@@ -4,9 +4,9 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
 import dev.toka.pl.tokaPortal.utils.Portal;
-import prj.toka.zero.player.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
 
-import static prj.toka.zero.player.Players.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
 
 public class SpawnCommand extends Command {
 
@@ -17,6 +17,7 @@ public class SpawnCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINTS)) return false;
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);

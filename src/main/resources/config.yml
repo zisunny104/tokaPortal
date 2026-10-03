@@ -1,0 +1,7 @@
+# 修改格式後重新啟動；轉換前會備份現有資料。
+storage:
+  type: yaml
+
+# 內建的舊版統計元件預設停用。
+metrics:
+  enabled: false

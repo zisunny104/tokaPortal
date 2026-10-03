@@ -4,10 +4,10 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.level.Position;
 import cn.nukkit.Player;
-import prj.toka.zero.player.PlayerInfo;
-import prj.toka.zero.utils.Utils;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
 
-import static prj.toka.zero.player.Players.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
 
 public class WildCommand extends Command {
     public WildCommand() {
@@ -16,6 +16,7 @@ public class WildCommand extends Command {
     }
 
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.WILD)) return false;
         if (sender instanceof Player) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);
@@ -23,8 +24,8 @@ public class WildCommand extends Command {
                 if (pli.getBossBarLength() >= 90) {
                     int plX = (int) player.getPosition().x;
                     int plZ = (int) player.getPosition().z;
-                    int x = Utils.rand(plX - 375, plX + 375);
-                    int z = Utils.rand(plZ - 375, plZ + 375);
+                    int x = ZeroIntegration.rand(plX - 375, plX + 375);
+                    int z = ZeroIntegration.rand(plZ - 375, plZ + 375);
                     int y = player.getLevel().getHighestBlockAt(x, z) + 1;
                     player.teleport(new Position(x, y, z, player.getLevel()));
                     pli.sendText("[傳送]隨機傳送成功");

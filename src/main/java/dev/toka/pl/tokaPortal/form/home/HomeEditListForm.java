@@ -37,7 +37,7 @@ public class HomeEditListForm extends FormWindowCustom implements BaseForm {
             if (name == null) {
                 return;
             }
-            player.showFormWindow(new HomeEditForm(name));//TODO　超問號的問題 下次處理
+            player.showFormWindow(new HomeEditForm(name));
         }
     }
 

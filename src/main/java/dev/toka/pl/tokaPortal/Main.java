@@ -8,7 +8,8 @@ import dev.toka.pl.tokaPortal.bstats.MetricsLite;
 import dev.toka.pl.tokaPortal.command.*;
 import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
-import dev.toka.pl.tokaPortal.provider.YamlDataProvider;
+import dev.toka.pl.tokaPortal.provider.BaseDataProvider;
+import dev.toka.pl.tokaPortal.provider.storage.StorageManager;
 import dev.toka.pl.tokaPortal.utils.Portal;
 import dev.toka.pl.tokaPortal.utils.PortalHistory;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
@@ -27,29 +28,28 @@ public class Main extends PluginBase implements Listener {
     }
 
     @Override
-    public void onLoad() {
-        this.getLogger().info("[prj_Toka]正在載入 傳送");
-    }
-
-    @Override
     public void onEnable() {
-        this.getLogger().info("[prj_Toka]載入完成 傳送");
         instance = this;
+        dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize();
+        reload();
 
-        MetricsLite metricsLite = new MetricsLite(this);
-        if (metricsLite.isEnabled()) {
-            getLogger().info("[bStats]已允許傳送資料");
+        try {
+            if (Boolean.TRUE.equals(getConfig().getNested("metrics.enabled", false))) {
+                MetricsLite metricsLite = new MetricsLite(this);
+                if (metricsLite.isEnabled()) getLogger().info("[bStats]已允許傳送資料");
+            }
+        } catch (RuntimeException | LinkageError e) {
+            getLogger().warning("bStats 無法啟動，傳送功能繼續運作: " + e);
         }
 
         this.registerEvents();
         this.registerCommandMap();
-
-        reload();
+        getLogger().info("tokaPortal 已啟用，住家儲存格式: " + provider.getName());
     }
 
     @Override
     public void onDisable() {
-        this.getLogger().info("[prj_Toka]正在關閉 傳送");
+        if (provider != null) { provider.close(false); provider = null; }
     }
 
     private void registerEvents() {
@@ -74,17 +74,15 @@ public class Main extends PluginBase implements Listener {
     }
 
     public void reload() {
-        //Utils.init(this);
-        //ConfigProvider.init(this);
-        //TODO:經濟串接
-        //Economy.init(this,ConfigProvider.getString("PreferEconomy"));
-        //TODO:增加多種存儲格式
-        provider = new YamlDataProvider(this);
-
-        //ConfigProvider.set("Provider",provider.getName());
-        //ConfigProvider.set("PreferEconomy",Economy.getApi().toString());
-        //getLogger().notice(Utils.translate("current.provider",provider.getName()));
-        //getLogger().notice(Utils.translate("current.economy",Economy.getApi().toString()));
+        saveDefaultConfig();
+        reloadConfig();
+        if (provider != null) { provider.close(false); provider = null; }
+        String format = getConfig().getNested("storage.type", "yaml");
+        try {
+            provider = new BaseDataProvider(StorageManager.open(getDataFolder().toPath(), format), format);
+        } catch (java.io.IOException | RuntimeException e) {
+            throw new IllegalStateException("住家資料無法開啟；請檢查設定與資料檔，勿刪除原始資料。", e);
+        }
     }
 
     @EventHandler

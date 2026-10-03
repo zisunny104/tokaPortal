@@ -7,10 +7,10 @@ import dev.toka.pl.tokaPortal.form.home.HomeDelForm;
 import dev.toka.pl.tokaPortal.form.home.HomeEditListForm;
 import dev.toka.pl.tokaPortal.form.home.HomeListForm;
 import dev.toka.pl.tokaPortal.form.home.HomeSetForm;
-import prj.toka.zero.player.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.setHome;
-import static prj.toka.zero.player.Players.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
 
 public class HomeCommand extends Command {
 
@@ -20,16 +20,15 @@ public class HomeCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.PLAYERS, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.REGIONS)) return false;
         if (sender instanceof Player) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);
-            if (player.getName().equals("Ethan940114") || pli.isTopQuanXian()) {
-                //TODO 刪掉
+            if (player.isOp() || pli.isTopQuanXian()) {
                 if (args.length > 0) {
                     switch (args[0].toLowerCase()) {
                         case "set":
                             if (args.length == 2) {
-                                player.sendMessage("[DEBUG]args.length" + args.length);
                                 setHome(player, args[1]);
                             } else {
                                 player.showFormWindow(new HomeSetForm());
@@ -54,7 +53,7 @@ public class HomeCommand extends Command {
                 }
                 return true;
             } else {
-                player.sendMessage("[傳送]實驗功能 尚未開發完成!");
+                player.sendMessage("[傳送]住家功能僅限管理員使用。");
                 return false;
             }
         } else {

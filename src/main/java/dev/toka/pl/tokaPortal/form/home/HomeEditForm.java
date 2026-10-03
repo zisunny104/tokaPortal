@@ -16,7 +16,6 @@ public class HomeEditForm extends FormWindowSimple implements BaseForm {
         super(TITLE_PORTAL_HOME_EDIT.replace("%name", name),
                 "請選擇要對住家進行的動作");
         this.name = name;
-        this.addButton(new ElementButton("更改名稱"));
         this.addButton(new ElementButton("刪除住家"));
         this.addButton(new ElementButton("返回列表"));
     }
@@ -29,8 +28,6 @@ public class HomeEditForm extends FormWindowSimple implements BaseForm {
             case "刪除住家":
                 player.showFormWindow(new HomeDelForm(name));
                 break;
-            case "更改名稱":
-                player.sendMessage("[傳送]這項功能還沒有被寫出來喔((");
             case "返回列表":
             default:
                 player.showFormWindow(new HomeEditListForm(player));

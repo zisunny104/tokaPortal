@@ -5,16 +5,13 @@ name: tokaPortal
 main: dev.toka.pl.tokaPortal.Main
 
 #插件版本
-version: "1.0.7"
+version: "2.0.0"
 
 #核心API版本
 api: ["1.0.11"]
 
 #插件載入選項[POSTWORLD, STARTUP]
 load: POSTWORLD
-
-#插件作者
-author: zisunny104
 
 #插件描述
 description: "[prjToka]傳送插件"
@@ -24,3 +21,4 @@ description: "[prjToka]傳送插件"
 
 #插件依賴
 #depend: []
+softdepend: [zero]

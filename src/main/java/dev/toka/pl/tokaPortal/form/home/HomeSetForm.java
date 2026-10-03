@@ -22,6 +22,5 @@ public class HomeSetForm extends FormWindowCustom implements BaseForm {
 
     @Override
     public void onFormClose(PlayerFormRespondedEvent event) {
-        //TODO 關閉回到指定頁面
     }
 }

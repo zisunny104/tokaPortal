@@ -5,13 +5,13 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.Player;
-import prj.toka.zero.player.PlayerInfo;
-import prj.toka.zero.ser.land.Land;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land;
 
 import static dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalLandListWindow;
-import static prj.toka.zero.player.Players.getPlayerInfo;
-import static prj.toka.zero.ser.land.Land.getLand;
-import static prj.toka.zero.ser.land.Land.toLand;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land.getLand;
+import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land.toLand;
 
 public class TplCommand extends Command {
 
@@ -25,8 +25,10 @@ public class TplCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.LAND)) return false;
         if (!sender.isPlayer()) {
             sender.sendMessage("[傳送]請在遊戲內進行");
+            return false;
         }
         Player player = Server.getInstance().getPlayer(sender.getName());
         PlayerInfo pli = getPlayerInfo(player);

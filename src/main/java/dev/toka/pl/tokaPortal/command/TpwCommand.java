@@ -19,7 +19,8 @@ public class TpwCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        Player player = Server.getInstance().getPlayer(sender.getName());
+        if (!(sender instanceof Player)) { sender.sendMessage("[傳送]請在遊戲內進行"); return false; }
+        Player player = (Player) sender;
         if (args.length > 0) {
             Level world = Server.getInstance().getLevelByName(args[0]);
             if (player.isOp()) {
