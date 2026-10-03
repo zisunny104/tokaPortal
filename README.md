@@ -1,6 +1,6 @@
 # tokaPortal
 
-**tokaPortal 2.0.0** 是 **Nukkit PetteriM1 Edition（PM1E）伺服器的傳送插件**，安裝於伺服器端，為伺服器內的玩家提供傳送功能。伺服器需要使用 **Java 21**。
+**tokaPortal 2.1.0** 是 **Nukkit PetteriM1 Edition（PM1E）伺服器的傳送插件**，安裝於伺服器端，為伺服器內的玩家提供傳送功能。伺服器需要使用 **Java 21**。
 
 玩家可以向其他人提出傳送請求，透過 `/back` 和 `/next` 回到先前的位置；管理員也能傳送到指定世界。輸入 `/portal` 即可開啟傳送選單。
 
@@ -11,7 +11,7 @@
 目前已驗證的環境為 Java 21 與 [Nukkit PetteriM1 Edition 發行版 4511](https://github.com/PetteriM1/NukkitPetteriM1Edition/releases/tag/4511)。其他 Nukkit 分支尚未驗證。
 
 1. 停止伺服器，確認啟動伺服器的 Java 版本為 21。
-2. 將 `tokaPortal-2.0.0.jar` 放入伺服器的 `plugins/` 目錄。
+2. 將 `tokaPortal-2.1.0.jar` 放入伺服器的 `plugins/` 目錄。
 3. 需要住家或領地等功能時，一併安裝相容的 zero 插件。
 4. 啟動伺服器，確認 tokaPortal 已啟用，再於遊戲內輸入 `/portal`。
 
@@ -33,6 +33,8 @@
 | `/back` | 返回前一個傳送位置 |
 | `/next` | 前往下一個傳送位置 |
 | `/portal help` | 顯示傳送紀錄指令提示 |
+
+指令輸入介面會提示 `/tpw` 的世界名稱與 `/tpa` 的線上玩家名稱；世界清單包含已載入及 `worlds/` 內可辨識的世界，也可手動輸入名稱。玩家進出或世界載入、卸載時會更新提示。
 
 例如，輸入 `/tpa Steve` 後，對方會收到同意或拒絕的選單。一般玩家必須取得對方同意；未安裝 zero 時，OP 可直接傳送。若有相容的 zero 玩家權限功能，則依其權限規則處理。
 
@@ -56,6 +58,8 @@ zero 必須提供本專案使用的 `prj.toka.zero` 功能介面；同名插件�
 傳送選單也可顯示 zero 提供的商店、區域與城市通入口。插件會分別檢查各項功能，缺少或不相容的項目會隱藏；直接執行相關指令時，會說明停用原因。zero 停用或功能呼叫失敗時，其他可用功能仍會繼續運作，既有住家資料也會保留。
 
 若 zero 在 `plugin.yml` 宣告的名稱不是 `zero`，請將其實際名稱加入 tokaPortal 的 `softdepend`，確保載入順序正確。
+
+`/home` 會提示 `list`、`set`、`del`、`edit`；`/tph` 與 `/home del` 只提示自己的住家。新增或刪除住家後會更新清單，`/home set` 的新名稱可自由輸入。提示的選取方式依 Bedrock 客戶端而定。
 
 ### 使用限制
 
@@ -94,7 +98,7 @@ bStats 用於了解插件使用情況，收集版本、玩家數量、Java 與�
 
 首次建置需連線下載依賴。若 JDK 或 Maven 安裝位置與腳本預設值不同，可透過 `-JdkHome` 與 `-Maven` 指定路徑。
 
-可部署的 JAR：`output/tokaPortal-2.0.0.jar`。建置腳本會執行測試；`output/` 與建置快取不納入 Git。
+可部署的 JAR：`output/tokaPortal-2.1.0.jar`。建置腳本會執行測試；`output/` 與建置快取不納入 Git。
 
 ## 驗證範圍與問題回報
 

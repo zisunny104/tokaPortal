@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.level.Level;
 
 public class TpwCommand extends Command {
@@ -15,6 +16,17 @@ public class TpwCommand extends Command {
         this.commandParameters.put("def", new CommandParameter[]{
                 new CommandParameter("世界名稱", false)
         });
+    }
+
+    @Override
+    public CommandDataVersions generateCustomCommandData(Player player) {
+        if (!player.isOp()) return null;
+        var data = super.generateCustomCommandData(player);
+        var names = CommandSuggestions.worldNames();
+        var manual = new CommandParameter[]{CommandParameter.newType("世界名稱", cn.nukkit.command.data.CommandParamType.STRING)};
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
+        return CommandSuggestions.parameters(data,
+                new CommandParameter[]{CommandSuggestions.names("世界名稱", false, "TokaPortalWorlds", names)}, manual);
     }
 
     @Override

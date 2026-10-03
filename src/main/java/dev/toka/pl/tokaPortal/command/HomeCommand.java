@@ -3,6 +3,10 @@ package dev.toka.pl.tokaPortal.command;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandDataVersions;
+import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandParamType;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
 import dev.toka.pl.tokaPortal.form.home.HomeDelForm;
 import dev.toka.pl.tokaPortal.form.home.HomeEditListForm;
 import dev.toka.pl.tokaPortal.form.home.HomeListForm;
@@ -16,6 +20,25 @@ public class HomeCommand extends Command {
 
     public HomeCommand() {
         super("home", "住家系統指令");
+        commandParameters.clear();
+    }
+
+    @Override
+    public CommandDataVersions generateCustomCommandData(Player player) {
+        if (!ZeroIntegration.has(ZeroIntegration.Feature.PLAYERS)
+                || !ZeroIntegration.has(ZeroIntegration.Feature.REGIONS)) return null;
+        if (!player.isOp() && !getPlayerInfo(player).isTopQuanXian()) return null;
+        var data = super.generateCustomCommandData(player);
+        var names = CommandSuggestions.homeNames(player);
+        var basic = new CommandParameter[]{CommandSuggestions.names("操作", true, "TokaPortalHomeView", java.util.List.of("list", "edit"))};
+        var set = new CommandParameter[]{CommandSuggestions.names("操作", false, "TokaPortalHomeSet", java.util.List.of("set")),
+                CommandParameter.newType("新住家名稱", true, CommandParamType.STRING)};
+        var del = new CommandParameter[]{CommandSuggestions.names("操作", false, "TokaPortalHomeDelete", java.util.List.of("del")),
+                CommandParameter.newType("住家名稱", true, CommandParamType.STRING)};
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, basic, set, del);
+        return CommandSuggestions.parameters(data, basic, set, del,
+                new CommandParameter[]{CommandSuggestions.names("操作", false, "TokaPortalHomeDelete", java.util.List.of("del")),
+                        CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", names)});
     }
 
     @Override

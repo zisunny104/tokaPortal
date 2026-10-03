@@ -184,6 +184,7 @@ public class Portal implements Listener {
                     return;
                 }
                 pli.sendText("[傳送]已成功設定住家'%name'!".replace("%name", name));
+                player.sendCommandData();
                 return;
             }
         }
@@ -211,6 +212,7 @@ public class Portal implements Listener {
                 return;
             }
             pli.sendText("[傳送]成功刪除住家!");
+            player.sendCommandData();
             return;
         }
         pli.sendText("[傳送]發生未知的錯誤!本次並未造成任何修改。");

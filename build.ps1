@@ -27,7 +27,7 @@ try {
     & $Maven @common package
     if ($LASTEXITCODE) { throw 'Build failed. See Maven errors above.' }
     New-Item -ItemType Directory -Force output | Out-Null
-    Copy-Item -LiteralPath 'target/tokaPortal-2.0.0.jar' -Destination 'output/tokaPortal-2.0.0.jar'
+    Copy-Item -LiteralPath 'target/tokaPortal-2.1.0.jar' -Destination 'output/tokaPortal-2.1.0.jar'
 } finally {
     $env:JAVA_HOME = $previousJava
     $env:PATH = $previousPath

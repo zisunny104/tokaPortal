@@ -57,6 +57,7 @@ public class Main extends PluginBase implements Listener {
         this.getServer().getPluginManager().registerEvents(new Portal(), this);
         this.getServer().getPluginManager().registerEvents(new PortalHistory(), this);
         this.getServer().getPluginManager().registerEvents(new PortalWindow(), this);
+        this.getServer().getPluginManager().registerEvents(new CommandSuggestionUpdater(), this);
     }
 
     private void registerCommandMap() {

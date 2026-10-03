@@ -4,6 +4,9 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.CommandDataVersions;
+import cn.nukkit.command.data.CommandParamType;
+import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
 import dev.toka.pl.tokaPortal.form.home.HomeListForm;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
@@ -19,8 +22,21 @@ public class TphCommand extends Command {
         super("tph", "傳送至住家");
         this.commandParameters.clear();
         this.commandParameters.put("def", new CommandParameter[]{
-                new CommandParameter("住家名稱", false)
+                new CommandParameter("住家名稱", true)
         });
+    }
+
+    @Override
+    public CommandDataVersions generateCustomCommandData(Player player) {
+        if (!ZeroIntegration.has(ZeroIntegration.Feature.PLAYERS)
+                || !ZeroIntegration.has(ZeroIntegration.Feature.REGIONS)) return null;
+        if (!player.isOp() && !getPlayerInfo(player).isTopQuanXian()) return null;
+        var data = super.generateCustomCommandData(player);
+        var names = CommandSuggestions.homeNames(player);
+        var manual = new CommandParameter[]{CommandParameter.newType("住家名稱", true, CommandParamType.STRING)};
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
+        return CommandSuggestions.parameters(data,
+                new CommandParameter[]{CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", names)}, manual);
     }
 
     @Override
