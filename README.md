@@ -1,6 +1,6 @@
 # tokaPortal
 
-**tokaPortal 2.1.1** 是 **Nukkit PetteriM1 Edition（PM1E）伺服器的傳送插件**，安裝於伺服器端，為伺服器內的玩家提供傳送功能。伺服器需要使用 **Java 21**。
+**tokaPortal 2.1.1** 是 **Nukkit 伺服器的傳送插件**，安裝於伺服器端，提供玩家傳送功能，使用 **Java 21**。目前已驗證 PM1E 4511；其他 Nukkit 分支的相容性仍待驗證。
 
 玩家可以向其他人提出傳送請求，透過 `/back` 和 `/next` 回到先前的位置；管理員也能傳送到指定世界。輸入 `/portal` 即可開啟傳送選單。
 
