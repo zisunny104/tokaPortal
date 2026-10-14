@@ -11,6 +11,34 @@ import java.util.*;
 public final class StorageManager {
     private StorageManager() {}
 
+    public static HomeStorage openConfigured(Path folder,Map<String,Object> config)throws IOException {
+        Object raw=config.get("storage");
+        if(raw!=null&&!(raw instanceof Map<?,?>))throw new IOException("storage 設定必須是物件。");
+        Map<?,?> settings=raw instanceof Map<?,?> map?map:Map.of();
+        Object backend=settings.get("backend");
+        if(backend==null&&settings.get("type")!=null) {
+            String legacy=Objects.toString(settings.get("type"),"").toLowerCase(Locale.ROOT);
+            if(!Set.of("yaml","sqlite").contains(legacy))throw new IOException("舊 storage.type 僅支援 yaml/sqlite。");
+            Path state=folder.resolve("storage-state.txt");
+            if(Files.exists(state)&&!Files.readString(state).strip().equals(legacy))throw new IOException("請停服並明確搬遷；不得只修改 storage.type 切換格式。");
+            String other=legacy.equals("yaml")?"sqlite":"yaml";
+            if(!Files.exists(file(folder,legacy))&&Files.exists(file(folder,other)))throw new IOException("存在另一種舊住家資料，請明確搬遷。");
+            if(Files.exists(folder.resolve("storage/active-backend.txt")))throw new IOException("已啟用 tokaStorage；不能回讀過期 legacy 資料。");
+            return open(folder,legacy);
+        }
+        String selected=Objects.toString(backend,"sqlite").toLowerCase(Locale.ROOT);
+        dev.toka.storage.Backend format;
+        try{format=dev.toka.storage.Backend.valueOf(selected.toUpperCase(Locale.ROOT));}catch(IllegalArgumentException error){throw new IOException("storage.backend 僅支援 sqlite/json/yaml。",error);}
+        Path root=folder.resolve("storage"),target=root.resolve(selected),marker=root.resolve("active-backend.txt");
+        if(Files.exists(marker)&&!Files.readString(marker).strip().equals(selected))throw new IOException("tokaStorage backend 已啟用；請明確離線搬遷，不可只改設定。");
+        boolean legacy=Files.exists(folder.resolve("data.yml"))||Files.exists(folder.resolve("homes.db"));
+        if(legacy&&!Files.exists(target.resolve("legacy-import.ok")))throw new IOException("存在舊住家資料，請先明確離線匯入 tokaStorage。");
+        if(!Files.exists(marker))for(String candidate:List.of("sqlite","json","yaml"))if(!candidate.equals(selected)&&Files.exists(root.resolve(candidate)))throw new IOException("發現另一種 tokaStorage 目錄；請明確核對後搬遷。");
+        TokaHomeStorage storage=new TokaHomeStorage(target,format);
+        try {storage.save(storage.load());HomeStorage.writeAtomic(marker,selected.getBytes(StandardCharsets.UTF_8));return storage;}
+        catch(IOException|RuntimeException error){try{storage.close();}catch(IOException cleanup){error.addSuppressed(cleanup);}throw error;}
+    }
+
     public static HomeStorage open(Path folder, String format) throws IOException {
         String selected = format.toLowerCase(Locale.ROOT);
         if (!Set.of("yaml", "sqlite").contains(selected)) throw new IOException("storage.type 僅支援 yaml 或 sqlite。");

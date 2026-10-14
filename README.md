@@ -1,6 +1,6 @@
 # tokaPortal
 
-**tokaPortal 2.1.0** 是 **Nukkit PetteriM1 Edition（PM1E）伺服器的傳送插件**，安裝於伺服器端，為伺服器內的玩家提供傳送功能。伺服器需要使用 **Java 21**。
+**tokaPortal 2.1.1** 是 **Nukkit PetteriM1 Edition（PM1E）伺服器的傳送插件**，安裝於伺服器端，為伺服器內的玩家提供傳送功能。伺服器需要使用 **Java 21**。
 
 玩家可以向其他人提出傳送請求，透過 `/back` 和 `/next` 回到先前的位置；管理員也能傳送到指定世界。輸入 `/portal` 即可開啟傳送選單。
 
@@ -11,7 +11,7 @@
 目前已驗證的環境為 Java 21 與 [Nukkit PetteriM1 Edition 發行版 4511](https://github.com/PetteriM1/NukkitPetteriM1Edition/releases/tag/4511)。其他 Nukkit 分支尚未驗證。
 
 1. 停止伺服器，確認啟動伺服器的 Java 版本為 21。
-2. 將 `tokaPortal-2.1.0.jar` 放入伺服器的 `plugins/` 目錄。
+2. 將 `tokaPortal-2.1.1.jar` 放入伺服器的 `plugins/` 目錄。
 3. 需要住家或領地等功能時，一併安裝相容的 zero 插件。
 4. 啟動伺服器，確認 tokaPortal 已啟用，再於遊戲內輸入 `/portal`。
 
@@ -98,7 +98,7 @@ bStats 用於了解插件使用情況，收集版本、玩家數量、Java 與�
 
 首次建置需連線下載依賴。若 JDK 或 Maven 安裝位置與腳本預設值不同，可透過 `-JdkHome` 與 `-Maven` 指定路徑。
 
-可部署的 JAR：`output/tokaPortal-2.1.0.jar`。建置腳本會執行測試；`output/` 與建置快取不納入 Git。
+可部署的 JAR：`output/tokaPortal-2.1.1.jar`。建置腳本會執行測試；`output/` 與建置快取不納入 Git。
 
 ## 驗證範圍與問題回報
 
@@ -115,3 +115,10 @@ bStats 用於了解插件使用情況，收集版本、玩家數量、Java 與�
 本專案採用 [MIT License](LICENSE)，授權全文位於專案根目錄的 `LICENSE`。散布時須保留著作權與授權聲明。
 
 第三方元件的授權、來源查核範圍與 GPL 核心散布注意事項，請參閱 [第三方授權聲明](THIRD_PARTY_NOTICES.md)。JAR 亦附有相關授權文件。
+
+
+## 2.1.1 儲存交接
+
+新安裝使用 tokaStorage 0.1.1，預設 SQLite，另支援 JSON／YAML；library 私有打包，不需另裝插件。既有 storage.type 保留舊格式，改 backend 前須停服明確匯入。請先閱讀 [儲存與離線搬遷](docs/storage-2.1.1.md)。
+
+16 個測試與三後端的 PM1E 4511 載入、儲存、重載、刪除測試通過。與 zero 1.7.8、tokaWorlds 1.0.2 的住家更名、引用連動及模擬失敗還原也通過；沒有真玩家或正式 MySQL 驗證。住家名稱／擁有者尚未完成 Profiles UUID 搬遷，不宣稱已全部解耦。
