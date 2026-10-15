@@ -30,6 +30,14 @@ public class Main extends PluginBase implements Listener {
     public void onEnable() {
         instance = this;
         dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize();
+        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
+            // zero may be enabled after this plugin; check again once all plugins are up
+            getServer().getScheduler().scheduleDelayedTask(this, () -> {
+                if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
+                    dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize();
+                }
+            }, 40);
+        }
         reload();
 
         this.registerEvents();

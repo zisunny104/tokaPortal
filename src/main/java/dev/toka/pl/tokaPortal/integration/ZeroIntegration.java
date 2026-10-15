@@ -23,6 +23,11 @@ public final class ZeroIntegration {
 
     private ZeroIntegration() {}
 
+    /** True when the zero plugin was found and enabled at the last {@link #initialize()}. */
+    public static boolean isLinked() {
+        return zero != null;
+    }
+
     public static void initialize() {
         available.clear();
         zero = null;
