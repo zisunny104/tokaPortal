@@ -78,7 +78,7 @@ storage:
 
 YAML 儲存於 `data.yml`，SQLite 儲存於 `homes.db`。修改格式後重新啟動，插件會先備份現用資料，再轉換並核對內容。原始檔與 `.backup-*` 備份會保留；請保留 `storage-state.txt`，它記錄目前使用的格式。請勿在伺服器運行時編輯資料檔。
 
-兩種格式都保留座標精度與自訂欄位，目前未提供 JSON 儲存選項。SQLite 只寫入變更的紀錄，YAML 每次重新寫入整份資料；實際效能取決於住家數量與硬碟，少量資料通常差異不大。
+兩種舊格式都保留座標精度與自訂欄位；舊格式只有 YAML 與 SQLite。新安裝改用 tokaStorage，三種格式（SQLite、JSON、YAML）都可以選，見下方「2.1.1 儲存交接」。SQLite 只寫入變更的紀錄，YAML 每次重新寫入整份資料；實際效能取決於住家數量與硬碟，少量資料通常差異不大。
 
 資料缺漏、格式錯誤或轉換失敗時，插件會停止啟動並留下錯誤訊息，避免覆寫原始資料。更新或搬移前請備份完整資料目錄；傳送點、領地與區域資料由 zero 管理，須另外備份。
 
@@ -117,6 +117,6 @@ YAML 儲存於 `data.yml`，SQLite 儲存於 `homes.db`。修改格式後重新�
 
 ## 2.1.1 儲存交接
 
-新安裝使用 tokaStorage 0.1.1，預設 SQLite，另支援 JSON／YAML；library 私有打包，不需另裝插件。既有 storage.type 保留舊格式，改 backend 前須停服明確匯入。請先閱讀 [儲存與離線搬遷](docs/storage-2.1.1.md)。
+新安裝使用 tokaStorage 0.1.3，預設 SQLite，另支援 JSON／YAML（`storage.backend: sqlite｜json｜yaml`）；library 私有打包，不需另裝插件。既有 storage.type 保留舊格式，改 backend 前須停服明確匯入。請先閱讀 [儲存與離線搬遷](docs/storage-2.1.1.md)。
 
 16 個測試與三後端的 PM1E 4511 載入、儲存、重載、刪除測試通過。與 zero 1.7.8、tokaWorlds 1.0.2 的住家更名、引用連動及模擬失敗還原也通過；沒有真玩家或正式 MySQL 驗證。住家名稱／擁有者尚未完成 Profiles UUID 搬遷，不宣稱已全部解耦。
