@@ -15,16 +15,12 @@ try {
     $env:JAVA_HOME = $JdkHome
     $env:PATH = "$JdkHome/bin;$env:PATH"
     if (!(Test-Path $Maven)) { throw "Maven missing: $Maven" }
-    New-Item -ItemType Directory -Force .build-tools | Out-Null
-    $core = '.build-tools/Nukkit-PM1E.jar'
-    if (!(Test-Path $core)) {
-        Invoke-WebRequest 'https://github.com/PetteriM1/NukkitPetteriM1Edition/releases/download/4511/Nukkit-PM1E.jar' -OutFile $core
-    }
-    $expected = '67CEC0084ED161BB558AB2C103DD15B0939A258F39A0FF5CB98E5DE896A86ACD'
-    if ((Get-FileHash $core -Algorithm SHA256).Hash -ne $expected) { throw 'PM1E 4511 checksum mismatch.' }
+    $core = Join-Path (Split-Path $PSScriptRoot -Parent) 'Nukkit/target/nukkit-1.0-SNAPSHOT.jar'
+    if (!(Test-Path $core)) { throw "Nukkit jar missing, build it first: $core" }
+    Write-Host ("Nukkit core: {0} {1}" -f $core, (Get-FileHash $core -Algorithm SHA256).Hash)
     $common = @('-B', '-ntp', "-Dmaven.repo.local=$Repository")
-    & $Maven @common 'org.apache.maven.plugins:maven-install-plugin:3.1.4:install-file' "-Dfile=$core" '-DgroupId=cn.nukkit' '-DartifactId=Nukkit' '-Dversion=PM1E-4511' '-Dpackaging=jar' '-DgeneratePom=true'
-    if ($LASTEXITCODE) { throw 'PM1E dependency installation failed.' }
+    & $Maven @common 'org.apache.maven.plugins:maven-install-plugin:3.1.4:install-file' "-Dfile=$core" '-DgroupId=cn.nukkit' '-DartifactId=Nukkit' '-Dversion=1.0-SNAPSHOT' '-Dpackaging=jar' '-DgeneratePom=true'
+    if ($LASTEXITCODE) { throw 'Nukkit dependency installation failed.' }
     & $Maven @common package
     if ($LASTEXITCODE) { throw 'Build failed. See Maven errors above.' }
     New-Item -ItemType Directory -Force output | Out-Null

@@ -31,21 +31,6 @@
 
 此查核核對官方倉庫 LICENSE，未對歷史 1.5.2.1-PN 的所有檔案做逐一來源追溯。
 
-## bStats-Metrics
-
-- 上游：https://github.com/Bastian/bStats-Metrics
-- 查得授權：MIT。
-- 授權來源：https://github.com/Bastian/bStats-Metrics/blob/cb92d2653c5aa478599c5638c446371d247d6123/LICENSE
-- 上游聲明：Copyright (c) 2021 Bastian Oppermann。
-- 授權全文：[licenses/bstats-MIT.txt](licenses/bstats-MIT.txt)。
-- 對應檔案：`src/main/java/dev/toka/pl/tokaPortal/bstats/MetricsLite.java`。
-
-本專案包含舊版 Nukkit 移植程式，後續修改包括改用公開服務註冊 API，以避開 Java 21 不相容反射。
-已確認 bStats-Metrics 客戶端上游的 MIT 條款，但原專案未記錄此 Nukkit 移植版本的來源 URL 或完整修改歷史，無法確認所有移植修改的來源。
-保留上游聲明不等於此來源缺口已完成查核；取得移植來源後仍需核對是否有額外條款或著作權聲明。
-
-建置產物包含 `META-INF/licenses/bstats-MIT.txt` 與本文件，不會用 tokaPortal 的著作權聲明取代上游聲明。
-
 ## zero
 
 僅確認程式以反射使用 `prj.toka.zero` API。尚未取得 zero 的實際 JAR、原始碼或授權文件，授權未定。

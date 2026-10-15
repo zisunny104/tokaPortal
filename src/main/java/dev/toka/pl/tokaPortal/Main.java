@@ -4,7 +4,6 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.plugin.PluginBase;
-import dev.toka.pl.tokaPortal.bstats.MetricsLite;
 import dev.toka.pl.tokaPortal.command.*;
 import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
@@ -32,15 +31,6 @@ public class Main extends PluginBase implements Listener {
         instance = this;
         dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize();
         reload();
-
-        try {
-            if (Boolean.TRUE.equals(getConfig().getNested("metrics.enabled", false))) {
-                MetricsLite metricsLite = new MetricsLite(this);
-                if (metricsLite.isEnabled()) getLogger().info("[bStats]已允許傳送資料");
-            }
-        } catch (RuntimeException | LinkageError e) {
-            getLogger().warning("bStats 無法啟動，傳送功能繼續運作: " + e);
-        }
 
         this.registerEvents();
         this.registerCommandMap();

@@ -10,7 +10,7 @@ results=[]
 for backend in ('sqlite','json','yaml'):
     work=run/backend;(work/'plugins/tokaPortal').mkdir(parents=True)
     shutil.copy2(jar,work/'plugins/tokaPortal.jar')
-    (work/'plugins/tokaPortal/config.yml').write_text('storage:\n  backend: '+backend+'\nmetrics:\n  enabled: false\n',encoding='utf-8')
+    (work/'plugins/tokaPortal/config.yml').write_text('storage:\n  backend: '+backend+'\n',encoding='utf-8')
     with zipfile.ZipFile(work/'plugins/StorageProbe.jar','w') as z:
         for file in classes.rglob('*.class'):z.write(file,file.relative_to(classes).as_posix())
         z.writestr('plugin.yml','name: StorageProbe\nmain: StorageProbe\nversion: "0.1"\napi: ["1.0.4"]\nload: POSTWORLD\nsoftdepend: [tokaPortal]\n')
