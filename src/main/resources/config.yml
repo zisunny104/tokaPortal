@@ -2,3 +2,11 @@
 # 舊設定的 storage.type 維持原資料；切換需停服明確匯入。
 storage:
   backend: sqlite
+
+wild:
+  worlds: [ZiYuan]
+  cooldown-seconds: 40
+  radius: 375
+  attempts: 16
+  show-cooldown: true
+

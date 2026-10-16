@@ -48,7 +48,6 @@ class CommandSuggestionsTest {
                 new CommandParameter[]{CommandSuggestions.names("世界名稱", false, "TokaPortalWorlds", List.of("world", "世界"))},
                 new CommandParameter[]{CommandParameter.newType("世界名稱", CommandParamType.STRING)});
         AvailableCommandsPacket packet = new AvailableCommandsPacket();
-        packet.protocol = ProtocolInfo.CURRENT_PROTOCOL;
         packet.commands = new LinkedHashMap<>();
         packet.commands.put("tpw", metadata);
         assertDoesNotThrow(packet::encode);

@@ -17,6 +17,8 @@ public class Main extends PluginBase implements Listener {
 
     private static Main instance;
     private static IDataProvider provider;
+    private dev.toka.pl.tokaPortal.wild.WildService wildService;
+    public dev.toka.pl.tokaPortal.wild.WildService getWildService(){return wildService;}
 
     public static Main getInstance() {
         return instance;
@@ -40,6 +42,8 @@ public class Main extends PluginBase implements Listener {
         }
         reload();
 
+        wildService=new dev.toka.pl.tokaPortal.wild.WildService(this);
+        getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);
         this.registerEvents();
         this.registerCommandMap();
         getLogger().info("tokaPortal 已啟用，住家儲存格式: " + provider.getName());
@@ -47,6 +51,7 @@ public class Main extends PluginBase implements Listener {
 
     @Override
     public void onDisable() {
+        if(wildService!=null)wildService.close();
         if (provider != null) { provider.close(false); provider = null; }
     }
 
@@ -98,3 +103,4 @@ public class Main extends PluginBase implements Listener {
 
 
 }
+
