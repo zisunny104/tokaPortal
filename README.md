@@ -67,20 +67,29 @@ zero 必須提供本專案使用的 `prj.toka.zero` 功能介面；同名插件�
 
 住家指令僅限 OP 或 zero 最高權限玩家使用，只能管理及傳送至自己的住家，並須在允許的區域新增住家。住家更名與跨伺服器目的地管理尚未提供。
 
-目前沒有可供權限插件配置的獨立權限節點。住家允許區域與隨機傳送世界名稱等限制仍寫在原始碼中。
+目前沒有可供權限插件配置的獨立權限節點。住家允許區域等限制仍寫在原始碼中；`/wild` 可使用的世界、冷卻與範圍已改為設定檔（`wild.*`）。
 
 ## 資料與統計
 
-設定檔位於 `plugins/tokaPortal/config.yml`。住家資料預設使用 YAML；資料較多時可選擇 SQLite：
+設定檔位於 `plugins/tokaPortal/config.yml`。住家資料有兩種儲存方式，**請先看自己的設定檔是哪一種**：
+
+**1. 新安裝：共用的 tokaStorage，預設 SQLite**（另可選 JSON、YAML），設定是 `storage.backend`：
 
 ```yaml
 storage:
-  type: yaml # 可用 yaml 或 sqlite
+  backend: sqlite # sqlite、json 或 yaml
 ```
 
-YAML 儲存於 `data.yml`，SQLite 儲存於 `homes.db`。修改格式後重新啟動，插件會先備份現用資料，再轉換並核對內容。原始檔與 `.backup-*` 備份會保留；請保留 `storage-state.txt`，它記錄目前使用的格式。請勿在伺服器運行時編輯資料檔。
+**2. 舊設定：`storage.type`**，只有 YAML 與 SQLite，保留原本的資料檔：
 
-兩種舊格式都保留座標精度與自訂欄位；舊格式只有 YAML 與 SQLite。新安裝改用 tokaStorage，三種格式（SQLite、JSON、YAML）都可以選，見下方「2.1.1 儲存交接」。SQLite 只寫入變更的紀錄，YAML 每次重新寫入整份資料；實際效能取決於住家數量與硬碟，少量資料通常差異不大。
+```yaml
+storage:
+  type: sqlite # yaml 或 sqlite
+```
+
+舊設定的 YAML 儲存於 `data.yml`，SQLite 儲存於 `homes.db`。我們的正式伺服器目前就是這一種（`storage.type: sqlite`，住家在 `homes.db`）。更改格式要停服，不能只改設定就當作搬完：舊設定修改後重新啟動，插件會先備份現用資料，再轉換並核對內容；原始檔與 `.backup-*` 備份會保留；請保留 `storage-state.txt`，它記錄目前使用的格式。請勿在伺服器運行時編輯資料檔。
+
+舊格式保留座標精度與自訂欄位。SQLite 只寫入變更的紀錄，YAML 每次重新寫入整份資料；實際效能取決於住家數量與硬碟，少量資料通常差異不大。新安裝使用 tokaStorage 的細節見下方「2.1.1 儲存交接」。
 
 資料缺漏、格式錯誤或轉換失敗時，插件會停止啟動並留下錯誤訊息，避免覆寫原始資料。更新或搬移前請備份完整資料目錄；傳送點、領地與區域資料由 zero 管理，須另外備份。
 
