@@ -46,7 +46,6 @@ public class Main extends PluginBase implements Listener {
         getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);
         this.registerEvents();
         this.registerCommandMap();
-        getLogger().info("tokaPortal 已啟用，住家儲存格式: " + provider.getName());
     }
 
     @Override
