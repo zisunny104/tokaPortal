@@ -80,9 +80,12 @@ public class Main extends PluginBase implements Listener {
         saveDefaultConfig();
         reloadConfig();
         if (provider != null) { provider.close(false); provider = null; }
-        String format = getConfig().getNested("storage.backend", getConfig().getNested("storage.type", "sqlite"));
+        String format = getConfig().getNested("storage.backend", "sqlite");
         try {
-            provider = new BaseDataProvider(StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll()), format);
+            var storage = StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll());
+            int homes = storage.load().getList("homes").size();
+            provider = new BaseDataProvider(storage, format);
+            getLogger().info("載入住家共 " + homes + " 個");
         } catch (java.io.IOException | RuntimeException e) {
             throw new IllegalStateException("住家資料無法開啟；請檢查設定與資料檔，勿刪除原始資料。", e);
         }

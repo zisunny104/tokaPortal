@@ -18,22 +18,22 @@ class TokaHomeStorageTest {
         try(HomeStorage storage=StorageManager.openConfigured(folder,new ConfigSection())){storage.save(data());}
         assertTrue(Files.isRegularFile(folder.resolve("storage/sqlite/documents.sqlite")));ConfigSection yaml=new ConfigSection();yaml.set("storage",Map.of("backend","yaml"));assertThrows(IOException.class,()->StorageManager.openConfigured(folder,yaml));assertFalse(Files.exists(folder.resolve("storage/yaml")));
     }
-    @Test void existingLegacyConfigKeepsDataUntilExplicitImport()throws Exception {
-        try(HomeStorage storage=new YamlHomeStorage(folder.resolve("data.yml"))){storage.save(data());}
-        byte[] source=Files.readAllBytes(folder.resolve("data.yml"));ConfigSection legacy=new ConfigSection();legacy.set("storage",Map.of("type","yaml"));try(HomeStorage storage=StorageManager.openConfigured(folder,legacy)){verify(storage.load());}
-        assertThrows(IOException.class,()->StorageManager.openConfigured(folder,new ConfigSection()));assertArrayEquals(source,Files.readAllBytes(folder.resolve("data.yml")));
+    @Test void oldFilesOfTheLegacyFormatAreIgnored()throws Exception {
+        Files.writeString(folder.resolve("data.yml"),"homes: [broken]");Files.writeString(folder.resolve("homes.db"),"not a database");
+        byte[] yaml=Files.readAllBytes(folder.resolve("data.yml"));byte[] db=Files.readAllBytes(folder.resolve("homes.db"));
+        try(HomeStorage storage=StorageManager.openConfigured(folder,new ConfigSection())){storage.save(data());verify(storage.load());}
+        assertArrayEquals(yaml,Files.readAllBytes(folder.resolve("data.yml")));assertArrayEquals(db,Files.readAllBytes(folder.resolve("homes.db")));
     }
-    @Test void legacyImportEachSourceEachTargetPreservesOriginalAndBackup()throws Exception {
-        for(String source:List.of("yaml","sqlite"))for(Backend target:Backend.values()){
-            Path dir=Files.createDirectory(folder.resolve(source+target));Path sourcePath=dir.resolve(source.equals("yaml")?"data.yml":"homes.db");try(HomeStorage storage=source.equals("yaml")?new YamlHomeStorage(sourcePath):new SqliteHomeStorage(sourcePath)){storage.save(data());}
-            byte[] before=Files.readAllBytes(sourcePath);var result=LegacyHomeImport.migrate(dir,source,target,folder.resolve("backups"));assertArrayEquals(before,Files.readAllBytes(sourcePath));assertArrayEquals(before,Files.readAllBytes(result.backup()));
-            ConfigSection config=new ConfigSection();config.set("storage",Map.of("backend",target.name().toLowerCase(Locale.ROOT)));try(HomeStorage storage=StorageManager.openConfigured(dir,config)){verify(storage.load());}
-            assertThrows(IOException.class,()->LegacyHomeImport.migrate(dir,source,target,folder.resolve("backups")));
-            ConfigSection old=new ConfigSection();old.set("storage",Map.of("type",source));assertThrows(IOException.class,()->StorageManager.openConfigured(dir,old));
-        }
+    @Test void theOldStorageTypeIsRefusedWithAClearMessage()throws Exception {
+        ConfigSection old=new ConfigSection();old.set("storage",Map.of("type","sqlite"));
+        IOException error=assertThrows(IOException.class,()->StorageManager.openConfigured(folder,old));
+        assertTrue(error.getMessage().contains("storage.backend"));assertFalse(Files.exists(folder.resolve("storage")));
     }
-    @Test void brokenSourceAndExistingTargetRemainUntouched()throws Exception {
-        Files.writeString(folder.resolve("data.yml"),"homes: [broken]");byte[] original=Files.readAllBytes(folder.resolve("data.yml"));assertThrows(IOException.class,()->LegacyHomeImport.migrate(folder,"yaml",Backend.SQLITE,folder.resolve("backups")));assertArrayEquals(original,Files.readAllBytes(folder.resolve("data.yml")));assertFalse(Files.exists(folder.resolve("storage/sqlite")));
-        Files.createDirectories(folder.resolve("storage/sqlite"));Files.writeString(folder.resolve("storage/sqlite/keep"),"original");assertThrows(IOException.class,()->LegacyHomeImport.migrate(folder,"yaml",Backend.SQLITE,folder.resolve("backups")));assertEquals("original",Files.readString(folder.resolve("storage/sqlite/keep")));
+    @Test void theBackendThatWasUsedIsKeptAndOtherDirectoriesAreNotMistaken()throws Exception {
+        try(HomeStorage storage=StorageManager.openConfigured(folder,new ConfigSection())){storage.save(data());}
+        assertEquals("sqlite",Files.readString(folder.resolve("storage/active-backend.txt")).strip());
+        try(HomeStorage storage=StorageManager.openConfigured(folder,new ConfigSection())){verify(storage.load());}
+        Path other=Files.createDirectory(folder.resolve("other"));Files.createDirectories(other.resolve("storage/json"));
+        assertThrows(IOException.class,()->StorageManager.openConfigured(other,new ConfigSection()));
     }
 }
