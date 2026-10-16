@@ -1,30 +1,28 @@
-# Maven / Java build output
+# Build output
 /target/
 /out/
 /output/
 *.class
 
-# Downloaded build tools, dependencies and isolated test servers
+# Downloaded build tools and isolated test servers
 /.build-tools/
 
-# IntelliJ personal settings and generated project files
+# IntelliJ IDEA
+.idea/
 *.iml
-/.idea/workspace.xml
-/.idea/tasks.xml
-/.idea/usage.statistics.xml
-/.idea/dataSources.local.xml
-/.idea/httpRequests/
-/.idea/shelf/
-/.idea/libraries/
-/.idea/artifacts/
+*.ipr
+*.iws
 
-# Local logs, crash reports and editor temporary files
+# Logs, crash reports and temporary files
+logs/
 *.log
 hs_err_pid*
 replay_pid*
 *.tmp
 *.swp
 *~
+
+# Operating system files
 .DS_Store
 Thumbs.db
 
