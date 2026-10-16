@@ -29,6 +29,14 @@ public final class ZeroIntegration {
     }
 
     public static void initialize() {
+        initialize(true);
+    }
+
+    /**
+     * @param finalAttempt false for the first check at start, when zero may not be enabled yet: nothing is reported
+     *                     as missing, the second check reports it
+     */
+    public static void initialize(boolean finalAttempt) {
         available.clear();
         zero = null;
         for (Plugin plugin : Server.getInstance().getPluginManager().getPlugins().values()) {
@@ -66,11 +74,19 @@ public final class ZeroIntegration {
                     {"player.Players", "getPlayerInfo", "cn.nukkit.Player"},
                     {"player.PlayerInfo", "getBossBarLength"}, {"player.PlayerInfo", "reBossBarLength"}});
         }
-        Main.getInstance().getLogger().info("zero 可用整合: " + available);
+        if (zero == null && !finalAttempt) {
+            Main.getInstance().getLogger().info("§7等待 zero 載入，稍後再檢查整合");
+            return;
+        }
+        if (zero == null) {
+            Main.getInstance().getLogger().warning("§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、隨機傳送等）");
+            return;
+        }
+        Main.getInstance().getLogger().info("§b載入 zero 可用整合共 §a" + available.size() + " §b個：§f" + available);
         if (!has(Feature.PLAYERS) || !has(Feature.REGIONS))
-            Main.getInstance().getLogger().warning("zero 玩家/區域 API 不可用，已關閉住家管理及住家傳送。");
+            Main.getInstance().getLogger().warning("§ezero 玩家/區域 API 不可用，已關閉住家管理及住家傳送。");
         for (Feature feature : Feature.values()) if (!has(feature))
-            Main.getInstance().getLogger().warning("已關閉 zero 功能: " + feature);
+            Main.getInstance().getLogger().warning("§e已關閉 zero 功能：" + feature);
     }
 
     private static void check(Feature feature, String[][] signatures) {

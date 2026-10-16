@@ -31,12 +31,12 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize();
+        dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize(false);
         if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
             // zero may be enabled after this plugin; check again once all plugins are up
             getServer().getScheduler().scheduleDelayedTask(this, () -> {
                 if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
-                    dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize();
+                    dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize(true);
                 }
             }, 40);
         }
@@ -85,7 +85,7 @@ public class Main extends PluginBase implements Listener {
             var storage = StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll());
             int homes = storage.load().getList("homes").size();
             provider = new BaseDataProvider(storage, format);
-            getLogger().info("載入住家共 " + homes + " 個");
+            getLogger().info("§b載入住家共 §a" + homes + " §b個");
         } catch (java.io.IOException | RuntimeException e) {
             throw new IllegalStateException("住家資料無法開啟；請檢查設定與資料檔，勿刪除原始資料。", e);
         }
