@@ -1,5 +1,7 @@
 # tokaPortal
 
+整體拆分現況只維護於 [拆分主文件](https://github.com/zisunny104/tokaProfiles/blob/main/docs/ARCHITECTURE.md)；本 README 維護本專案的設定、API 與使用限制。
+
 **tokaPortal 2.1.1** 是 **Nukkit 伺服器的傳送插件**，安裝於伺服器端，提供玩家傳送功能，使用 **Java 21**。目前已驗證 PM1E 4511；其他 Nukkit 分支的相容性仍待驗證。
 
 玩家可以向其他人提出傳送請求，透過 `/back` 和 `/next` 回到先前的位置；管理員也能傳送到指定世界。輸入 `/portal` 即可開啟傳送選單。
@@ -120,3 +122,4 @@ YAML 儲存於 `data.yml`，SQLite 儲存於 `homes.db`。修改格式後重新�
 新安裝使用 tokaStorage 0.1.3，預設 SQLite，另支援 JSON／YAML（`storage.backend: sqlite｜json｜yaml`）；library 私有打包，不需另裝插件。既有 storage.type 保留舊格式，改 backend 前須停服明確匯入。請先閱讀 [儲存與離線搬遷](docs/storage-2.1.1.md)。
 
 16 個測試與三後端的 PM1E 4511 載入、儲存、重載、刪除測試通過。與 zero 1.7.8、tokaWorlds 1.0.2 的住家更名、引用連動及模擬失敗還原也通過；沒有真玩家或正式 MySQL 驗證。住家名稱／擁有者尚未完成 Profiles UUID 搬遷，不宣稱已全部解耦。
+
