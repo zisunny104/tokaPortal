@@ -29,14 +29,26 @@ public final class WildService {
   }
   player.sendMessage("[傳送]暫時找不到安全落點，沒有扣除冷卻，請稍後再試");
  }
+ private final java.util.Set<UUID> shown=new java.util.HashSet<>();
+ /** The cooldown is one pinned line under the base information of the boss bar, and it drives the bar. */
  public void render(){
   var active=cooldowns.players();
   var display=plugin.getServer().getPluginManager().getPlugin("tokaDisplay");if(display==null||!display.isEnabled()||!plugin.getConfig().getBoolean("wild.show-cooldown",true))return;
   for(UUID uuid:active){
    Player player=plugin.getServer().getOnlinePlayers().get(uuid);if(player==null)continue;
    long left=remainingMillis(uuid);float progress=Math.max(0,Math.min(100,100f-left*100f/(seconds()*1000f)));
-   try{display.getClass().getMethod("bossBar",Player.class,String.class,String.class,float.class,int.class,int.class).invoke(null,player,"portal:wild","[隨機傳送]冷卻剩餘 "+((left+999)/1000)+" 秒",progress,100,25);}
-   catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){/* Display cannot change business readiness. */}
+   String text="[隨機傳送]冷卻剩餘 "+((left+999)/1000)+" 秒";
+   try{
+    try{display.getClass().getMethod("pin",Player.class,String.class,String.class,int.class,int.class,float.class,String.class).invoke(null,player,"portal:wild",text,3,10,progress,plugin.getConfig().getString("wild.bar-color","cooldown"));}
+    catch(NoSuchMethodException older){display.getClass().getMethod("bossBar",Player.class,String.class,String.class,float.class,int.class,int.class).invoke(null,player,"portal:wild",text,progress,100,25);}
+    shown.add(uuid);
+   }catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){/* Display cannot change business readiness. */}
+  }
+  for(var uuid:new java.util.ArrayList<>(shown)){
+   if(active.contains(uuid))continue;
+   shown.remove(uuid);Player player=plugin.getServer().getOnlinePlayers().get(uuid);if(player==null)continue;
+   try{display.getClass().getMethod("unpin",Player.class,String.class).invoke(null,player,"portal:wild");}
+   catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){/* The line goes away by itself after its time. */}
   }
  }
  public void close(){cooldowns.clear();var display=plugin.getServer().getPluginManager().getPlugin("tokaDisplay");if(display!=null&&display.isEnabled())try{display.getClass().getMethod("removeSource",String.class).invoke(null,"portal:wild");}catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){}}

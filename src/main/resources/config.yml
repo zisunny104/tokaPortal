@@ -5,11 +5,13 @@ storage:
 
 # /wild（隨機傳送）：只有在 worlds 列出的世界內可以使用，填世界名稱（資料夾名稱），可以列多個。
 # 例如 worlds: [resource, nether]；列表是空的就沒有任何世界可以使用。
-# cooldown-seconds：冷卻秒數；radius：以目前位置為中心的隨機範圍（格）；attempts：找不到安全落點時最多重試幾次。
+# cooldown-seconds：冷卻秒數；radius：以目前位置為中心的隨機範圍（格）；attempts：找不到安全落點時最多重試幾次；show-cooldown：冷卻中是否在血條下面顯示一行冷卻，並用血條表示冷卻進度。
 wild:
   worlds: [resource]
   cooldown-seconds: 40
   radius: 375
   attempts: 16
   show-cooldown: true
+  # 冷卻中血條的顏色：tokaDisplay 的 7 種顏色之一，或它 config.yml 裡 colors 的別名；空白則用預設顏色。
+  bar-color: cooldown
 
