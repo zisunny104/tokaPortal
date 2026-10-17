@@ -21,6 +21,7 @@ public class PortalCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "portal"); return true; }
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);
