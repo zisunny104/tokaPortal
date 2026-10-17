@@ -19,29 +19,29 @@ public interface HomeStorage extends AutoCloseable {
     @Override default void close() throws IOException {}
 
     static ConfigSection validate(Object value) throws IOException {
-        if (!(value instanceof Map<?, ?> map)) throw new IOException("住家資料必須是物件。");
+        if (!(value instanceof Map<?, ?> map)) throw new IOException("Home data must be an object.");
         ConfigSection root = new ConfigSection(toMap(map));
         Object entries = root.get("homes");
-        if (!(entries instanceof List<?> list)) throw new IOException("住家資料缺少 homes 列表。");
+        if (!(entries instanceof List<?> list)) throw new IOException("Home data has no homes list.");
         Set<String> names = new HashSet<>();
         for (Object entry : list) {
-            if (!(entry instanceof Map<?, ?> home)) throw new IOException("住家資料格式不正確。");
+            if (!(entry instanceof Map<?, ?> home)) throw new IOException("Home entry has an invalid format.");
             String name = requiredString(home, "name");
-            if (!names.add(name)) throw new IOException("住家名稱重複: " + name);
+            if (!names.add(name)) throw new IOException("Duplicate home name: " + name);
             requiredString(home, "creator");
             requiredString(home, "type");
-            if (!(home.get("loc") instanceof Map<?, ?> location)) throw new IOException("住家缺少位置: " + name);
+            if (!(home.get("loc") instanceof Map<?, ?> location)) throw new IOException("Home has no location: " + name);
             requiredString(location, "level");
             for (String coordinate : List.of("x", "y", "z", "yaw", "pitch")) {
                 if (!(location.get(coordinate) instanceof Number number) || !Double.isFinite(number.doubleValue()))
-                    throw new IOException("住家位置無效: " + name + "/" + coordinate);
+                    throw new IOException("Invalid home location: " + name + "/" + coordinate);
             }
         }
         return root;
     }
 
     private static String requiredString(Map<?, ?> map, String key) throws IOException {
-        if (!(map.get(key) instanceof String text) || text.isBlank()) throw new IOException("資料欄位無效: " + key);
+        if (!(map.get(key) instanceof String text) || text.isBlank()) throw new IOException("Invalid data field: " + key);
         return text;
     }
 
@@ -50,10 +50,10 @@ public interface HomeStorage extends AutoCloseable {
     }
 
     private static LinkedHashMap<String, Object> toMap(Map<?, ?> map, Set<Object> visiting, int depth) throws IOException {
-        if (depth > 50 || !visiting.add(map)) throw new IOException("資料包含循環參照或過多巢狀欄位。");
+        if (depth > 50 || !visiting.add(map)) throw new IOException("Data has a reference cycle or too many nested fields.");
         LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
         for (var entry : map.entrySet()) {
-            if (!(entry.getKey() instanceof String key)) throw new IOException("資料欄位名稱必須是字串。");
+            if (!(entry.getKey() instanceof String key)) throw new IOException("Data field names must be strings.");
             copy.put(key, plain(entry.getValue(), visiting, depth + 1));
         }
         visiting.remove(map);
@@ -61,10 +61,10 @@ public interface HomeStorage extends AutoCloseable {
     }
 
     private static Object plain(Object value, Set<Object> visiting, int depth) throws IOException {
-        if (depth > 50) throw new IOException("資料包含過多巢狀欄位。");
+        if (depth > 50) throw new IOException("Data has too many nested fields.");
         if (value instanceof Map<?, ?> map) return toMap(map, visiting, depth);
         if (value instanceof List<?> list) {
-            if (!visiting.add(list)) throw new IOException("資料包含循環參照。");
+            if (!visiting.add(list)) throw new IOException("Data has a reference cycle.");
             List<Object> copy = new ArrayList<>();
             for (Object item : list) copy.add(plain(item, visiting, depth + 1));
             visiting.remove(list);
@@ -72,7 +72,7 @@ public interface HomeStorage extends AutoCloseable {
         }
         if (value == null || value instanceof String || value instanceof Boolean) return value;
         if (value instanceof Number number && Double.isFinite(number.doubleValue())) return value;
-        throw new IOException("資料包含不支援的值: " + value.getClass().getSimpleName());
+        throw new IOException("Data has an unsupported value: " + value.getClass().getSimpleName());
     }
 
     static ConfigSection empty() {

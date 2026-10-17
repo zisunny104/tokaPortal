@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -14,7 +15,8 @@ import static dev.toka.pl.tokaPortal.point.teleportPoint.*;
 public class PortalCommand extends Command {
 
     public PortalCommand() {
-        super("portal", "傳送系統指令");
+        super("portal", Main.text("cmd.portal.desc"));
+        this.setUsage(Main.text("cmd.portal.usage"));
     }
 
     @Override
@@ -27,8 +29,8 @@ public class PortalCommand extends Command {
                 switch (args[0].toLowerCase()) {
                     case "tpp":
                     case "point": {
-                        if (!player.hasPermission("tokaPortal.points.manage")) { player.sendMessage("[傳送]權限不足。"); return false; }
-                        if (args.length < 2) { player.sendMessage("/portal point <set|del> <名稱> [類型]"); return false; }
+                        if (!player.hasPermission("tokaPortal.points.manage")) { player.sendMessage(Main.text("err.noPermission")); return false; }
+                        if (args.length < 2) { player.sendMessage(Main.text("msg.point.usage")); return false; }
                         if (args[1] != null) {
                             switch (args[1].toLowerCase()) {
                                 case "add":
@@ -44,16 +46,15 @@ public class PortalCommand extends Command {
 
                                         if (getPoint(name) == null) {
                                             if (!setTeleportPoint(name, pl, type, info, location)) {
-                                                player.sendMessage("[傳送]傳送點建立失敗，整合功能已關閉。");
+                                                player.sendMessage(Main.text("err.point.createDisabled"));
                                                 return false;
                                             }
-                                            pli.sendText("[傳送]傳送點 %name 建立成功"
-                                                    .replace("%name", name));
+                                            pli.sendText(Main.text("msg.point.created", name));
                                         } else {
-                                            pli.sendText("[傳送]傳送點建立失敗(重名)");
+                                            pli.sendText(Main.text("err.point.duplicate"));
                                         }
                                     } else {
-                                        pli.sendText("[傳送]傳送點建立失敗 請輸入有效名稱");
+                                        pli.sendText(Main.text("err.point.nameInvalid"));
                                     }
                                     break;
                                 }
@@ -65,19 +66,18 @@ public class PortalCommand extends Command {
                                         if (point != null) {
                                             if (point.getCreator().equals(pl) || player.isOp()) {
                                                 if (!delTeleportPoint(point)) {
-                                                    player.sendMessage("[傳送]傳送點刪除失敗，整合功能已關閉。");
+                                                    player.sendMessage(Main.text("err.point.deleteDisabled"));
                                                     return false;
                                                 }
-                                                pli.sendText("[傳送]傳送點 %name 成功移除"
-                                                        .replace("%name", name));
+                                                pli.sendText(Main.text("msg.point.deleted", name));
                                             } else {
-                                                pli.sendText("[傳送]傳送點刪除失敗 權限不足");
+                                                pli.sendText(Main.text("err.point.deleteDenied"));
                                             }
                                         } else {
-                                            pli.sendText("[傳送]傳送點刪除失敗 傳送點不存在");
+                                            pli.sendText(Main.text("err.point.deleteNotFound"));
                                         }
                                     } else {
-                                        pli.sendText("[傳送]傳送點刪除失敗 請輸入有效名稱");
+                                        pli.sendText(Main.text("err.point.deleteNameInvalid"));
                                     }
                                     break;
                                 }
@@ -87,12 +87,12 @@ public class PortalCommand extends Command {
                     }
 
                     case "server": {
-                        player.sendMessage("[傳送]尚未提供跨伺服器目的地管理功能。");
+                        player.sendMessage(Main.text("msg.portal.serverUnavailable"));
                         break;
                     }
 
                     case "help": {
-                        sender.sendMessage("/back - 返回前次傳送點\n/next - 前往下個傳送點");
+                        Main.help(sender, "portal");
                         break;
                     }
                 }
@@ -101,7 +101,7 @@ public class PortalCommand extends Command {
             }
             return true;
         } else {
-            sender.sendMessage("僅供遊戲內使用");
+            sender.sendMessage(Main.text("err.playerOnly"));
             return false;
         }
     }

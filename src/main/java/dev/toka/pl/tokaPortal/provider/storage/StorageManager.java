@@ -21,12 +21,12 @@ public final class StorageManager {
     public static HomeStorage openConfigured(Path folder, Map<String, Object> config) throws IOException {
         Object raw = config.get("storage");
         if (raw != null && !(raw instanceof Map<?, ?>)) {
-            throw new IOException("storage 設定必須是物件。");
+            throw new IOException("The storage setting must be an object.");
         }
         Map<?, ?> settings = raw instanceof Map<?, ?> map ? map : Map.of();
         Object backend = settings.get("backend");
         if (backend == null && settings.get("type") != null) {
-            throw new IOException("設定檔還是舊的 storage.type，已不再支援；請改成 storage.backend: sqlite、json 或 yaml。");
+            throw new IOException("The legacy storage.type is no longer supported; use storage.backend: sqlite, json or yaml.");
         }
 
         String selected = Objects.toString(backend, "sqlite").toLowerCase(Locale.ROOT);
@@ -34,19 +34,19 @@ public final class StorageManager {
         try {
             format = dev.toka.storage.Backend.valueOf(selected.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException error) {
-            throw new IOException("storage.backend 僅支援 sqlite/json/yaml。", error);
+            throw new IOException("storage.backend supports only sqlite, json or yaml.", error);
         }
 
         Path root = folder.resolve("storage");
         Path target = root.resolve(selected);
         Path marker = root.resolve("active-backend.txt");
         if (Files.exists(marker) && !Files.readString(marker).strip().equals(selected)) {
-            throw new IOException("tokaStorage backend 已啟用；請明確離線搬遷，不可只改設定。");
+            throw new IOException("A tokaStorage backend is already active; migrate explicitly while offline, do not only change the setting.");
         }
         if (!Files.exists(marker)) {
             for (String candidate : List.of("sqlite", "json", "yaml")) {
                 if (!candidate.equals(selected) && Files.exists(root.resolve(candidate))) {
-                    throw new IOException("發現另一種 tokaStorage 目錄；請明確核對後搬遷。");
+                    throw new IOException("Found a different tokaStorage directory; verify it and migrate explicitly.");
                 }
             }
         }

@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -19,10 +20,11 @@ import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
 public class TphCommand extends Command {
 
     public TphCommand() {
-        super("tph", "傳送至住家");
+        super("tph", Main.text("cmd.tph.desc"));
+        this.setUsage(Main.text("cmd.tph.usage"));
         this.commandParameters.clear();
         this.commandParameters.put("def", new CommandParameter[]{
-                new CommandParameter("住家名稱", true)
+                new CommandParameter(Main.text("param.homeName"), true)
         });
     }
 
@@ -33,17 +35,18 @@ public class TphCommand extends Command {
         if (!player.isOp() && !getPlayerInfo(player).isTopQuanXian()) return null;
         var data = super.generateCustomCommandData(player);
         var names = CommandSuggestions.homeNames(player);
-        var manual = new CommandParameter[]{CommandParameter.newType("住家名稱", true, CommandParamType.STRING)};
+        var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.homeName"), true, CommandParamType.STRING)};
         if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", names)}, manual);
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.homeName"), true, "TokaPortalHomes", names)}, manual);
     }
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tph"); return true; }
         if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.PLAYERS, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.REGIONS)) return false;
         if (!(sender instanceof Player)) {
-            sender.sendMessage("[傳送]請在遊戲內進行");
+            sender.sendMessage(Main.text("err.playerOnly"));
             return false;
         }
         Player player = (Player) sender;
@@ -58,12 +61,12 @@ public class TphCommand extends Command {
 
                     return true;
                 }
-                pli.sendText("[傳送]住家 " + name + " 無法傳送(不存在)");
+                pli.sendText(Main.text("err.home.notFound", name));
             } else {
                 player.showFormWindow(new HomeListForm(player));
             }
         } else {
-            player.sendMessage("[傳送]住家功能僅限管理員使用。");
+            player.sendMessage(Main.text("err.homeAdminOnly"));
             return false;
         }
         return false;

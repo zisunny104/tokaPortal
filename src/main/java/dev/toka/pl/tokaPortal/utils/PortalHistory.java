@@ -7,6 +7,7 @@ import cn.nukkit.event.player.PlayerDeathEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.level.Location;
+import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.event.PlayerPortalEvent;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
 
@@ -28,12 +29,12 @@ public class PortalHistory implements Listener {
         PlayerInfo pli = getPlayerInfo(player);
 
         if (pli.isPortalStatus()) {
-            pli.sendText("§a[傳送]§b請等待冷卻時間結束後, \n再次進行傳送");
+            pli.sendText(Main.text("err.portalCooldown"));
             return false;
         }
 
         if (portalHistoryMap.get(player) == null) {
-            pli.sendText("[傳送]尚無傳送紀錄。");
+            pli.sendText(Main.text("err.history.none"));
             return false;
         }
 
@@ -43,14 +44,14 @@ public class PortalHistory implements Listener {
         if (!Objects.equals(status, NEXT) && !Objects.equals(status, BACK)) return false;
         int target = Objects.equals(status, NEXT) ? historyStatus + 1 : historyStatus - 1;
         if (target < 0 || target >= historyList.size()) {
-            pli.sendText("[傳送]沒有可前往的傳送紀錄。");
+            pli.sendText(Main.text("err.history.noTarget"));
             return false;
         }
         Location loc = historyList.get(target);
-        if (loc.getLevel() == null) { pli.sendText("[傳送]紀錄的世界尚未載入。"); return false; }
-        String toInfo = Objects.equals(status, NEXT) ? "下個傳送位置" : "前次傳送位置";
+        if (loc.getLevel() == null) { pli.sendText(Main.text("err.history.worldNotLoaded")); return false; }
+        String toInfo = Objects.equals(status, NEXT) ? Main.text("status.history.next") : Main.text("status.history.back");
 
-        PlayerPortalEvent ev = new PlayerPortalEvent(pli, "目前位置", toInfo, player.getLocation(), loc, false);
+        PlayerPortalEvent ev = new PlayerPortalEvent(pli, Main.text("status.here"), toInfo, player.getLocation(), loc, false);
         callEvent(ev);
         if (!ev.isCancelled()) {
             Location playerBeforeTeleport = player.getLocation().clone();
@@ -60,7 +61,7 @@ public class PortalHistory implements Listener {
             if (!success) return false;
             if (historyStatus == historyList.size()) historyList.add(playerBeforeTeleport);
             portalHistoryStatusMap.put(player, target);
-            pli.sendText("§a[傳送]§b已返回" + toInfo);
+            pli.sendText(Main.text("msg.history.arrived", toInfo));
             return true;
         }
         return false;

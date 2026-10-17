@@ -2,7 +2,7 @@
 
 整體拆分現況只維護於 [拆分主文件](https://github.com/zisunny104/zero/blob/master/docs/ARCHITECTURE.md)；本 README 維護本專案的設定、API 與使用限制。
 
-**tokaPortal 2.2.2** 是 **Nukkit 伺服器的傳送插件**，安裝於伺服器端，提供玩家傳送功能，使用 **Java 21**。目前已驗證 PM1E 4511；其他 Nukkit 分支的相容性仍待驗證。
+**tokaPortal 2.3.0** 是 **Nukkit 伺服器的傳送插件**，安裝於伺服器端，提供玩家傳送功能，使用 **Java 21**。目前已驗證 PM1E 4511；其他 Nukkit 分支的相容性仍待驗證。
 
 玩家可以向其他人提出傳送請求，透過 `/back` 和 `/next` 回到先前的位置；管理員也能傳送到指定世界。輸入 `/portal` 即可開啟傳送選單。
 
@@ -13,7 +13,7 @@
 目前已驗證的環境為 Java 21 與 [Nukkit PetteriM1 Edition 發行版 4511](https://github.com/PetteriM1/NukkitPetteriM1Edition/releases/tag/4511)。其他 Nukkit 分支尚未驗證。
 
 1. 停止伺服器，確認啟動伺服器的 Java 版本為 21。
-2. 將 `tokaPortal-2.2.2.jar` 放入伺服器的 `plugins/` 目錄。
+2. 將 `tokaPortal-2.3.0.jar` 放入伺服器的 `plugins/` 目錄。
 3. 需要住家或領地等功能時，一併安裝相容的 zero 插件。
 4. 啟動伺服器，確認 tokaPortal 已啟用，再於遊戲內輸入 `/portal`。
 
@@ -98,7 +98,11 @@ storage:
 
 首次建置需連線下載依賴。若 JDK 或 Maven 安裝位置與腳本預設值不同，可透過 `-JdkHome` 與 `-Maven` 指定路徑。
 
-可部署的 JAR：`output/tokaPortal-2.2.2.jar`。建置腳本會執行測試；`output/` 與建置快取不納入 Git。
+可部署的 JAR：`output/tokaPortal-2.3.0.jar`。建置腳本會執行測試；`output/` 與建置快取不納入 Git。
+
+## 多語系
+
+所有玩家訊息、表單、指令說明與後台文字都放在 `lang/zh-TW.yml`（共用套件 tokaI18n，內嵌於 JAR）。`config.yml` 的 `language` 選擇語言，目前只提供繁體中文 `zh-TW`。伺服器擁有者可把同名檔放進 `plugins/tokaPortal/lang/` 覆蓋個別文字。每個指令都可用 `/<指令> help` 查看說明。key 分區與待確認事項見 [多語系說明](docs/I18N.md)。
 
 ## 驗證範圍與問題回報
 

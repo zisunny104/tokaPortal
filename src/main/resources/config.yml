@@ -1,17 +1,28 @@
-# 新安裝使用共用 tokaStorage，預設 SQLite。
-# 舊設定的 storage.type 維持原資料；切換需停服明確匯入。
+# tokaPortal 設定檔。修改後需重新啟動伺服器才會生效。
+
+# 顯示語言：決定插件訊息、表單與後台文字的語言（對應 lang/<語言>.yml）。
+# 目前只提供 zh-TW（繁體中文）；填入尚未提供的語言時，找不到的文字會退回 en-US，再退回顯示 key。
+# 伺服器擁有者可把同名檔放進 plugins/tokaPortal/lang/ 覆蓋個別文字。
+language: zh-TW
+
+# 資料儲存（住家與公共傳送點共用）：新安裝使用共用 tokaStorage，預設 SQLite。
+# 舊設定的 storage.type 維持原資料；切換儲存格式需停服並明確匯入，不能只改這裡。
 storage:
+  # backend 可填 sqlite、json、yaml。啟用後不要只改這個值來切換，插件會偵測到另一種儲存目錄並拒絕啟動。
   backend: sqlite
 
 # /wild（隨機傳送）：只有在 worlds 列出的世界內可以使用，填世界名稱（資料夾名稱），可以列多個。
 # 例如 worlds: [resource, nether]；列表是空的就沒有任何世界可以使用。
-# cooldown-seconds：冷卻秒數；radius：以目前位置為中心的隨機範圍（格）；attempts：找不到安全落點時最多重試幾次；show-cooldown：冷卻中是否在血條下面顯示一行冷卻，並用血條表示冷卻進度。
 wild:
+  # 可以使用 /wild 的世界名稱清單。
   worlds: [resource]
+  # 冷卻秒數：1 到 86400 的整數，預設 40。
   cooldown-seconds: 40
+  # 以目前位置為中心的隨機範圍（格）：1 到 10000 的整數，預設 375。
   radius: 375
+  # 找不到安全落點時最多重試幾次：1 到 64 的整數，預設 16。
   attempts: 16
+  # 冷卻中是否在血條下面顯示一行冷卻，並用血條表示冷卻進度（需要 tokaDisplay）。可填 true 或 false。
   show-cooldown: true
   # 冷卻中血條的顏色：tokaDisplay 的 7 種顏色之一，或它 config.yml 裡 colors 的別名；空白則用預設顏色。
   bar-color: cooldown
-

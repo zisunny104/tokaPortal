@@ -48,7 +48,7 @@ public class Portal implements Listener {
             return;
         }
         if (point == null) {
-            player.sendTitle("§c未知傳送點", "§e無法傳送");
+            player.sendTitle(Main.text("ui.title.unknownPoint"), Main.text("ui.title.cannotTeleport"));
             return;
         }
         portal(player, point.getLocation(), point.getInfo());
@@ -60,11 +60,11 @@ public class Portal implements Listener {
         }
         if (!canUseHome(player)) return;
         if (home == null) {
-            player.sendTitle("§c未知住家", "§e無法傳送");
+            player.sendTitle(Main.text("ui.title.unknownHome"), Main.text("ui.title.cannotTeleport"));
             return;
         }
         if (!home.isCreator(player)) {
-            player.sendTitle("§c無效住家", "§e無法傳送");
+            player.sendTitle(Main.text("ui.title.invalidHome"), Main.text("ui.title.cannotTeleport"));
             return;
         }
         portal(player, home.getLocation(), home.getName());
@@ -80,7 +80,7 @@ public class Portal implements Listener {
             return;
         }
         if (region == null) {
-            player.sendTitle("§c未知區域", "§e無法傳送");
+            player.sendTitle(Main.text("ui.title.unknownRegion"), Main.text("ui.title.cannotTeleport"));
             return;
         }
         portal(player, region.getTpr(), region.getInfo());
@@ -91,35 +91,29 @@ public class Portal implements Listener {
         PlayerInfo fromPli = getPlayerInfo(fromPlayer);
         PlayerInfo toPli = getPlayerInfo(toPlayer);
         if (fromPli.isTopQuanXian()) {
-            toPli.sendText("§a[傳送]§b玩家§e %1 §b即將傳送到你身邊!§r"
-                    .replace("%1", fromPlayer.getName()));
+            toPli.sendText(Main.text("msg.tpa.incoming", fromPlayer.getName()));
             if (portal(fromPlayer, toPlayer.getLocation(), toPlayer.getName()))
-                fromPli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r"
-                    .replace("%1", toPlayer.getName()));
+                fromPli.sendText(Main.text("msg.tpa.arrived", toPlayer.getName()));
             return;
         }
         if (fromPli.isHighQuanXian()) {
-            fromPli.sendText("§a[傳送]§b即將傳送至玩家§e %1 §b身邊§r"
-                    .replace("%1", toPlayer.getName()));
-            toPli.sendText("§a[傳送]§b玩家§e %1 §b即將傳送到你身邊!§r"
-                    .replace("%1", fromPlayer.getName()));
+            fromPli.sendText(Main.text("msg.tpa.soon", toPlayer.getName()));
+            toPli.sendText(Main.text("msg.tpa.incoming", fromPlayer.getName()));
             (new NukkitRunnable() {
                 public void run() {
                     if (!fromPlayer.isOnline() || !toPlayer.isOnline()) return;
                     if (portal(fromPlayer, toPlayer.getLocation(), toPli.getName()))
-                        fromPli.sendText("§a[傳送]§b您已傳送到玩家§e %1 §b身旁§r"
-                            .replace("%1", toPlayer.getName()));
+                        fromPli.sendText(Main.text("msg.tpa.arrived", toPlayer.getName()));
                     this.cancel();
                 }
             }).runTaskLater(Main.getInstance(), 30);
         } else {
             if (tpaMap.containsKey(toPlayer)) {
-                fromPli.sendText("[傳送]對方仍有待處理的傳送請求，請稍後再試。");
+                fromPli.sendText(Main.text("err.tpa.pending"));
                 return;
             }
             tpaMap.put(toPlayer, fromPlayer);
-            fromPli.sendText("§a[傳送]§b您已發送傳送要求給§e %1 §b請等待對方回應§r"
-                    .replace("%1", toPlayer.getName()));
+            fromPli.sendText(Main.text("msg.tpa.sent", toPlayer.getName()));
             sendPortalTpaAcceptWindow(toPlayer);
             Main.getInstance().getServer().getScheduler().scheduleDelayedTask(Main.getInstance(), () -> {
                 if (tpaMap.get(toPlayer) == fromPlayer) tpaMap.remove(toPlayer);
@@ -142,12 +136,12 @@ public class Portal implements Listener {
     }
 
     public static boolean portal(Player player, Location location) {
-        return portal(player, location, "傳送點");
+        return portal(player, location, Main.text("status.pointDefault"));
     }
 
     public static boolean portal(Player player, Location location, String title) {
         if (player == null || !player.isOnline() || location == null || location.getLevel() == null) {
-            if (player != null) player.sendMessage("[傳送]目的地世界尚未載入，無法傳送。");
+            if (player != null) player.sendMessage(Main.text("err.worldNotLoaded"));
             return false;
         }
         PlayerInfo pli = getPlayerInfo(player);
@@ -155,7 +149,7 @@ public class Portal implements Listener {
                 pli, pli.getRegionInfo(), title, player.getLocation(), location);
         if (callEvent(ev)) {
             if (!player.teleport(location)) return false;
-            player.sendTitle(title, "§b正在傳送...", 1, 20, 5);
+            player.sendTitle(title, Main.text("ui.title.teleporting"), 1, 20, 5);
             Effect effectBLINDNESS = getEffect(BLINDNESS).setVisible(false)
                     .setAmplifier(0).setDuration(40);
             player.addEffect(effectBLINDNESS);
@@ -168,34 +162,34 @@ public class Portal implements Listener {
         if (!canUseHome(player)) return;
         PlayerInfo pli = getPlayerInfo(player);
         if (name == null || name.isBlank()) {
-            pli.sendText("[傳送]住家名稱不得為空!");
+            pli.sendText(Main.text("err.home.nameEmpty"));
             return;
         }
         if (getProvider().getHomePoint(name) != null) {
-            pli.sendText("[傳送]已存在此名稱的住家，請更換一個名稱後再試。");
+            pli.sendText(Main.text("err.home.exists"));
             return;
         }
         if (pli.getRegion() != null) {
             if (canAddHomeRegionList.contains(pli.getRegion().getName())) {
                 try { getProvider().addHomePoint(name, player, player.getLocation()); }
                 catch (RuntimeException e) {
-                    Main.getInstance().getLogger().error("住家儲存失敗", e);
-                    pli.sendText("[傳送]資料儲存失敗，住家未建立。請聯絡管理員。");
+                    Main.getInstance().getLogger().error(Main.text("log.homes.saveFailed"), e);
+                    pli.sendText(Main.text("err.home.saveFailed"));
                     return;
                 }
-                pli.sendText("[傳送]已成功設定住家'%name'!".replace("%name", name));
+                pli.sendText(Main.text("msg.home.set", name));
                 player.sendCommandData();
                 return;
             }
         }
-        pli.sendText("[傳送]此區域無法設置住家。");
+        pli.sendText(Main.text("err.home.regionDenied"));
     }
 
     public static void delHome(Player player, String name) {
         PlayerInfo pli = getPlayerInfo(player);
         HomePoint point = getProvider().getHomePoint(name);
         if (point == null) {
-            pli.sendText("[傳送]找不到要刪除的住家!");
+            pli.sendText(Main.text("err.home.delNotFound"));
             return;
         }
         delHome(player, point);
@@ -207,21 +201,21 @@ public class Portal implements Listener {
         if (home != null && home.isCreator(player)) {
             try { getProvider().delHomePoint(home); }
             catch (RuntimeException e) {
-                Main.getInstance().getLogger().error("住家刪除失敗", e);
-                pli.sendText("[傳送]資料儲存失敗，住家未刪除。請聯絡管理員。");
+                Main.getInstance().getLogger().error(Main.text("log.homes.deleteFailed"), e);
+                pli.sendText(Main.text("err.home.deleteFailed"));
                 return;
             }
-            pli.sendText("[傳送]成功刪除住家!");
+            pli.sendText(Main.text("msg.home.deleted"));
             player.sendCommandData();
             return;
         }
-        pli.sendText("[傳送]發生未知的錯誤!本次並未造成任何修改。");
+        pli.sendText(Main.text("err.home.unknown"));
     }
 
     private static boolean canUseHome(Player player) {
         if (!ZeroIntegration.require(player, PLAYERS, REGIONS)) return false;
         if (player.isOp() || getPlayerInfo(player).isTopQuanXian()) return true;
-        player.sendMessage("[傳送]住家功能僅限管理員使用。");
+        player.sendMessage(Main.text("err.homeAdminOnly"));
         return false;
     }
 }

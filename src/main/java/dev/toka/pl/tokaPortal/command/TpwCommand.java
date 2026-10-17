@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
@@ -11,10 +12,11 @@ import cn.nukkit.level.Level;
 public class TpwCommand extends Command {
 
     public TpwCommand() {
-        super("tpw", "傳送到世界");
+        super("tpw", Main.text("cmd.tpw.desc"));
+        this.setUsage(Main.text("cmd.tpw.usage"));
         this.commandParameters.clear();
         this.commandParameters.put("def", new CommandParameter[]{
-                new CommandParameter("世界名稱", false)
+                new CommandParameter(Main.text("param.worldName"), false)
         });
     }
 
@@ -23,34 +25,35 @@ public class TpwCommand extends Command {
         if (!player.isOp()) return null;
         var data = super.generateCustomCommandData(player);
         var names = CommandSuggestions.worldNames();
-        var manual = new CommandParameter[]{CommandParameter.newType("世界名稱", cn.nukkit.command.data.CommandParamType.STRING)};
+        var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.worldName"), cn.nukkit.command.data.CommandParamType.STRING)};
         if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names("世界名稱", false, "TokaPortalWorlds", names)}, manual);
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.worldName"), false, "TokaPortalWorlds", names)}, manual);
     }
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (!(sender instanceof Player)) { sender.sendMessage("[傳送]請在遊戲內進行"); return false; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tpw"); return true; }
+        if (!(sender instanceof Player)) { sender.sendMessage(Main.text("err.playerOnly")); return false; }
         Player player = (Player) sender;
         if (args.length > 0) {
             Level world = Server.getInstance().getLevelByName(args[0]);
             if (player.isOp()) {
                 if (world != null) {
                     player.teleport(world.getSafeSpawn());
-                    player.sendMessage("[傳送]已傳送至世界 " + args[0]);
+                    player.sendMessage(Main.text("msg.world.arrived", args[0]));
                 } else {
                     Server.getInstance().loadLevel(args[0]);
                     world = Server.getInstance().getLevelByName(args[0]);
                     if (world != null) {
                         player.teleport(world.getSafeSpawn());
-                        player.sendMessage("[傳送]已載入並傳送至世界 " + args[0]);
+                        player.sendMessage(Main.text("msg.world.loadedArrived", args[0]));
                     } else {
-                        player.sendMessage("[傳送]世界 " + args[0] + " 無法傳送(錯誤的名稱或是未載入)");
+                        player.sendMessage(Main.text("err.world.cannotTeleport", args[0]));
                     }
                 }
             } else {
-                player.sendMessage("[傳送]權限不足");
+                player.sendMessage(Main.text("err.noPermission"));
             }
         }
         return false;

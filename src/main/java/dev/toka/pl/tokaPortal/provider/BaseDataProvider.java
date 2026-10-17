@@ -29,7 +29,7 @@ public class BaseDataProvider implements IDataProvider {
     public int addHomePoint(String name, Object creator, Location loc) {
         if (creator instanceof Player player) creator = player.getName();
         if (!(creator instanceof String owner)) return -1;
-        if (getHomePoint(name) != null) throw new IllegalArgumentException("住家名稱重複。");
+        if (getHomePoint(name) != null) throw new IllegalArgumentException("Duplicate home name.");
         int id = homes.keySet().stream().mapToInt(Integer::intValue).max().orElse(-1) + 1;
         Map<Integer, HomePoint> candidate = new LinkedHashMap<>(homes);
         candidate.put(id, new HomePoint(id, name, "home", owner, loc));
@@ -48,7 +48,7 @@ public class BaseDataProvider implements IDataProvider {
 
     @Override public boolean delHomePoint(Object value) {
         if (value instanceof HomePoint home) value = home.getId();
-        if (!(value instanceof Integer id)) throw new IllegalArgumentException("必須指定住家或住家編號。");
+        if (!(value instanceof Integer id)) throw new IllegalArgumentException("A home or a home id is required.");
         if (!homes.containsKey(id)) return false;
         Map<Integer, HomePoint> candidate = new LinkedHashMap<>(homes);
         candidate.remove(id);
@@ -61,7 +61,7 @@ public class BaseDataProvider implements IDataProvider {
         ConfigSection next = new ConfigSection(document);
         next.set("homes", new ArrayList<>(candidate.values().stream().map(HomePoint::getRawData).toList()));
         try { storage.save(next); }
-        catch (IOException e) { throw new IllegalStateException("住家資料儲存失敗。", e); }
+        catch (IOException e) { throw new IllegalStateException("Home data could not be saved.", e); }
         document = next;
     }
 
@@ -79,7 +79,7 @@ public class BaseDataProvider implements IDataProvider {
             homes = next;
             document = loaded;
             return this;
-        } catch (IOException e) { throw new IllegalStateException("住家資料載入失敗。", e); }
+        } catch (IOException e) { throw new IllegalStateException("Home data could not be loaded.", e); }
     }
     @Override public IDataProvider save() { persist(homes); return this; }
     @Override public IDataProvider close() { return close(true); }
@@ -87,7 +87,7 @@ public class BaseDataProvider implements IDataProvider {
         try { if (save) save(); }
         finally {
             try { storage.close(); }
-            catch (IOException e) { throw new IllegalStateException("住家資料關閉失敗。", e); }
+            catch (IOException e) { throw new IllegalStateException("Home data could not be closed.", e); }
         }
         return this;
     }

@@ -67,9 +67,9 @@ public class PlayerPortalEvent extends Event implements Cancellable {
     }
 
     public String toString() {
-        return "[傳送]" + pli.getNameTag() + "從'"
-                + fromInfo + "'(" + from.getFloorX() + "," + from.getFloorY() + "," + from.getFloorZ() + "," + from.level.getName() + ") 傳送至 ' "
-                + toInfo + "'(" + to.getFloorX() + "," + to.getFloorY() + "," + to.getFloorZ() + "," + to.level.getName() + ")";
+        return dev.toka.pl.tokaPortal.Main.text("log.portalEvent", pli.getNameTag(), fromInfo,
+                from.getFloorX() + "," + from.getFloorY() + "," + from.getFloorZ() + "," + from.level.getName(), toInfo,
+                to.getFloorX() + "," + to.getFloorY() + "," + to.getFloorZ() + "," + to.level.getName());
     }
 
 

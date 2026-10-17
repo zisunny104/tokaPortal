@@ -4,6 +4,8 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.command.CommandSender;
+import dev.toka.i18n.Messages;
 import dev.toka.pl.tokaPortal.command.*;
 import dev.toka.pl.tokaPortal.form.BaseForm;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
@@ -17,6 +19,7 @@ public class Main extends PluginBase implements Listener {
 
     private static Main instance;
     private static IDataProvider provider;
+    private Messages messages;
     private dev.toka.pl.tokaPortal.point.PublicPoints publicPoints;
     public dev.toka.pl.tokaPortal.point.PublicPoints getPublicPoints(){return publicPoints;}
     private dev.toka.pl.tokaPortal.wild.WildService wildService;
@@ -26,6 +29,26 @@ public class Main extends PluginBase implements Listener {
         return instance;
     }
 
+    /** The texts of the selected language. */
+    public Messages messages() {
+        return messages;
+    }
+
+    /** Text by key with ${0}, ${1} ... arguments; the key itself is returned before the plugin is enabled. */
+    public static String text(String key, Object... arguments) {
+        return instance == null || instance.messages == null ? key : instance.messages.text(key, arguments);
+    }
+
+    /** Every line of a multi-line text. */
+    public static java.util.List<String> lines(String key, Object... arguments) {
+        return instance == null || instance.messages == null ? java.util.List.of(key) : instance.messages.lines(key, arguments);
+    }
+
+    /** Sends the help text of a command (help.&lt;command&gt;) to the sender. */
+    public static void help(CommandSender sender, String command) {
+        for (String line : lines("help." + command)) sender.sendMessage(line);
+    }
+
     public static IDataProvider getProvider() {
         return provider;
     }
@@ -33,6 +56,8 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onEnable() {
         instance = this;
+        saveDefaultConfig();
+        messages = new Messages(getClass().getClassLoader(), getDataFolder().toPath(), getConfig().getString("language", "zh-TW"), line -> getLogger().warning(line));
         dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize(false);
         if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
             // zero may be enabled after this plugin; check again once all plugins are up
@@ -53,7 +78,7 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onDisable() {
         if(wildService!=null)wildService.close();
-        if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error("傳送點資料關閉失敗",e);} publicPoints=null;}
+        if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error(text("log.points.closeFailed"),e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
     }
 
@@ -82,7 +107,8 @@ public class Main extends PluginBase implements Listener {
     public void reload() {
         saveDefaultConfig();
         reloadConfig();
-        if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error("傳送點資料關閉失敗",e);} publicPoints=null;}
+        if (messages != null) messages.language(getConfig().getString("language", "zh-TW"));
+        if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error(text("log.points.closeFailed"),e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
         String format = getConfig().getNested("storage.backend", "sqlite");
         try {
@@ -90,11 +116,11 @@ public class Main extends PluginBase implements Listener {
             provider = new BaseDataProvider(storage, format);
             var backend=dev.toka.storage.Backend.valueOf(format.toUpperCase(java.util.Locale.ROOT));
             publicPoints=new dev.toka.pl.tokaPortal.point.PublicPoints(getDataFolder().toPath().resolve("storage").resolve(format).resolve("public-points"),backend);
-            getLogger().info("§b載入傳送點共 §a"+publicPoints.points().size()+" §b個");
+            getLogger().info(text("log.points.loaded", publicPoints.points().size()));
             int homes = storage.load().getList("homes").size();
-            getLogger().info("§b載入住家共 §a" + homes + " §b個");
+            getLogger().info(text("log.homes.loaded", homes));
         } catch (java.io.IOException | RuntimeException e) {
-            throw new IllegalStateException("住家資料無法開啟；請檢查設定與資料檔，勿刪除原始資料。", e);
+            throw new IllegalStateException(text("err.storageOpen"), e);
         }
     }
 

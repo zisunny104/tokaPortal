@@ -4,9 +4,10 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
 import dev.toka.pl.tokaPortal.Main;
 public class WildCommand extends Command {
- public WildCommand(){super("wild","資源世界隨機傳送");this.commandParameters.clear();}
+ public WildCommand(){super("wild",Main.text("cmd.wild.desc"));this.setUsage(Main.text("cmd.wild.usage"));this.commandParameters.clear();}
  public boolean execute(CommandSender sender,String label,String[] args){
-  if(!(sender instanceof Player player)){sender.sendMessage("[傳送]僅可在遊戲內使用");return true;}
+  if(args.length>0&&args[0].equalsIgnoreCase("help")){Main.help(sender,"wild");return true;}
+  if(!(sender instanceof Player player)){sender.sendMessage(Main.text("err.playerOnly"));return true;}
   Main.getInstance().getWildService().execute(player);return true;
  }
 }

@@ -62,18 +62,18 @@ public final class ZeroIntegration {
             check(Feature.CITY_PASS, new String[][] {{"player.citypass.CityPass", "sendCityPassForm", "cn.nukkit.Player"}});
         }
         if (zero == null && !finalAttempt) {
-            Main.getInstance().getLogger().info("§7等待 zero 載入，稍後再檢查整合");
+            Main.getInstance().getLogger().info(Main.text("log.zero.waiting"));
             return;
         }
         if (zero == null) {
-            Main.getInstance().getLogger().warning("§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、區域及城市通）");
+            Main.getInstance().getLogger().warning(Main.text("log.zero.missing"));
             return;
         }
-        Main.getInstance().getLogger().info("§b載入 zero 可用整合共 §a" + available.size() + " §b個：§f" + available);
+        Main.getInstance().getLogger().info(Main.text("log.zero.loaded", available.size(), available));
         if (!has(Feature.PLAYERS) || !has(Feature.REGIONS))
-            Main.getInstance().getLogger().warning("§ezero 玩家/區域 API 不可用，已關閉住家管理及住家傳送。");
+            Main.getInstance().getLogger().warning(Main.text("log.zero.playersRegionsOff"));
         for (Feature feature : Feature.values()) if (!has(feature))
-            Main.getInstance().getLogger().warning("§e已關閉 zero 功能：" + feature);
+            Main.getInstance().getLogger().warning(Main.text("log.zero.featureOff", feature));
     }
 
     private static void check(Feature feature, String[][] signatures) {
@@ -100,7 +100,7 @@ public final class ZeroIntegration {
             }
             available.add(feature);
         } catch (ReflectiveOperationException | LinkageError | SecurityException e) {
-            Main.getInstance().getLogger().warning("zero " + feature + " API 不相容: " + e.getMessage());
+            Main.getInstance().getLogger().warning(Main.text("log.zero.incompatible", feature, e.getMessage()));
         }
     }
 
@@ -110,7 +110,7 @@ public final class ZeroIntegration {
 
     public static boolean require(CommandSender sender, Feature... features) {
         for (Feature feature : features) if (!has(feature)) {
-            sender.sendMessage("[傳送]此功能已關閉：缺少或不相容的 zero " + feature + " API。");
+            sender.sendMessage(Main.text("err.featureOff", feature));
             return false;
         }
         return true;
@@ -137,7 +137,7 @@ public final class ZeroIntegration {
             throw new NoSuchMethodException(type + "." + method);
         } catch (ReflectiveOperationException | LinkageError | RuntimeException e) {
             available.remove(feature);
-            Main.getInstance().getLogger().warning("zero 功能 " + feature + " 已關閉：" + e);
+            Main.getInstance().getLogger().warning(Main.text("log.zero.disabled", feature, e));
             return null;
         }
     }
@@ -158,7 +158,7 @@ public final class ZeroIntegration {
         public boolean isTopQuanXian() { return delegate == null ? player.isOp() : Boolean.TRUE.equals(get("isTopQuanXian")); }
         public boolean isHighQuanXian() { return delegate != null && Boolean.TRUE.equals(get("isHighQuanXian")); }
         public boolean isPortalStatus() { return delegate != null && Boolean.TRUE.equals(get("isPortalStatus")); }
-        public String getRegionInfo() { Object value = get("getRegionInfo"); return value == null ? "目前位置" : value.toString(); }
+        public String getRegionInfo() { Object value = get("getRegionInfo"); return value == null ? Main.text("status.here") : value.toString(); }
         public Region getRegion() { Object value = get("getRegion"); return value == null ? null : new Region(value); }
     }
 

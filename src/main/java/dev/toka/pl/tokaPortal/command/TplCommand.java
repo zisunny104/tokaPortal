@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -16,18 +17,20 @@ import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land.toLand;
 public class TplCommand extends Command {
 
     public TplCommand() {
-        super("tpl", "傳送至領地");
+        super("tpl", Main.text("cmd.tpl.desc"));
+        this.setUsage(Main.text("cmd.tpl.usage"));
         this.commandParameters.clear();
         this.commandParameters.put("def", new CommandParameter[]{
-                new CommandParameter("領地名稱", false)
+                new CommandParameter(Main.text("param.landName"), false)
         });
     }
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tpl"); return true; }
         if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.LAND)) return false;
         if (!sender.isPlayer()) {
-            sender.sendMessage("[傳送]請在遊戲內進行");
+            sender.sendMessage(Main.text("err.playerOnly"));
             return false;
         }
         Player player = Server.getInstance().getPlayer(sender.getName());
@@ -37,10 +40,10 @@ public class TplCommand extends Command {
             Land land = getLand(name);
             if (land != null) {
                 toLand(land, player);
-                pli.sendText("[傳送]已傳送至領地 " + name);
+                pli.sendText(Main.text("msg.land.arrived", name));
                 return true;
             }
-            pli.sendText("[傳送]領地 " + name + " 無法傳送(不存在)");
+            pli.sendText(Main.text("err.land.notFound", name));
         } else {
             sendPortalLandListWindow(player);
         }

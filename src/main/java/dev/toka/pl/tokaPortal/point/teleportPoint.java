@@ -17,7 +17,7 @@ public final class teleportPoint {
  public static teleportPoint getPoint(String name){return getPoints().get(name);}
  public static boolean setTeleportPoint(String name,String creator,String type,String info,Location location){
   JsonObject row=new JsonObject();row.addProperty("name",name);row.addProperty("creator",creator);row.addProperty("type",type);row.addProperty("info",info);row.addProperty("world",location.getLevel().getName());row.addProperty("x",location.x);row.addProperty("y",location.y);row.addProperty("z",location.z);row.addProperty("yaw",location.yaw);row.addProperty("pitch",location.pitch);
-  try{return Main.getInstance().getPublicPoints().create(row);}catch(java.io.IOException e){throw new IllegalStateException("傳送點儲存失敗",e);}
+  try{return Main.getInstance().getPublicPoints().create(row);}catch(java.io.IOException e){throw new IllegalStateException("Public point save failed",e);}
  }
- public static boolean delTeleportPoint(teleportPoint point){try{return Main.getInstance().getPublicPoints().delete(point.getName());}catch(java.io.IOException e){throw new IllegalStateException("傳送點儲存失敗",e);}}
+ public static boolean delTeleportPoint(teleportPoint point){try{return Main.getInstance().getPublicPoints().delete(point.getName());}catch(java.io.IOException e){throw new IllegalStateException("Public point save failed",e);}}
 }

@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
@@ -13,14 +14,16 @@ import static dev.toka.pl.tokaPortal.point.teleportPoint.getPoint;
 
 public class TppCommand extends Command {
     public TppCommand() {
-        super("tpp", "顯示傳送列表");
+        super("tpp", Main.text("cmd.tpp.desc"));
+        this.setUsage(Main.text("cmd.tpp.usage"));
         this.commandParameters.clear();
     }
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tpp"); return true; }
 
-        if (!(sender instanceof Player)) { sender.sendMessage("[傳送]請在遊戲內進行"); return false; }
+        if (!(sender instanceof Player)) { sender.sendMessage(Main.text("err.playerOnly")); return false; }
         Player player = (Player) sender;
         PlayerInfo pli = getPlayerInfo(player);
         if (args.length > 0) {
@@ -28,9 +31,9 @@ public class TppCommand extends Command {
             teleportPoint point = getPoint(name);
             if (point != null) {
                 toPoint(name, player);
-                pli.sendText("§a[傳送]§b已傳送至傳送點 §f" + name + " ( " + point.getInfo() + " §f)");
+                pli.sendText(Main.text("msg.point.arrived", name, point.getInfo()));
             } else {
-                pli.sendText("[傳送]傳送點 " + name + " 無法傳送");
+                pli.sendText(Main.text("err.point.cannotTeleport", name));
             }
         } else {
             PortalWindow.sendPortalMainWindow(player);

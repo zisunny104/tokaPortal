@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
@@ -11,20 +12,22 @@ import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
 public class SpawnCommand extends Command {
 
     public SpawnCommand() {
-        super("spawn", "回到重生點");
+        super("spawn", Main.text("cmd.spawn.desc"));
+        this.setUsage(Main.text("cmd.spawn.usage"));
         this.commandParameters.clear();
     }
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "spawn"); return true; }
 
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);
             Portal.toPoint("spawn", player);
-            pli.sendText("§a[傳送]§b已傳送至重生點 §f");
+            pli.sendText(Main.text("msg.spawn.arrived"));
         } else {
-            sender.sendMessage("[傳送]請在遊戲內進行");
+            sender.sendMessage(Main.text("err.playerOnly"));
         }
         return false;
     }

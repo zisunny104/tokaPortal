@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.form.home;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Player;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.element.ElementDropdown;
@@ -13,19 +14,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.toka.pl.tokaPortal.Main.getProvider;
-import static dev.toka.pl.tokaPortal.utils.Utils.TITLE_PORTAL_HOME_EDIT_LIST;
 
 public class HomeEditListForm extends FormWindowCustom implements BaseForm {
 
     public HomeEditListForm(Player player) {
-        super(TITLE_PORTAL_HOME_EDIT_LIST);
+        super(Main.text("ui.home.editList.title"));
         HomePoint[] homes = getProvider().getHomePointsByCreator(player);
         if (homes.length > 0) {
             List<String> homeNames = Arrays.stream(homes).map(HomePoint::getName).collect(Collectors.toList());
-            this.addElement(new ElementLabel("選取需要編輯的住家後\n點擊下方'送出'按鈕 進行編輯"));
-            this.addElement(new ElementDropdown("住家列表", homeNames));
+            this.addElement(new ElementLabel(Main.text("ui.home.editList.hint")));
+            this.addElement(new ElementDropdown(Main.text("ui.home.editList.dropdown"), homeNames));
         } else {
-            this.addElement(new ElementLabel("您沒有可編輯的住家"));
+            this.addElement(new ElementLabel(Main.text("ui.home.editList.empty")));
         }
     }
 

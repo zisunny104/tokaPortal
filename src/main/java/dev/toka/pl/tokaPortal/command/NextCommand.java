@@ -1,5 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -9,14 +10,16 @@ import static dev.toka.pl.tokaPortal.utils.PortalHistory.toHistoryLocation;
 
 public class NextCommand extends Command {
     public NextCommand() {
-        super("next", "前往下個傳送地點");
+        super("next", Main.text("cmd.next.desc"));
+        this.setUsage(Main.text("cmd.next.usage"));
     }
 
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "next"); return true; }
         if (sender instanceof Player) {
             toHistoryLocation((Player) sender, NEXT);
         } else {
-            sender.sendMessage("§a[傳送]§e請在遊戲內進行§r");
+            sender.sendMessage(Main.text("err.playerOnly"));
         }
         return false;
     }

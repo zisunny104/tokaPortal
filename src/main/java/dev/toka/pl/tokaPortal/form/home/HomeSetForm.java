@@ -1,18 +1,18 @@
 package dev.toka.pl.tokaPortal.form.home;
 
+import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.window.FormWindowCustom;
 import dev.toka.pl.tokaPortal.form.BaseForm;
-import dev.toka.pl.tokaPortal.utils.Utils;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.setHome;
 
 public class HomeSetForm extends FormWindowCustom implements BaseForm {
 
     public HomeSetForm() {
-        super(Utils.TITLE_PORTAL_HOME_SET);
-        this.addElement(new ElementInput("設置住家名稱", "住家名稱"));
+        super(Main.text("ui.home.set.title"));
+        this.addElement(new ElementInput(Main.text("ui.home.set.input"), Main.text("ui.home.set.placeholder")));
     }
 
     @Override
