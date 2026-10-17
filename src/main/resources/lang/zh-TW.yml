@@ -229,18 +229,36 @@ msg:
 # ---------------------------------------------------------------
 ui:
   # 分頁頁尾（tokaI18n 的 Pager 慣例）。${0}=頁碼 ${1}=總頁數 ${2}=指令
+  # 清單的搜尋、排序、每頁數量視窗（清單項目多時才出現）。${0}=清單全部項目數
+  options:
+    title: "=清單選項="
+    hint: "共有 ${0} 項。關鍵字留空表示不篩選；設定會保留到您離開伺服器。"
+    query: "搜尋關鍵字"
+    queryHint: "輸入名稱的一部分"
+    sort: "排序方式"
+    sortDefault: "預設順序"
+    sortName: "依名稱"
+    perPage: "每頁顯示幾項"
+  # 搜尋後沒有符合項目時的說明。${0}=關鍵字
+  search:
+    none: "沒有名稱含有「${0}」的項目，請按最下方的選項重新搜尋"
   page:
+    # 分頁視窗的標題。${0}=原標題 ${1}=頁碼 ${2}=總頁數
+    title: "${0} §7(${1}/${2})"
     footer: "§7第 §a${0}§7/§a${1}§7 頁，用 §e${2} <頁碼>§7 換頁"
   common:
     confirm: "確定"
     cancel: "取消"
   button:
     teleportList: "§e>>§8傳送點列表  "
-    shopboxList: "§e>>§8商店傳送列表"
+    shopboxList: "§e>>§8SHOPBOX傳送列表"
     regionList: "§e>>§8區域傳送列表"
     landList: "§e>>§8領地傳送列表"
     playerList: "§e>>§8線上玩家傳送"
     back: "§l§e>返回前頁<"
+    prevPage: "§l§e<上一頁"
+    options: "§l§b搜尋／排序／每頁數量"
+    nextPage: "§l§e下一頁>"
     pass: "§l§b>進入城市通<"
     close: "§l§c>關閉<"
     agree: "§l§a>同意<"
@@ -256,12 +274,15 @@ ui:
       hint:
         - "傳送點列表 "
         - "點擊進行傳送"
+      empty: "目前沒有任何公共傳送點"
     shopboxList:
-      title: "=商店列表="
+      title: "=SHOPBOX列表="
       hint: "點擊進行傳送"
+      empty: "目前沒有任何 SHOPBOX 可以傳送"
     regionList:
       title: "=區域列表="
       hint: "點擊按鈕 進行傳送"
+      empty: "目前沒有任何區域可以傳送"
     landList:
       title: "=領地列表="
       hint: "點選要傳送的領地"
@@ -269,9 +290,7 @@ ui:
     playerList:
       title: "=玩家列表="
       hint: "點選要傳送的玩家（對方同意後才會傳送）"
-    playerNone:
-      title: "=現無玩家="
-      hint: "現在沒有其他線上玩家可以傳送喔.."
+      empty: "現在沒有其他線上玩家可以傳送喔.."
   home:
     list:
       title: "=住家列表="

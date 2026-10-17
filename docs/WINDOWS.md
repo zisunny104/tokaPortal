@@ -8,7 +8,7 @@
 flowchart LR
     C["/portal、/tpp（無參數）"] --> M[PortalWindow.sendPortalMainWindow]
     M -->|按鈕索引| A["Menu：每顆按鈕綁一個動作"]
-    A --> R[區域清單] & L[領地清單] & P[玩家清單] & S[商店箱清單] & T[傳送點清單] & CP[城市通]
+    A --> R[區域清單] & L[領地清單] & P[玩家清單] & S[SHOPBOX清單] & T[傳送點清單] & CP[城市通]
     R & L & P & S & T -->|返回| M
     E["PlayerFormRespondedEvent"] -->|"clickedButtonId → 動作"| A
 ```
@@ -32,10 +32,27 @@ flowchart LR
 3. 領地、玩家清單從下拉式 + 「送出」改成按鈕清單，並補上「返回」（原本是死路，只能關閉再重開）。
 4. tpa 視窗：請求者不在線或已被取代時安靜忽略。
 
+## 與核心表單對照（Nukkit `cn.nukkit.form`）
+
+| 核心元件 | 用在哪 | 設計 |
+|---|---|---|
+| `FormWindowSimple`（標題、內文、按鈕） | 主選單、各清單、tpa、住家 | 標題＝這是什麼（含頁碼）；內文＝一句引導（要點什麼）或沒有內容的說明；按鈕＝可做的事，第一顆固定「返回」，分頁與選項按鈕固定在最後 |
+| `FormWindowCustom`（Label、Input、Dropdown、Slider） | 清單選項視窗 | Label 顯示總數；Input 搜尋關鍵字；Dropdown 排序（預設／依名稱）；Slider 每頁數量（範圍由 config） |
+| `FormWindowModal`（兩顆按鈕） | 未使用 | 刪除確認目前沿用 Simple，可日後改 Modal |
+| `ElementHeader`／`ElementDivider`／`ElementToggle`／`ElementStepSlider` | 未使用 | 目前沒有需要；排序若增加到 3 種以上可改 StepSlider |
+
+## 清單的搜尋、排序、每頁數量
+
+- 清單項目超過 `window-search-threshold`（預設 8）時，最後會多一顆「搜尋／排序／每頁數量」按鈕；搜尋中一定會顯示，方便清除。
+- 搜尋：名稱包含關鍵字（不分大小寫）；沒有符合時內文提示並可重新搜尋。
+- 排序：預設順序（資料原本順序）或依名稱。依距離排序需要座標，暫不做。
+- 每頁數量：玩家用滑桿調整，範圍 `window-items-min`～`window-items-max`；設定存在記憶體，離開伺服器就清掉（「一次性」）。要永久保存可日後接 tokaProfiles 的玩家偏好。
+- 管理員可改的預設值：`window-items-per-page`（10）、`window-items-min`（3）、`window-items-max`（30）、`window-search-threshold`（8），都在 config.yml 有繁中註解。
+
 ## 已知限制
 
-- 清單沒有分頁：傳送點、區域很多時視窗會很長（Bedrock 表單可捲動）。超過約 30 項時再考慮用 `Pager` 分頁。
-- 「商店箱」「傳送點」即使沒有項目也會顯示在主選單，進去只有「返回」。
+- 清單沒有像 `/help` 那樣的指令搜尋；搜尋只在視窗內。
+- 「SHOPBOX」「傳送點」即使沒有項目也會顯示在主選單，進去會顯示「目前沒有…」的提示與「返回」。
 
 ## 住家視窗（form/home/）
 

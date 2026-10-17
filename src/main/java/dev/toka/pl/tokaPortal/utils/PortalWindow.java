@@ -5,7 +5,14 @@ import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
+import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.form.element.ElementButton;
+import cn.nukkit.form.element.ElementDropdown;
+import cn.nukkit.form.element.ElementInput;
+import cn.nukkit.form.element.ElementLabel;
+import cn.nukkit.form.element.ElementSlider;
+import cn.nukkit.form.response.FormResponseCustom;
+import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowSimple;
@@ -69,54 +76,119 @@ public class PortalWindow implements Listener {
         menu.show(player);
     }
 
-    /** The list of the points of one type; the buttons are the points themselves, so two points with the same text cannot be mixed up. */
-    private static void sendPointList(Player player, String type, String key) {
-        Menu menu = new Menu(Main.text(key + ".title"), Main.text(key + ".hint")).back();
-        for (teleportPoint point : teleportPoint.getPoints().values()) {
-            if (point.getType().equals(type)) {
-                menu.button(point.getInfo(), p -> Portal.toPoint(point, p));
-            }
+    private record Item(String text, java.util.function.Consumer<Player> action) {
+    }
+
+    /** What one player chose for the lists: the words to look for, the order and the number of items on a page (0 for the default of the config). */
+    private record View(String query, int sort, int perPage) {
+    }
+
+    private static final java.util.Map<java.util.UUID, View> views = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<FormWindow, java.util.function.Consumer<FormResponseCustom>> options = new java.util.WeakHashMap<>();
+
+    private static View view(Player player) {
+        return views.getOrDefault(player.getUniqueId(), new View("", 0, 0));
+    }
+
+    public static void forget(Player player) {
+        views.remove(player.getUniqueId());
+    }
+
+    private static int configInt(String key, int fallback) {
+        return Main.getInstance().getConfig().getInt(key, fallback);
+    }
+
+    /**
+     * A list in pages: the back button first, the items of the page, then the buttons for the previous and the next page.
+     * A long list also has a button for the words to look for, the order and the number of items on a page, which the player
+     * keeps until leaving. A list with nothing in it shows the empty text. The buttons are the items themselves, so two items
+     * with the same text cannot be mixed up.
+     */
+    private static void sendList(Player player, String key, java.util.List<Item> all, int page) {
+        View view = view(player);
+        java.util.List<Item> items = new java.util.ArrayList<>(all);
+        if (!view.query().isEmpty()) {
+            String needle = view.query().toLowerCase(java.util.Locale.ROOT);
+            items.removeIf(item -> !item.text().toLowerCase(java.util.Locale.ROOT).contains(needle));
+        }
+        if (view.sort() == 1) items.sort(java.util.Comparator.comparing(item -> item.text().toLowerCase(java.util.Locale.ROOT)));
+        int min = Math.max(3, configInt("window-items-min", 3));
+        int max = Math.max(min, configInt("window-items-max", 30));
+        int perPage = Math.min(max, Math.max(min, view.perPage() > 0 ? view.perPage() : configInt("window-items-per-page", 10)));
+        dev.toka.i18n.Pager.Page<Item> shown = dev.toka.i18n.Pager.of(items, perPage, page);
+        String title = Main.text(key + ".title");
+        if (shown.pages() > 1) title = Main.text("ui.page.title", title, shown.page(), shown.pages());
+        String content = Main.text(!all.isEmpty() && items.isEmpty() ? "ui.search.none" : all.isEmpty() ? key + ".empty" : key + ".hint", view.query());
+        Menu menu = new Menu(title, content).back();
+        for (Item item : shown.lines()) menu.button(item.text(), item.action());
+        if (shown.page() > 1) menu.button(Main.text("ui.button.prevPage"), p -> sendList(p, key, all, shown.page() - 1));
+        if (shown.page() < shown.pages()) menu.button(Main.text("ui.button.nextPage"), p -> sendList(p, key, all, shown.page() + 1));
+        if (all.size() > configInt("window-search-threshold", 8) || !view.query().isEmpty()) {
+            menu.button(Main.text("ui.button.options"), p -> sendOptions(p, key, all, min, max, perPage));
         }
         menu.show(player);
+    }
+
+    /** The form for the words to look for, the order and the number of items on a page. */
+    private static void sendOptions(Player player, String key, java.util.List<Item> all, int min, int max, int perPage) {
+        View view = view(player);
+        FormWindowCustom window = new FormWindowCustom(Main.text("ui.options.title"));
+        window.addElement(new ElementLabel(Main.text("ui.options.hint", all.size())));
+        window.addElement(new ElementInput(Main.text("ui.options.query"), Main.text("ui.options.queryHint"), view.query()));
+        window.addElement(new ElementDropdown(Main.text("ui.options.sort"),
+                java.util.List.of(Main.text("ui.options.sortDefault"), Main.text("ui.options.sortName")), view.sort()));
+        window.addElement(new ElementSlider(Main.text("ui.options.perPage"), min, max, 1, perPage));
+        options.put(window, response -> {
+            String query = response.getInputResponse(1) == null ? "" : response.getInputResponse(1).strip();
+            int sort = response.getDropdownResponse(2) == null ? 0 : response.getDropdownResponse(2).getElementID();
+            int per = Math.round(response.getSliderResponse(3));
+            views.put(player.getUniqueId(), new View(query, sort, per));
+            sendList(player, key, all, 1);
+        });
+        forms.put(window, new Form(player, java.util.List.of(), null));
+        player.showFormWindow(window);
+    }
+
+    private static void sendPointList(Player player, String type, String key) {
+        java.util.List<Item> items = new java.util.ArrayList<>();
+        for (teleportPoint point : teleportPoint.getPoints().values()) {
+            if (point.getType().equals(type)) items.add(new Item(point.getInfo(), p -> Portal.toPoint(point, p)));
+        }
+        sendList(player, key, items, 1);
     }
 
     private static void sendPortalRegionListWindow(Player player) {
         if (!ZeroIntegration.require(player, REGIONS)) return;
-        Menu menu = new Menu(Main.text("ui.portal.regionList.title"), Main.text("ui.portal.regionList.hint")).back();
+        java.util.List<Item> items = new java.util.ArrayList<>();
         for (Region region : Region.getRegions().values()) {
-            menu.button(region.getInfo(), p -> {
+            items.add(new Item(region.getInfo(), p -> {
                 if (ZeroIntegration.require(p, REGIONS)) toRegion(region, p);
-            });
+            }));
         }
-        menu.show(player);
+        sendList(player, "ui.portal.regionList", items, 1);
     }
 
     public static void sendPortalLandListWindow(Player player) {
         if (!ZeroIntegration.require(player, LAND)) return;
-        java.util.List<String> names = Land.getLandNameListByOwner(player);
-        Menu menu = new Menu(Main.text("ui.portal.landList.title"), Main.text(names.isEmpty() ? "ui.portal.landList.empty" : "ui.portal.landList.hint")).back();
-        for (String name : names) {
-            menu.button(name, p -> {
+        java.util.List<Item> items = new java.util.ArrayList<>();
+        for (String name : Land.getLandNameListByOwner(player)) {
+            items.add(new Item(name, p -> {
                 Land land = Land.getLand(name);
                 if (land != null && ZeroIntegration.require(p, LAND)) Land.toLand(land, p);
-            });
+            }));
         }
-        menu.show(player);
+        sendList(player, "ui.portal.landList", items, 1);
     }
 
     private static void sendPortalPlayerListWindow(Player player) {
-        boolean others = Server.getInstance().getOnlinePlayers().size() > 1;
-        Menu menu = new Menu(Main.text(others ? "ui.portal.playerList.title" : "ui.portal.playerNone.title"),
-                Main.text(others ? "ui.portal.playerList.hint" : "ui.portal.playerNone.hint")).back();
-        if (others) {
-            for (String name : getPlayerNameList(player)) {
-                menu.button(name, p -> {
-                    Player target = Server.getInstance().getPlayer(name);
-                    if (target != null && target.isOnline()) Portal.Tpa(p, target);
-                });
-            }
+        java.util.List<Item> items = new java.util.ArrayList<>();
+        for (String name : getPlayerNameList(player)) {
+            items.add(new Item(name, p -> {
+                Player target = Server.getInstance().getPlayer(name);
+                if (target != null && target.isOnline()) Portal.Tpa(p, target);
+            }));
         }
-        menu.show(player);
+        sendList(player, "ui.portal.playerList", items, 1);
     }
 
     public static void sendPortalTpaAcceptWindow(Player player) {
@@ -144,10 +216,20 @@ public class PortalWindow implements Listener {
     }
 
     @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        forget(event.getPlayer());
+    }
+
+    @EventHandler
     public void PortalRespond(PlayerFormRespondedEvent event) {
         Player player = event.getPlayer();
         Form form = forms.remove(event.getWindow());
         if (form == null || form.player() != player) return;
+        var optionAction = options.remove(event.getWindow());
+        if (optionAction != null) {
+            if (!event.wasClosed() && event.getResponse() instanceof FormResponseCustom custom) optionAction.accept(custom);
+            return;
+        }
         if (event.wasClosed() || !(event.getResponse() instanceof FormResponseSimple response)) {
             if (form.requester() != null && Portal.getTpaFrom(player) == form.requester()) delTpaMap(player);
             return;
