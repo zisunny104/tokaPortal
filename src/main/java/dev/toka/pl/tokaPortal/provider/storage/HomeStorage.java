@@ -29,6 +29,10 @@ public interface HomeStorage extends AutoCloseable {
             String name = requiredString(home, "name");
             if (!names.add(name)) throw new IOException("Duplicate home name: " + name);
             requiredString(home, "creator");
+            // owner（UUID 字串）與 ownerName 為選填；舊資料沒有
+            for (String key : List.of("owner", "ownerName")) {
+                if (home.get(key) != null && !(home.get(key) instanceof String)) throw new IOException("Invalid data field: " + key);
+            }
             requiredString(home, "type");
             if (!(home.get("loc") instanceof Map<?, ?> location)) throw new IOException("Home has no location: " + name);
             requiredString(location, "level");

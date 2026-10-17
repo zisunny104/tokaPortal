@@ -12,11 +12,16 @@ public final class teleportPoint {
  public String getInfo(){return row.get("info").getAsString();}
  public String getType(){return row.get("type").getAsString();}
  public String getCreator(){return row.get("creator").getAsString();}
+ /** 建立者 UUID；舊資料沒有則為 null。 */
+ public java.util.UUID getOwner(){return row.has("owner")?HomePoint.parseUuid(row.get("owner").getAsString()):null;}
+ /** 有 owner 以 UUID 比對，舊資料才比對建立者名稱。 */
+ public boolean isCreator(cn.nukkit.Player player){java.util.UUID owner=getOwner();return owner!=null?owner.equals(player.getUniqueId()):getCreator().equalsIgnoreCase(player.getName());}
  public Location getLocation(){var level=Server.getInstance().getLevelByName(row.get("world").getAsString());if(level==null)return null;return new Location(row.get("x").getAsDouble(),row.get("y").getAsDouble(),row.get("z").getAsDouble(),row.get("yaw").getAsDouble(),row.get("pitch").getAsDouble(),level);}
  public static Map<Object,teleportPoint> getPoints(){return Main.getInstance().getPublicPoints().points();}
  public static teleportPoint getPoint(String name){return getPoints().get(name);}
- public static boolean setTeleportPoint(String name,String creator,String type,String info,Location location){
-  JsonObject row=new JsonObject();row.addProperty("name",name);row.addProperty("creator",creator);row.addProperty("type",type);row.addProperty("info",info);row.addProperty("world",location.getLevel().getName());row.addProperty("x",location.x);row.addProperty("y",location.y);row.addProperty("z",location.z);row.addProperty("yaw",location.yaw);row.addProperty("pitch",location.pitch);
+ public static boolean setTeleportPoint(String name,String creator,String type,String info,Location location){return setTeleportPoint(name,creator,null,type,info,location);}
+ public static boolean setTeleportPoint(String name,String creator,java.util.UUID owner,String type,String info,Location location){
+  JsonObject row=new JsonObject();row.addProperty("name",name);row.addProperty("creator",creator);if(owner!=null)row.addProperty("owner",owner.toString());row.addProperty("type",type);row.addProperty("info",info);row.addProperty("world",location.getLevel().getName());row.addProperty("x",location.x);row.addProperty("y",location.y);row.addProperty("z",location.z);row.addProperty("yaw",location.yaw);row.addProperty("pitch",location.pitch);
   try{return Main.getInstance().getPublicPoints().create(row);}catch(java.io.IOException e){throw new IllegalStateException("Public point save failed",e);}
  }
  public static boolean delTeleportPoint(teleportPoint point){try{return Main.getInstance().getPublicPoints().delete(point.getName());}catch(java.io.IOException e){throw new IllegalStateException("Public point save failed",e);}}

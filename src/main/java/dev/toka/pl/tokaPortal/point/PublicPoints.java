@@ -28,6 +28,8 @@ public final class PublicPoints implements AutoCloseable {
   for(JsonElement item:input.getAsJsonArray("points")){
    JsonObject row=item.getAsJsonObject(),out=new JsonObject();
    for(String key:List.of("name","creator","type","info","world"))out.addProperty(key,text(row,key,key.equals("name")||key.equals("world")));
+   // owner（建立者 UUID）為選填，舊資料沒有；不合法的值直接略過
+   JsonElement owner=row.get("owner");if(owner!=null&&owner.isJsonPrimitive()&&owner.getAsJsonPrimitive().isString()&&HomePoint.parseUuid(owner.getAsString())!=null)out.addProperty("owner",owner.getAsString());
    if(out.get("name").getAsString().length()>255||out.get("world").getAsString().length()>255)throw new IllegalArgumentException("Name too long");
    for(String key:List.of("x","y","z","yaw","pitch")){
     JsonElement value=row.get(key);if(value==null||!value.isJsonPrimitive()||!value.getAsJsonPrimitive().isNumber())throw new IllegalArgumentException("Invalid "+key);

@@ -33,11 +33,19 @@
 | --- | --- | --- | --- |
 | `/portal point set` | `/portal point set <名稱> [類型]` | 在目前位置建立公共傳送點；類型 `point`（預設）列於「傳送點列表」，`shopbox` 列於「SHOPBOX 傳送列表」 | `tokaPortal.points.manage` |
 | `/portal point del` | `/portal point del <名稱>` | 刪除傳送點（建立者或 OP） | `tokaPortal.points.manage` |
+| `/portal legacy list` | `/portal legacy list [頁]` | 列出尚未對應玩家 UUID 的舊名稱住家（console 可用） | OP |
+| `/portal legacy claim` | `/portal legacy claim <名稱> <玩家>` | 把該舊名稱的住家全部交給指定玩家，有爭議的也可用此指令處理 | OP |
 | `/tpw` | `/tpw <世界名稱>` | 傳送到世界的安全出生點，世界未載入會先載入 | OP |
 | `/home`、`/tph` | `/home [list｜set｜del｜edit] [名稱]`、`/tph [名稱]` | 住家管理與傳送 | OP 或 zero 最高權限 |
 
 `tokaPortal.points.manage` 預設只有 OP。傳送點名稱不可使用 `reserved-names` 內的字。
 `/tpa` 的規則：OP（或 zero 最高權限）直接傳送；zero 高權限者稍待片刻後傳送；其餘玩家需對方同意。
+
+## 住家擁有者（UUID）
+
+住家以玩家 UUID 為擁有者，改名後仍找得到；`ownerName` 只是最後已知名稱，玩家登入時自動更新，`creator` 欄位照寫同樣的名稱，舊版 jar 仍可讀取。
+舊資料只有名稱，啟動時會在背景依序以線上玩家、tokaProfiles、tokaEconomy（皆為選用）、伺服器玩家檔對應 UUID，結果寫在後台。
+查不到的住家維持「僅名稱」，同名玩家登入時自動取回；若同名已有不同玩家的住家則視為爭議，不自動處理，請用 `/portal legacy` 指令處理。
 
 ## 設定（`config.yml`，變更後需重新啟動）
 
@@ -71,4 +79,4 @@
 - **住家指令無法使用？** 住家僅限管理員，且需安裝 zero。
 - **沒有 zero 能用嗎？** 可以，傳送選單、`/tpa`、傳送點、`/back`、`/wild` 都不受影響。
 
-目前版本 2.6.3
+目前版本 2.7.0

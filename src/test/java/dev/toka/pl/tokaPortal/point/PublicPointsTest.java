@@ -21,6 +21,19 @@ class PublicPointsTest {
    try(PublicPoints points=new PublicPoints(dir,backend)){assertTrue(points.verify(DATA));assertEquals("出生點",points.points().get("spawn").getInfo());assertTrue(points.delete("spawn"));assertFalse(points.delete("spawn"));}
   }
  }
+ @Test void keepsOptionalOwnerAndIgnoresInvalidOne()throws Exception{
+  String id="3f2b8c1e-9a4d-4e6f-8b7a-1c2d3e4f5a6b";
+  String creator="\"creator\":\"admin\"";
+  try(PublicPoints points=new PublicPoints(Files.createTempDirectory(Path.of("target"),"public-points-owner-"),Backend.JSON)){
+   points.replaceIfEmptyOrEqual(DATA.replace(creator,creator+",\"owner\":\""+id+"\""));
+   assertEquals(java.util.UUID.fromString(id),points.points().get("spawn").getOwner());
+  }
+  try(PublicPoints points=new PublicPoints(Files.createTempDirectory(Path.of("target"),"public-points-old-"),Backend.JSON)){
+   points.replaceIfEmptyOrEqual(DATA.replace(creator,creator+",\"owner\":\"not-a-uuid\""));
+   assertNull(points.points().get("spawn").getOwner());
+   assertEquals("admin",points.points().get("spawn").getCreator());
+  }
+ }
  @Test void rejectsDuplicateInvalidAndNonFinite()throws Exception{
   Path dir=Files.createTempDirectory(Path.of("target"),"public-points-invalid-");
   try(PublicPoints points=new PublicPoints(dir,Backend.JSON)){

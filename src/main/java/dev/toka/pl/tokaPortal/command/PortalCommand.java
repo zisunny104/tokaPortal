@@ -22,6 +22,7 @@ public class PortalCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (args.length > 0 && args[0].equalsIgnoreCase("help")) { dev.toka.pl.tokaPortal.utils.HelpOverview.send(sender, args); return true; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("legacy")) { legacy(sender, args); return true; }
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);
@@ -56,7 +57,7 @@ public class PortalCommand extends Command {
                                         if (getPoint(name) == null) {
                                             boolean created;
                                             try {
-                                                created = setTeleportPoint(name, pl, type, info, location);
+                                                created = setTeleportPoint(name, pl, player.getUniqueId(), type, info, location);
                                             } catch (RuntimeException e) {
                                                 Main.getInstance().getLogger().error(Main.text("log.points.saveFailed"), e);
                                                 created = false;
@@ -80,7 +81,7 @@ public class PortalCommand extends Command {
                                         String name = args[2];
                                         teleportPoint point = getPoint(name);
                                         if (point != null) {
-                                            if (point.getCreator().equals(pl) || player.isOp()) {
+                                            if (point.isCreator(player) || player.isOp()) {
                                                 boolean deleted;
                                                 try {
                                                     deleted = delTeleportPoint(point);
@@ -127,5 +128,35 @@ public class PortalCommand extends Command {
             sender.sendMessage(Main.text("err.playerOnly"));
             return false;
         }
+    }
+
+    /** /portal legacy list [頁] | claim <名稱> <玩家>：管理尚未對應 UUID 的舊名稱住家（OP，console 可用）。 */
+    private void legacy(CommandSender sender, String[] args) {
+        if (!sender.isOp()) { sender.sendMessage(Main.text("err.noPermission")); return; }
+        var provider = Main.getProvider();
+        String sub = args.length > 1 ? args[1].toLowerCase() : "";
+        if (provider == null || (!sub.equals("list") && !sub.equals("claim"))) { sender.sendMessage(Main.text("msg.legacy.usage")); return; }
+        if (sub.equals("list")) {
+            var groups = provider.legacyGroups();
+            if (groups.isEmpty()) { sender.sendMessage(Main.text("msg.legacy.empty")); return; }
+            var page = dev.toka.i18n.Pager.of(groups, 10, dev.toka.i18n.Pager.parse(args.length > 2 ? args[2] : null, 1));
+            sender.sendMessage(Main.text("msg.legacy.header", groups.size()));
+            for (var group : page.lines()) {
+                sender.sendMessage(Main.text(group.disputed() ? "msg.legacy.lineDisputed" : "msg.legacy.line", group.name(), group.homes()));
+            }
+            if (page.pages() > 1) sender.sendMessage(Main.text("ui.page.footer", page.page(), page.pages(), "/portal legacy list"));
+            return;
+        }
+        if (args.length != 4) { sender.sendMessage(Main.text("msg.legacy.usage")); return; }
+        String legacyName = args[2], target = args[3];
+        Main.getInstance().getOwnerMigration().resolve(target, found -> {
+            var current = Main.getProvider();
+            if (current == null) return;
+            if (found.isEmpty()) { sender.sendMessage(Main.text("err.player.notFound", target)); return; }
+            String shown = Main.getInstance().getServer().getOnlinePlayers().values().stream()
+                    .filter(online -> online.getUniqueId().equals(found.get())).map(Player::getName).findFirst().orElse(target);
+            int claimed = current.claimLegacy(legacyName, found.get(), shown);
+            sender.sendMessage(claimed > 0 ? Main.text("msg.legacy.claimed", legacyName, shown, claimed) : Main.text("err.legacy.notFound", legacyName));
+        });
     }
 }

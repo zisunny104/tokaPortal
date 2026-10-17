@@ -22,6 +22,8 @@ public class Main extends PluginBase implements Listener {
     private dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer;
     private dev.toka.pl.tokaPortal.point.PublicPoints publicPoints;
     public dev.toka.pl.tokaPortal.point.PublicPoints getPublicPoints(){return publicPoints;}
+    private dev.toka.pl.tokaPortal.provider.OwnerMigration ownerMigration;
+    public dev.toka.pl.tokaPortal.provider.OwnerMigration getOwnerMigration() { return ownerMigration; }
     private dev.toka.pl.tokaPortal.wild.WildService wildService;
     public dev.toka.pl.tokaPortal.wild.WildService getWildService(){return wildService;}
 
@@ -74,6 +76,9 @@ public class Main extends PluginBase implements Listener {
             }, 40);
         }
         reload();
+        ownerMigration = new dev.toka.pl.tokaPortal.provider.OwnerMigration(this);
+        // 其他插件（tokaEconomy、tokaProfiles）啟用後再解析名稱
+        getServer().getScheduler().scheduleDelayedTask(this, () -> { if (provider != null) ownerMigration.start(provider); }, 20);
 
         wildService=new dev.toka.pl.tokaPortal.wild.WildService(this);
         getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);
@@ -84,6 +89,7 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onDisable() {
         if(wildService!=null)wildService.close();
+        if (ownerMigration != null) ownerMigration.stop();
         drainWrites();
         if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error(text("log.points.closeFailed"),e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
@@ -136,6 +142,16 @@ public class Main extends PluginBase implements Listener {
         } catch (java.io.IOException | RuntimeException e) {
             throw new IllegalStateException(text("err.storageOpen"), e);
         }
+    }
+
+    /** 登入：更新住家的最後已知名稱，並取回同名的 legacy 住家。 */
+    @EventHandler
+    public void onPlayerJoin(cn.nukkit.event.player.PlayerJoinEvent event) {
+        if (provider == null) return;
+        var player = event.getPlayer();
+        var joined = provider.onPlayerJoin(player.getUniqueId(), player.getName());
+        if (joined.claimed() > 0) getLogger().info(text("log.homes.claimed", player.getName(), joined.claimed()));
+        if (joined.disputed()) getLogger().warning(text("log.homes.joinDispute", player.getName()));
     }
 
     @EventHandler

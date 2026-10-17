@@ -21,7 +21,7 @@ cmd:
     usage: "/next"
   portal:
     desc: "傳送系統指令"
-    usage: "/portal [point <set|del> <名稱> [類型]|help]"
+    usage: "/portal [point <set|del> <名稱> [類型]|legacy <list [頁]|claim <名稱> <玩家>>|help]"
   spawn:
     desc: "回到重生點"
     usage: "/spawn"
@@ -85,6 +85,8 @@ help:
     - "§e/portal §7- §b開啟傳送系統選單"
     - "§e/portal point set <名稱> [類型] §7- §b在目前位置建立公共傳送點（需要權限）"
     - "§e/portal point del <名稱> §7- §b刪除公共傳送點（建立者或 OP）"
+    - "§e/portal legacy list [頁] §7- §b列出尚未對應玩家 UUID 的舊名稱住家（OP）"
+    - "§e/portal legacy claim <名稱> <玩家> §7- §b把該舊名稱的住家全部交給指定玩家（OP）"
     - "§e/back §7- §b返回前次傳送地點"
     - "§e/next §7- §b前往下個傳送地點"
     - "§e/portal help §7- §b顯示這份說明"
@@ -124,6 +126,12 @@ help:
 # 錯誤與拒絕
 # ---------------------------------------------------------------
 err:
+  # ${0}=玩家名稱
+  player:
+    notFound: "§7[傳送]§r§c找不到玩家 §a${0}"
+  legacy:
+    # ${0}=舊名稱
+    notFound: "§7[傳送]§r§c沒有名稱為 §a${0} §c的舊名稱住家"
   playerOnly: "§7[傳送]§r§c請在遊戲內使用此指令"
   noPermission: "§7[傳送]§r§c權限不足"
   homeAdminOnly: "§7[傳送]§r§c住家功能僅限管理員使用。"
@@ -179,6 +187,17 @@ err:
 # 玩家訊息
 # ---------------------------------------------------------------
 msg:
+  # 舊名稱住家（尚未對應玩家 UUID）
+  legacy:
+    usage: "§7[傳送]§r§7/portal legacy <list [頁]|claim <名稱> <玩家>>"
+    empty: "§7[傳送]§r§b沒有尚未取回的舊名稱住家"
+    # ${0}=名稱數
+    header: "§7[傳送]§r§b尚未取回的舊名稱共 §a${0} §b個，同名玩家登入會自動取回"
+    # ${0}=舊名稱、${1}=住家數
+    line: "§a${0} §7- §b${1} 個住家"
+    lineDisputed: "§a${0} §7- §b${1} 個住家 §e（爭議：已有其他玩家使用此名稱，需手動指定）"
+    # ${0}=舊名稱、${1}=玩家、${2}=住家數
+    claimed: "§7[傳送]§r§a已把舊名稱 ${0} 的 ${2} 個住家交給 ${1}"
   tpa:
     # ${0}=用法字串（cmd.tpa.usage）
     usage: "§7[傳送]§r§b用法：§e${0}"
@@ -344,6 +363,14 @@ log:
     loaded: "§b載入住家共 §a${0} §b個"
     saveFailed: "§c住家儲存失敗"
     deleteFailed: "§c住家刪除失敗"
+    # 擁有者遷移結果。${0}=舊名稱數、${1}=已對應 UUID 的住家數、${2}=仍只有名稱的住家數、${3}=爭議名稱數
+    migrated: "§b住家擁有者遷移：舊名稱 §a${0} §b個，已對應住家 §a${1} §b個，仍只有名稱 §a${2} §b個，爭議 §a${3} §b個"
+    # ${0}=名稱
+    dispute: "§e住家擁有者 §a${0} §e有爭議：已有不同玩家的住家使用此名稱，不自動處理，請用 /portal legacy claim 指定"
+    # ${0}=玩家名稱、${1}=住家數
+    claimed: "§b玩家 §a${0} §b登入，取回舊名稱住家 §a${1} §b個"
+    # ${0}=玩家名稱
+    joinDispute: "§e玩家 §a${0} §e登入，同名住家有爭議，不自動取回"
   writer:
     timeout: "§e背景儲存寫入逾時，部分資料可能未寫入"
   zero:
