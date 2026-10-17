@@ -2,10 +2,10 @@ package dev.toka.pl.tokaPortal.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import dev.toka.forms.Confirm;
-import dev.toka.forms.FormTexts;
-import dev.toka.forms.ListMenu;
-import dev.toka.forms.Menu;
+import dev.toka.pl.tokaPortal.form.Confirm;
+import dev.toka.pl.tokaPortal.form.FormTexts;
+import dev.toka.pl.tokaPortal.form.ListMenu;
+import dev.toka.pl.tokaPortal.form.Menu;
 import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land;
@@ -21,7 +21,7 @@ import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerNameLi
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.sendCityPassForm;
 import static dev.toka.pl.tokaPortal.utils.Portal.*;
 
-/** The windows of the portal menu, built from the shared windows of tokaForms. */
+/** The windows of the portal menu, built from the windows of the form package. */
 public final class PortalWindow {
     private static final String ICON_POINT = "textures/items/compass_item";
     private static final String ICON_SHOPBOX = "textures/blocks/chest_front";
@@ -35,7 +35,7 @@ public final class PortalWindow {
     private PortalWindow() {
     }
 
-    /** The texts of the shared windows, from the language file. */
+    /** The texts of the windows, from the language file. */
     public static FormTexts texts() {
         return new FormTexts(Main.text("ui.button.back"), Main.text("ui.button.prevPage"), Main.text("ui.button.nextPage"),
                 Main.text("ui.button.options"), Main.text("ui.options.title"), Main.text("ui.options.hint", "${0}"),

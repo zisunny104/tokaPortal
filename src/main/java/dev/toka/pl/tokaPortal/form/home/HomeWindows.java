@@ -1,9 +1,9 @@
 package dev.toka.pl.tokaPortal.form.home;
 
 import cn.nukkit.Player;
-import dev.toka.forms.Confirm;
-import dev.toka.forms.ListMenu;
-import dev.toka.forms.Menu;
+import dev.toka.pl.tokaPortal.form.Confirm;
+import dev.toka.pl.tokaPortal.form.ListMenu;
+import dev.toka.pl.tokaPortal.form.Menu;
 import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;

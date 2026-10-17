@@ -99,7 +99,7 @@ public class Main extends PluginBase implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new Portal(), this);
         this.getServer().getPluginManager().registerEvents(new PortalHistory(), this);
-        dev.toka.forms.FormListener.register(this);
+        dev.toka.pl.tokaPortal.form.FormListener.register(this);
         this.getServer().getPluginManager().registerEvents(new CommandSuggestionUpdater(), this);
     }
 
