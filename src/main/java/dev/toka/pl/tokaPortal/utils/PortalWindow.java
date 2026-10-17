@@ -6,12 +6,8 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.element.ElementDropdown;
-import cn.nukkit.form.element.ElementLabel;
-import cn.nukkit.form.response.FormResponseCustom;
 import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindow;
-import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.*;
@@ -28,189 +24,135 @@ import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.sendCityPassFor
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerNameList;
 
 public class PortalWindow implements Listener {
-    private static final java.util.Map<FormWindow, Player> windows = new java.util.WeakHashMap<>();
-    private static final java.util.Map<FormWindow, Player> requests = new java.util.WeakHashMap<>();
+    /** What each button of a window does, by the number of the button; the text of a button is never used to find out what was clicked. */
+    private record Form(Player player, java.util.List<java.util.function.Consumer<Player>> actions, Player requester) {
+    }
 
-    private static void show(Player player, FormWindow window) {
-        windows.put(window, player);
-        player.showFormWindow(window);
+    private static final java.util.Map<FormWindow, Form> forms = new java.util.WeakHashMap<>();
+
+    /** A window with buttons: each button is added together with the action it does. */
+    private static final class Menu {
+        private final FormWindowSimple window;
+        private final java.util.List<java.util.function.Consumer<Player>> actions = new java.util.ArrayList<>();
+        private Player requester;
+
+        Menu(String title, String content) {
+            this.window = new FormWindowSimple(title, content);
+        }
+
+        Menu button(String text, java.util.function.Consumer<Player> action) {
+            this.window.addButton(new ElementButton(text));
+            this.actions.add(action);
+            return this;
+        }
+
+        Menu back() {
+            return this.button(Main.text("ui.button.back"), PortalWindow::sendPortalMainWindow);
+        }
+
+        void show(Player player) {
+            forms.put(this.window, new Form(player, this.actions, this.requester));
+            player.showFormWindow(this.window);
+        }
     }
 
     public static void sendPortalMainWindow(Player player) {
-        FormWindowSimple window = new FormWindowSimple(Main.text("ui.portal.title"), Main.text("ui.portal.prompt"));
-        if (ZeroIntegration.has(REGIONS)) window.addButton(new ElementButton(Main.text("ui.button.regionList")));
-        if (ZeroIntegration.has(LAND)) window.addButton(new ElementButton(Main.text("ui.button.landList")));
-        window.addButton(new ElementButton(Main.text("ui.button.playerList")));
-        {
-            window.addButton(new ElementButton(Main.text("ui.button.shopboxList")));
-            window.addButton(new ElementButton(Main.text("ui.button.teleportList")));
-        }
-        if (ZeroIntegration.has(CITY_PASS)) window.addButton((new ElementButton(Main.text("ui.button.pass"))));
-        window.addButton(new ElementButton(Main.text("ui.button.close")));
-        show(player, window);
+        Menu menu = new Menu(Main.text("ui.portal.title"), Main.text("ui.portal.prompt"));
+        if (ZeroIntegration.has(REGIONS)) menu.button(Main.text("ui.button.regionList"), PortalWindow::sendPortalRegionListWindow);
+        if (ZeroIntegration.has(LAND)) menu.button(Main.text("ui.button.landList"), PortalWindow::sendPortalLandListWindow);
+        menu.button(Main.text("ui.button.playerList"), PortalWindow::sendPortalPlayerListWindow);
+        menu.button(Main.text("ui.button.shopboxList"), p -> sendPointList(p, "shopbox", "ui.portal.shopboxList"));
+        menu.button(Main.text("ui.button.teleportList"), p -> sendPointList(p, "point", "ui.portal.pointList"));
+        if (ZeroIntegration.has(CITY_PASS)) menu.button(Main.text("ui.button.pass"), p -> sendCityPassForm(p));
+        menu.button(Main.text("ui.button.close"), p -> {
+        });
+        menu.show(player);
     }
 
-    private static void sendPortalTeleportPointListWindow(Player player) {
-
-        FormWindowSimple window = new FormWindowSimple(Main.text("ui.portal.pointList.title"), Main.text("ui.portal.pointList.hint"));
-        window.addButton(new ElementButton(Main.text("ui.button.back")));
+    /** The list of the points of one type; the buttons are the points themselves, so two points with the same text cannot be mixed up. */
+    private static void sendPointList(Player player, String type, String key) {
+        Menu menu = new Menu(Main.text(key + ".title"), Main.text(key + ".hint")).back();
         for (teleportPoint point : teleportPoint.getPoints().values()) {
-            if (point.getType().equals("point")) {
-                window.addButton(new ElementButton(point.getInfo()));
+            if (point.getType().equals(type)) {
+                menu.button(point.getInfo(), p -> Portal.toPoint(point, p));
             }
         }
-        show(player, window);
-    }
-
-    private static void sendPortalShopBoxListWindow(Player player) {
-
-        FormWindowSimple window = new FormWindowSimple(Main.text("ui.portal.shopboxList.title"), Main.text("ui.portal.shopboxList.hint"));
-        window.addButton(new ElementButton(Main.text("ui.button.back")));
-        for (teleportPoint point : teleportPoint.getPoints().values()) {
-            if (point.getType().equals("shopbox")) {
-                window.addButton(new ElementButton(point.getInfo()));
-            }
-        }
-        show(player, window);
+        menu.show(player);
     }
 
     private static void sendPortalRegionListWindow(Player player) {
         if (!ZeroIntegration.require(player, REGIONS)) return;
-        FormWindowSimple window = new FormWindowSimple(Main.text("ui.portal.regionList.title"), Main.text("ui.portal.regionList.hint"));
-        window.addButton(new ElementButton(Main.text("ui.button.back")));
+        Menu menu = new Menu(Main.text("ui.portal.regionList.title"), Main.text("ui.portal.regionList.hint")).back();
         for (Region region : Region.getRegions().values()) {
-            window.addButton(new ElementButton(region.getInfo()));
+            menu.button(region.getInfo(), p -> {
+                if (ZeroIntegration.require(p, REGIONS)) toRegion(region, p);
+            });
         }
-
-        show(player, window);
+        menu.show(player);
     }
 
     public static void sendPortalLandListWindow(Player player) {
         if (!ZeroIntegration.require(player, LAND)) return;
-        FormWindowCustom window = new FormWindowCustom(Main.text("ui.portal.landList.title"));
-        if (Land.getLandNameListByOwner(player).size() > 0) {
-            window.addElement(new ElementLabel(Main.text("ui.portal.landList.hint")));
-            window.addElement(new ElementDropdown(Main.text("ui.portal.landList.dropdown"), Land.getLandNameListByOwner(player)));
-        } else {
-            window.addElement(new ElementLabel(Main.text("ui.portal.landList.empty")));
+        java.util.List<String> names = Land.getLandNameListByOwner(player);
+        Menu menu = new Menu(Main.text("ui.portal.landList.title"), Main.text(names.isEmpty() ? "ui.portal.landList.empty" : "ui.portal.landList.hint")).back();
+        for (String name : names) {
+            menu.button(name, p -> {
+                Land land = Land.getLand(name);
+                if (land != null && ZeroIntegration.require(p, LAND)) Land.toLand(land, p);
+            });
         }
-
-        show(player, window);
+        menu.show(player);
     }
 
     private static void sendPortalPlayerListWindow(Player player) {
-        FormWindowCustom window;
-        if (Server.getInstance().getOnlinePlayers().size() > 1) {
-            window = new FormWindowCustom(Main.text("ui.portal.playerList.title"));
-            window.addElement(new ElementLabel(Main.text("ui.portal.playerList.hint")));
-            window.addElement(new ElementDropdown(Main.text("ui.portal.playerList.dropdown"), getPlayerNameList(player)));
-        } else {
-            window = new FormWindowCustom(Main.text("ui.portal.playerNone.title"));
-            window.addElement(new ElementLabel(Main.text("ui.portal.playerNone.hint")));
+        boolean others = Server.getInstance().getOnlinePlayers().size() > 1;
+        Menu menu = new Menu(Main.text(others ? "ui.portal.playerList.title" : "ui.portal.playerNone.title"),
+                Main.text(others ? "ui.portal.playerList.hint" : "ui.portal.playerNone.hint")).back();
+        if (others) {
+            for (String name : getPlayerNameList(player)) {
+                menu.button(name, p -> {
+                    Player target = Server.getInstance().getPlayer(name);
+                    if (target != null && target.isOnline()) Portal.Tpa(p, target);
+                });
+            }
         }
-
-        show(player, window);
+        menu.show(player);
     }
 
     public static void sendPortalTpaAcceptWindow(Player player) {
         Player requester = Portal.getTpaFrom(player);
         if (requester == null) return;
-        String text = Main.text("ui.portal.tpaPrompt", requester.getName());
-        FormWindowSimple window = new FormWindowSimple(Main.text("ui.portal.tpaTitle"), text);
-        requests.put(window, requester);
-        window.addButton(new ElementButton(Main.text("ui.button.agree")));
-        window.addButton(new ElementButton(Main.text("ui.button.refuse")));
-
-        show(player, window);
+        Menu menu = new Menu(Main.text("ui.portal.tpaTitle"), Main.text("ui.portal.tpaPrompt", requester.getName()));
+        menu.requester = requester;
+        menu.button(Main.text("ui.button.agree"), p -> {
+            Player from = Portal.getTpaFrom(p);
+            if (from != requester) return;
+            if (!from.isOnline()) {
+                delTpaMap(p);
+                return;
+            }
+            if (portal(from, p.getLocation(), p.getName())) getPlayerInfo(from).sendText(Main.text("msg.tpa.arrived", p.getName()));
+            delTpaMap(p);
+        });
+        menu.button(Main.text("ui.button.refuse"), p -> {
+            Player from = Portal.getTpaFrom(p);
+            if (from != requester) return;
+            if (from.isOnline()) getPlayerInfo(from).sendText(Main.text("msg.tpa.declined", p.getName()));
+            delTpaMap(p);
+        });
+        menu.show(player);
     }
 
     @EventHandler
     public void PortalRespond(PlayerFormRespondedEvent event) {
         Player player = event.getPlayer();
-        FormWindow window = event.getWindow();
-        if (windows.remove(window) != player) return;
-        Player requester = requests.remove(window);
-        if (event.wasClosed() || event.getResponse() == null) {
-            if (requester != null && Portal.getTpaFrom(player) == requester) delTpaMap(player);
+        Form form = forms.remove(event.getWindow());
+        if (form == null || form.player() != player) return;
+        if (event.wasClosed() || !(event.getResponse() instanceof FormResponseSimple response)) {
+            if (form.requester() != null && Portal.getTpaFrom(player) == form.requester()) delTpaMap(player);
             return;
         }
-        if (window instanceof FormWindowSimple) {
-            String title = ((FormWindowSimple) event.getWindow()).getTitle();
-            String button = ((FormResponseSimple) event.getResponse()).getClickedButton().getText();
-            String back = Main.text("ui.button.back");
-
-            if (title.equals(Main.text("ui.portal.title"))) {
-                if (button.equals(Main.text("ui.button.teleportList"))) {
-                    sendPortalTeleportPointListWindow(player);
-                } else if (button.equals(Main.text("ui.button.shopboxList"))) {
-                    sendPortalShopBoxListWindow(player);
-                } else if (button.equals(Main.text("ui.button.regionList"))) {
-                    sendPortalRegionListWindow(player);
-                } else if (button.equals(Main.text("ui.button.playerList"))) {
-                    sendPortalPlayerListWindow(player);
-                } else if (button.equals(Main.text("ui.button.landList"))) {
-                    sendPortalLandListWindow(player);
-                } else if (button.equals(Main.text("ui.button.pass"))) {
-                    sendCityPassForm(player);
-                }
-            } else if (title.equals(Main.text("ui.portal.pointList.title"))
-                    || title.equals(Main.text("ui.portal.shopboxList.title"))) {
-                if (button.equals(back)) {
-                    sendPortalMainWindow(player);
-                }
-                for (teleportPoint point : teleportPoint.getPoints().values()) {
-                    if (button.equals(point.getInfo())) {
-                        Portal.toPoint(point, event.getPlayer());
-                    }
-                }
-            } else if (title.equals(Main.text("ui.portal.regionList.title"))) {
-                if (!ZeroIntegration.require(player, REGIONS)) return;
-                if (button.equals(back)) {
-                    sendPortalMainWindow(player);
-                }
-                for (Region region : Region.getRegions().values()) {
-                    if (button.equals(region.getInfo())) {
-                        toRegion(region, event.getPlayer());
-                    }
-                }
-            } else if (title.equals(Main.text("ui.portal.tpaTitle"))) {
-                Player fromPlayer = Portal.getTpaFrom(player);
-                if (fromPlayer != requester) return;
-                if (fromPlayer == null || !fromPlayer.isOnline()) {
-                    delTpaMap(player);
-                    return;
-                }
-                PlayerInfo fromPli = getPlayerInfo(fromPlayer);
-                if (button.equals(Main.text("ui.button.agree"))) {
-                    if (fromPlayer.isOnline()) {
-                        if (portal(fromPlayer, player.getLocation(), player.getName())) fromPli.sendText(Main.text("msg.tpa.arrived", player.getName()));
-                        delTpaMap(player);
-                    }
-                } else if (button.equals(Main.text("ui.button.refuse"))) {
-                    fromPli.sendText(Main.text("msg.tpa.declined", player.getName()));
-                    delTpaMap(player);
-                }
-            }
-        } else if (window instanceof FormWindowCustom) {
-            String title = ((FormWindowCustom) event.getWindow()).getTitle();
-            FormResponseCustom response = ((FormWindowCustom) window).getResponse();
-            if (title.equals(Main.text("ui.portal.playerList.title"))) {
-                String toPl = response.getDropdownResponse(1).getElementContent();
-                if (toPl == null) {
-                    return;
-                }
-                Player TPlayer = Server.getInstance().getPlayer(toPl);
-                Portal.Tpa(player, TPlayer);
-            } else if (title.equals(Main.text("ui.portal.landList.title"))) {
-                if (!ZeroIntegration.require(player, LAND)) return;
-                if (response.getDropdownResponse(1) != null) {
-                    String landName = response.getDropdownResponse(1).getElementContent();
-                    if (landName == null) {
-                        return;
-                    }
-                    Land.toLand(Land.getLand(landName), player);
-                }
-            }
-        }
+        int id = response.getClickedButtonId();
+        if (id >= 0 && id < form.actions().size()) form.actions().get(id).accept(player);
     }
 }

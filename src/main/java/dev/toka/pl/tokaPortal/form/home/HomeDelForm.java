@@ -9,6 +9,7 @@ import dev.toka.pl.tokaPortal.form.BaseForm;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.delHome;
 
+/** 刪除確認：按鈕 0=確認（modal 第一顆），1=取消（回到該住家的編輯選單）。 */
 public class HomeDelForm extends FormWindowModal implements BaseForm {
 
     String name;
@@ -24,9 +25,11 @@ public class HomeDelForm extends FormWindowModal implements BaseForm {
     @Override
     public void onFormResponse(PlayerFormRespondedEvent event) {
         Player player = event.getPlayer();
-        if (((FormResponseModal) event.getResponse())
-                .getClickedButtonText().equals(Main.text("ui.common.confirm"))) {
+        if (((FormResponseModal) event.getResponse()).getClickedButtonId() == 0) {
             delHome(player, name);
+            player.showFormWindow(new HomeEditListForm(player));
+        } else {
+            player.showFormWindow(new HomeEditForm(name));
         }
     }
 
