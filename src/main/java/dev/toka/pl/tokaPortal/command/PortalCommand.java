@@ -44,6 +44,10 @@ public class PortalCommand extends Command {
                                             type = args[3];
                                         }
 
+                                        if (dev.toka.pl.tokaPortal.utils.Portal.isReservedName(name)) {
+                                            pli.sendText(Main.text("err.point.reservedName", name));
+                                            return false;
+                                        }
                                         if (getPoint(name) == null) {
                                             if (!setTeleportPoint(name, pl, type, info, location)) {
                                                 player.sendMessage(Main.text("err.point.createDisabled"));

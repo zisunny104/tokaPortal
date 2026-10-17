@@ -134,6 +134,7 @@ err:
     pending: "§7[傳送]§r§c對方仍有待處理的傳送請求，請稍後再試。"
   home:
     nameEmpty: "§7[傳送]§r§c住家名稱不得為空!"
+    reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，請換一個住家名稱!"
     exists: "§7[傳送]§r§c已存在此名稱的住家，請更換一個名稱後再試。"
     regionDenied: "§7[傳送]§r§c此區域無法設置住家。"
     saveFailed: "§7[傳送]§r§c資料儲存失敗，住家未建立。請聯絡管理員。"
@@ -148,6 +149,7 @@ err:
   point:
     createDisabled: "§7[傳送]§r§c傳送點建立失敗，整合功能已關閉。"
     duplicate: "§7[傳送]§r§c傳送點建立失敗(重名)"
+    reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，請換一個傳送點名稱!"
     nameInvalid: "§7[傳送]§r§c傳送點建立失敗 請輸入有效名稱"
     deleteDisabled: "§7[傳送]§r§c傳送點刪除失敗，整合功能已關閉。"
     deleteDenied: "§7[傳送]§r§c傳送點刪除失敗 權限不足"

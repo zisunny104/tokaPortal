@@ -5,6 +5,15 @@
 # 伺服器擁有者可把同名檔放進 plugins/tokaPortal/lang/ 覆蓋個別文字。
 language: zh-TW
 
+# 不能拿來當住家、傳送點名稱的字（不分大小寫）。這些字是指令的關鍵字，例如 /tph help 會顯示說明；
+# 禁止它們被取成名稱，就不會發生「名稱被當成關鍵字」的情況。已經存在的同名住家不受影響。
+reserved-names:
+  - help
+  - list
+  - set
+  - del
+  - edit
+
 # 資料儲存（住家與公共傳送點共用）：新安裝使用共用 tokaStorage，預設 SQLite。
 # 舊設定的 storage.type 維持原資料；切換儲存格式需停服並明確匯入，不能只改這裡。
 storage:

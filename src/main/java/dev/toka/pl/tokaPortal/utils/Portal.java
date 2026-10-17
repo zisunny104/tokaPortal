@@ -158,11 +158,25 @@ public class Portal implements Listener {
         return false;
     }
 
+    /** The words in reserved-names; when the config has none the default words are used, so that the check is never off. */
+    public static boolean isReservedName(String name) {
+        java.util.List<String> words = Main.getInstance().getConfig().getStringList("reserved-names");
+        if (words == null || words.isEmpty()) {
+            words = java.util.List.of("help", "list", "set", "del", "edit");
+        }
+        String clean = name.strip();
+        return words.stream().anyMatch(word -> word.equalsIgnoreCase(clean));
+    }
+
     public static void setHome(Player player, String name) {
         if (!canUseHome(player)) return;
         PlayerInfo pli = getPlayerInfo(player);
         if (name == null || name.isBlank()) {
             pli.sendText(Main.text("err.home.nameEmpty"));
+            return;
+        }
+        if (isReservedName(name)) {
+            pli.sendText(Main.text("err.home.reservedName", name.strip()));
             return;
         }
         if (getProvider().getHomePoint(name) != null) {
