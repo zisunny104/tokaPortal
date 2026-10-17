@@ -4,7 +4,7 @@ import dev.toka.storage.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-/** Persistent public destinations; no dependency on zero or conversion code. */
+/** Persistent public destinations. */
 public final class PublicPoints implements AutoCloseable {
  private final DocumentStore store;
  private JsonObject state;

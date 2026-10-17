@@ -12,7 +12,6 @@ import dev.toka.pl.tokaPortal.Main;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /** Optional, reflective access to the original zero API. No zero classes are linked into this JAR. */
 public final class ZeroIntegration {
@@ -23,13 +22,9 @@ public final class ZeroIntegration {
 
     private ZeroIntegration() {}
 
-    /** True when the zero plugin was found and enabled at the last {@link #initialize()}. */
+    /** True when the zero plugin was found and enabled at the last {@link #initialize(boolean)}. */
     public static boolean isLinked() {
         return zero != null;
-    }
-
-    public static void initialize() {
-        initialize(true);
     }
 
     /**
@@ -209,5 +204,4 @@ public final class ZeroIntegration {
         return Server.getInstance().getOnlinePlayers().values().stream()
                 .filter(other -> !other.equals(player)).map(Player::getName).toList();
     }
-    public static int rand(int min, int max) { return ThreadLocalRandom.current().nextInt(min, max + 1); }
 }

@@ -18,11 +18,11 @@ public interface IDataProvider {
 
     IDataProvider save();
 
-    IDataProvider close(); // save=true
+    IDataProvider close();
 
     IDataProvider close(boolean save);
 
-    IDataProvider reload(); // save=false
+    IDataProvider reload();
 
     IDataProvider reload(boolean save);
 

@@ -28,11 +28,6 @@ public class Main extends PluginBase implements Listener {
         return instance;
     }
 
-    /** The texts of the selected language. */
-    public Messages messages() {
-        return messages;
-    }
-
     /** Text by key with ${0}, ${1} ... arguments; the key itself is returned before the plugin is enabled. */
     public static String text(String key, Object... arguments) {
         return instance == null || instance.messages == null ? key : instance.messages.text(key, arguments);
@@ -43,7 +38,6 @@ public class Main extends PluginBase implements Listener {
         return instance == null || instance.messages == null ? java.util.List.of(key) : instance.messages.lines(key, arguments);
     }
 
-    /** Sends the help text of a command (help.&lt;command&gt;) to the sender. */
     /** The values a help text needs from the config, such as the worlds and the cooldown of /wild. */
     public static Object[] helpArguments(String command) {
         if (command.equals("wild")) {
@@ -54,6 +48,7 @@ public class Main extends PluginBase implements Listener {
         return new Object[0];
     }
 
+    /** Sends the help text of a command (help.&lt;command&gt;) to the sender. */
     public static void help(CommandSender sender, String command) {
         for (String line : lines("help." + command, helpArguments(command))) sender.sendMessage(line);
     }
