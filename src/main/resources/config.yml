@@ -35,3 +35,6 @@ wild:
   show-cooldown: true
   # 冷卻中血條的顏色：tokaDisplay 的 7 種顏色之一，或它 config.yml 裡 colors 的別名；空白則用預設顏色。
   bar-color: cooldown
+
+# /portal help 總覽每頁顯示幾行（最少 3）。
+help-lines-per-page: 8
