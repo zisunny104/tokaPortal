@@ -12,14 +12,29 @@ import java.util.*;
 final class CommandSuggestions {
     private CommandSuggestions() {}
 
+    private static final long FOLDER_SCAN_TTL_MILLIS = 10_000L;
+    private static List<String> folderNames = List.of();
+    private static long folderScanAt;
+
+    /** The world folders on disk, scanned at most once per interval because every refresh asks once per operator. */
+    private static synchronized List<String> worldFolders(Server server) {
+        long now = System.currentTimeMillis();
+        if (now - folderScanAt < FOLDER_SCAN_TTL_MILLIS && folderScanAt != 0) return folderNames;
+        List<String> found = new ArrayList<>();
+        File[] folders = new File(server.getDataPath(), "worlds").listFiles(File::isDirectory);
+        if (folders != null) for (File folder : folders) {
+            if (server.isLevelGenerated(folder.getName())) found.add(folder.getName());
+        }
+        folderNames = found;
+        folderScanAt = now;
+        return found;
+    }
+
     static List<String> worldNames() {
         Server server = Server.getInstance();
         Set<String> names = new TreeSet<>();
         server.getLevels().values().forEach(level -> names.add(level.getName()));
-        File[] folders = new File(server.getDataPath(), "worlds").listFiles(File::isDirectory);
-        if (folders != null) for (File folder : folders) {
-            if (server.isLevelGenerated(folder.getName())) names.add(folder.getName());
-        }
+        names.addAll(worldFolders(server));
         return new ArrayList<>(names);
     }
 

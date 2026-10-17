@@ -68,15 +68,13 @@ public class PortalHistory implements Listener {
     }
 
     private void addHistoryLocation(Player player, Location location) {
-        portalHistoryMap.computeIfAbsent(player, k -> new ArrayList<>());
-        ArrayList<Location> historyList = portalHistoryMap.get(player);
+        ArrayList<Location> historyList = portalHistoryMap.computeIfAbsent(player, k -> new ArrayList<>());
         int cursor = portalHistoryStatusMap.getOrDefault(player, historyList.size());
         if (cursor < historyList.size()) historyList.subList(cursor, historyList.size()).clear();
         historyList.add(location.clone());
         if (historyList.size() > historyLimit) {
             historyList.remove(0);
         }
-        portalHistoryMap.put(player, historyList);
         portalHistoryStatusMap.put(player, historyList.size());
     }
 

@@ -30,24 +30,39 @@ public final class WildService {
   player.sendMessage(Main.text("err.wild.noSafeSpot"));
  }
  private final java.util.Set<UUID> shown=new java.util.HashSet<>();
+ private Class<?> boundType;private java.lang.reflect.Method pin,bossBar,unpin;
+ private static java.lang.reflect.Method find(Class<?> type,String name,Class<?>... params){try{return type.getMethod(name,params);}catch(NoSuchMethodException missing){return null;}}
+ /** tokaDisplay is reached by reflection; the methods are looked up once per display class, not on every render. */
+ private void bind(Class<?> type){
+  boundType=type;
+  pin=find(type,"pin",Player.class,String.class,String.class,int.class,int.class,float.class,String.class);
+  bossBar=find(type,"bossBar",Player.class,String.class,String.class,float.class,int.class,int.class);
+  unpin=find(type,"unpin",Player.class,String.class);
+ }
  /** The cooldown is one pinned line under the base information of the boss bar, and it drives the bar. */
  public void render(){
   var active=cooldowns.players();
   var display=plugin.getServer().getPluginManager().getPlugin("tokaDisplay");if(display==null||!display.isEnabled()||!plugin.getConfig().getBoolean("wild.show-cooldown",true))return;
-  for(UUID uuid:active){
-   Player player=plugin.getServer().getOnlinePlayers().get(uuid);if(player==null)continue;
-   long left=remainingMillis(uuid);float progress=Math.max(0,Math.min(100,100f-left*100f/(seconds()*1000f)));
-   String text=Main.text("ui.wild.cooldownBar",(left+999)/1000);
-   try{
-    try{display.getClass().getMethod("pin",Player.class,String.class,String.class,int.class,int.class,float.class,String.class).invoke(null,player,"portal:wild",text,3,10,progress,plugin.getConfig().getString("wild.bar-color","cooldown"));}
-    catch(NoSuchMethodException older){display.getClass().getMethod("bossBar",Player.class,String.class,String.class,float.class,int.class,int.class).invoke(null,player,"portal:wild",text,progress,100,25);}
-    shown.add(uuid);
-   }catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){/* Display cannot change business readiness. */}
+  if(display.getClass()!=boundType)bind(display.getClass());
+  if(!active.isEmpty()){
+   int total=seconds();String color=plugin.getConfig().getString("wild.bar-color","cooldown");
+   for(UUID uuid:active){
+    Player player=plugin.getServer().getOnlinePlayers().get(uuid);if(player==null)continue;
+    long left=remainingMillis(uuid);float progress=Math.max(0,Math.min(100,100f-left*100f/(total*1000f)));
+    String text=Main.text("ui.wild.cooldownBar",(left+999)/1000);
+    try{
+     if(pin!=null)pin.invoke(null,player,"portal:wild",text,3,10,progress,color);
+     else if(bossBar!=null)bossBar.invoke(null,player,"portal:wild",text,progress,100,25);
+     else continue;
+     shown.add(uuid);
+    }catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){/* Display cannot change business readiness. */}
+   }
   }
+  if(shown.isEmpty())return;
   for(var uuid:new java.util.ArrayList<>(shown)){
    if(active.contains(uuid))continue;
-   shown.remove(uuid);Player player=plugin.getServer().getOnlinePlayers().get(uuid);if(player==null)continue;
-   try{display.getClass().getMethod("unpin",Player.class,String.class).invoke(null,player,"portal:wild");}
+   shown.remove(uuid);Player player=plugin.getServer().getOnlinePlayers().get(uuid);if(player==null||unpin==null)continue;
+   try{unpin.invoke(null,player,"portal:wild");}
    catch(ReflectiveOperationException|RuntimeException|LinkageError ignored){/* The line goes away by itself after its time. */}
   }
  }
