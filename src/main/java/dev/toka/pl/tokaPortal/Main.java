@@ -45,8 +45,18 @@ public class Main extends PluginBase implements Listener {
     }
 
     /** Sends the help text of a command (help.&lt;command&gt;) to the sender. */
+    /** The values a help text needs from the config, such as the worlds and the cooldown of /wild. */
+    public static Object[] helpArguments(String command) {
+        if (command.equals("wild")) {
+            var config = instance.getConfig();
+            java.util.List<String> worlds = config.getStringList("wild.worlds");
+            return new Object[]{worlds.isEmpty() ? "-" : String.join("、", worlds), config.getInt("wild.cooldown-seconds", 40)};
+        }
+        return new Object[0];
+    }
+
     public static void help(CommandSender sender, String command) {
-        for (String line : lines("help." + command)) sender.sendMessage(line);
+        for (String line : lines("help." + command, helpArguments(command))) sender.sendMessage(line);
     }
 
     public static IDataProvider getProvider() {

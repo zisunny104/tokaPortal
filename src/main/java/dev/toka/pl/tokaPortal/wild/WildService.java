@@ -11,8 +11,8 @@ public final class WildService {
  public long remainingMillis(UUID player){return cooldowns.remainingMillis(player);}
  private int seconds(){return Math.max(1,Math.min(86400,plugin.getConfig().getInt("wild.cooldown-seconds",40)));}
  public void execute(Player player){
-  var worlds=plugin.getConfig().exists("wild.worlds")?plugin.getConfig().getStringList("wild.worlds"):java.util.List.of("resource");
-  if(!worlds.contains(player.getLevel().getName())){player.sendMessage(Main.text("err.wild.worldOnly"));return;}
+  var worlds=plugin.getConfig().getStringList("wild.worlds");
+  if(!worlds.contains(player.getLevel().getName())){player.sendMessage(Main.text("err.wild.worldOnly",worlds.isEmpty()?"-":String.join("、",worlds)));return;}
   long remaining=remainingMillis(player.getUniqueId());
   if(remaining>0){player.sendMessage(Main.text("err.wild.cooldown",(remaining+999)/1000));return;}
   var level=player.getLevel();int radius=Math.max(1,Math.min(10000,plugin.getConfig().getInt("wild.radius",375)));

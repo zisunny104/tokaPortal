@@ -33,7 +33,7 @@ public final class HelpOverview {
     public static void send(CommandSender sender, String[] args) {
         List<String> lines = new ArrayList<>();
         for (Entry entry : ENTRIES) {
-            List<String> help = Main.lines("help." + entry.command());
+            List<String> help = Main.lines("help." + entry.command(), Main.helpArguments(entry.command()));
             if (entry.line() >= help.size()) {
                 continue;
             }
