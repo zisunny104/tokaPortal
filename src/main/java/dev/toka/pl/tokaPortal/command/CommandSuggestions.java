@@ -50,7 +50,9 @@ final class CommandSuggestions {
     }
 
     static CommandParameter names(String label, boolean optional, String enumName, List<String> values) {
-        return CommandParameter.newEnum(label, optional, new CommandEnum(enumName, values));
+        // 客戶端只接受小寫候選字，含大寫的名稱不送，避免客戶端記錄錯誤。
+        List<String> accepted = values.stream().filter(value -> value.equals(value.toLowerCase(Locale.ROOT))).toList();
+        return CommandParameter.newEnum(label, optional, new CommandEnum(enumName, accepted));
     }
 
     static CommandDataVersions parameters(CommandDataVersions data, CommandParameter[]... alternatives) {
