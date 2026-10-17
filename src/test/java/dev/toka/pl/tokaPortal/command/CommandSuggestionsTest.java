@@ -24,12 +24,12 @@ class CommandSuggestionsTest {
         alice.versions.getFirst().overloads = shared;
         bob.versions.getFirst().overloads = shared;
         CommandSuggestions.parameters(alice, new CommandParameter[]{
-                CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", List.of("Alice 的家"))});
+                CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", List.of("alice 的家"))});
         CommandSuggestions.parameters(bob, new CommandParameter[]{
-                CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", List.of("Bob 的家"))});
+                CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", List.of("bob 的家"))});
         assertTrue(shared.isEmpty());
-        assertEquals(List.of("Alice 的家"), alice.versions.getFirst().overloads.get("choice0").input.parameters[0].enumData.getValues());
-        assertEquals(List.of("Bob 的家"), bob.versions.getFirst().overloads.get("choice0").input.parameters[0].enumData.getValues());
+        assertEquals(List.of("alice 的家"), alice.versions.getFirst().overloads.get("choice0").input.parameters[0].enumData.getValues());
+        assertEquals(List.of("bob 的家"), bob.versions.getFirst().overloads.get("choice0").input.parameters[0].enumData.getValues());
     }
 
     @Test void suggestionsRetainManualInputAndOptionalArgument() {
@@ -40,6 +40,11 @@ class CommandSuggestionsTest {
         assertEquals(CommandParamType.STRING, data.versions.getFirst().overloads.get("choice1").input.parameters[0].type);
         assertTrue(CommandSuggestions.names("住家名稱", true, "TokaPortalHomes", List.of("家")).optional);
         assertNull(CommandSuggestions.parameters(null, new CommandParameter[0]));
+    }
+
+    @Test void dropsNamesWithUppercaseLetters() {
+        var parameter = CommandSuggestions.names("名稱", true, "TokaPortalNames", List.of("KASTW-RedTown", "spawn"));
+        assertEquals(List.of("spawn"), parameter.enumData.getValues());
     }
 
     @Test void coreEncodesSuggestionsAndManualInputInCommandPacket() {
