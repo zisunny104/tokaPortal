@@ -102,7 +102,7 @@ storage:
 
 ## 多語系
 
-所有玩家訊息、表單、指令說明與後台文字都放在 `lang/zh-TW.yml`（共用套件 tokaI18n，內嵌於 JAR）。`config.yml` 的 `language` 選擇語言，目前只提供繁體中文 `zh-TW`。伺服器擁有者可把同名檔放進 `plugins/tokaPortal/lang/` 覆蓋個別文字。每個指令都可用 `/<指令> help` 查看說明。key 分區與待確認事項見 [多語系說明](docs/I18N.md)。
+所有玩家訊息、表單、指令說明與後台文字都放在 `lang/zh-TW.yml`（共用套件 tokaI18n，內嵌於 JAR）。`config.yml` 的 `language` 選擇語言，目前只提供繁體中文 `zh-TW`。伺服器擁有者可把同名檔放進 `plugins/tokaPortal/lang/` 覆蓋個別文字。每個指令都可用 `/<指令> help` 查看說明。key 分區與。共用的多語系原則見[拆分主文件](https://github.com/zisunny104/zero/blob/master/docs/ARCHITECTURE.md)。
 
 ## 驗證範圍與問題回報
 
