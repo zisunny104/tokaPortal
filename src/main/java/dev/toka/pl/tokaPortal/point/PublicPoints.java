@@ -7,8 +7,12 @@ import java.util.*;
 /** Persistent public destinations. */
 public final class PublicPoints implements AutoCloseable {
  private final DocumentStore store;
+ private final dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer;
  private JsonObject state;
- public PublicPoints(Path directory, Backend backend) throws IOException {
+ public PublicPoints(Path directory, Backend backend) throws IOException {this(directory,backend,null);}
+ /** writer 為 null 時同步寫入。 */
+ public PublicPoints(Path directory, Backend backend, dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer) throws IOException {
+  this.writer=writer;
   store=DocumentStore.open(new StoreConfig(backend,directory,1));
   try { state=normalize(store.load("public-points").orElseGet(()->JsonParser.parseString("{\"schema\":1,\"points\":[]}").getAsJsonObject())); }
   catch(IOException|RuntimeException e){store.close();throw e;}
@@ -49,10 +53,14 @@ public final class PublicPoints implements AutoCloseable {
   if(!state.getAsJsonArray("points").isEmpty()&&!state.equals(next))throw new IOException("Destination is not empty or identical");
   persist(next);return next.getAsJsonArray("points").size();
  }
- private void persist(JsonObject next)throws IOException{
+ private void write(JsonObject next)throws IOException{
   store.save("public-points",next);
   JsonObject actual=normalize(store.load("public-points").orElseThrow(()->new IOException("Missing readback")));
-  if(!actual.equals(next))throw new IOException("Public-points readback mismatch");state=next;
+  if(!actual.equals(next))throw new IOException("Public-points readback mismatch");
+ }
+ private void persist(JsonObject next)throws IOException{
+  if(writer==null){write(next);state=next;return;}
+  state=next;writer.submit("log.points.saveFailed",()->write(next));
  }
  public synchronized Map<Object,teleportPoint> points(){Map<Object,teleportPoint> out=new LinkedHashMap<>();for(JsonElement row:state.getAsJsonArray("points")){teleportPoint point=new teleportPoint(row.getAsJsonObject());out.put(point.getName(),point);}return Collections.unmodifiableMap(out);}
  public synchronized boolean create(JsonObject row)throws IOException{JsonObject next=state.deepCopy();for(JsonElement old:next.getAsJsonArray("points"))if(old.getAsJsonObject().get("name").equals(row.get("name")))return false;next.getAsJsonArray("points").add(row);persist(normalize(next));return true;}

@@ -344,6 +344,8 @@ log:
     loaded: "§b載入住家共 §a${0} §b個"
     saveFailed: "§c住家儲存失敗"
     deleteFailed: "§c住家刪除失敗"
+  writer:
+    timeout: "§e背景儲存寫入逾時，部分資料可能未寫入"
   zero:
     waiting: "§b等待 zero 載入"
     missing: "§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、區域及城市通）"

@@ -5,18 +5,21 @@ import cn.nukkit.level.Location;
 import cn.nukkit.utils.ConfigSection;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.provider.storage.HomeStorage;
+import dev.toka.pl.tokaPortal.provider.storage.WriteQueue;
 
 import java.io.IOException;
 import java.util.*;
 
 public class BaseDataProvider implements IDataProvider {
     private final HomeStorage storage;
+    private final WriteQueue writer;
     private final String name;
     private Map<Integer, HomePoint> homes = new LinkedHashMap<>();
     private ConfigSection document;
 
-    public BaseDataProvider(HomeStorage storage, String name) {
+    public BaseDataProvider(HomeStorage storage, WriteQueue writer, String name) {
         this.storage = storage;
+        this.writer = writer;
         this.name = name;
         try { reload(); }
         catch (RuntimeException e) {
@@ -60,8 +63,11 @@ public class BaseDataProvider implements IDataProvider {
     private void persist(Map<Integer, HomePoint> candidate) {
         ConfigSection next = new ConfigSection(document);
         next.set("homes", new ArrayList<>(candidate.values().stream().map(HomePoint::getRawData).toList()));
-        try { storage.save(next); }
+        ConfigSection validated;
+        try { validated = HomeStorage.validate(next); }
         catch (IOException e) { throw new IllegalStateException("Home data could not be saved.", e); }
+        // 記憶體立即更新，寫入排入背景佇列（驗證後為獨立副本）
+        writer.submit("log.homes.saveFailed", () -> storage.save(validated));
         document = next;
     }
 
@@ -86,6 +92,7 @@ public class BaseDataProvider implements IDataProvider {
     @Override public IDataProvider close(boolean save) {
         try { if (save) save(); }
         finally {
+            writer.drain(10_000);
             try { storage.close(); }
             catch (IOException e) { throw new IllegalStateException("Home data could not be closed.", e); }
         }

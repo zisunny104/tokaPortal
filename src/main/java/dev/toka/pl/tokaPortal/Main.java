@@ -19,6 +19,7 @@ public class Main extends PluginBase implements Listener {
     private static Main instance;
     private static IDataProvider provider;
     private Messages messages;
+    private dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer;
     private dev.toka.pl.tokaPortal.point.PublicPoints publicPoints;
     public dev.toka.pl.tokaPortal.point.PublicPoints getPublicPoints(){return publicPoints;}
     private dev.toka.pl.tokaPortal.wild.WildService wildService;
@@ -60,6 +61,7 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onEnable() {
         instance = this;
+        writer = new dev.toka.pl.tokaPortal.provider.storage.WriteQueue((key, error) -> getLogger().error(text(key), error));
         saveDefaultConfig();
         messages = new Messages(getClass().getClassLoader(), getDataFolder().toPath(), getConfig().getString("language", "zh-TW"), line -> getLogger().warning(line));
         dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize(false);
@@ -82,8 +84,15 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onDisable() {
         if(wildService!=null)wildService.close();
+        drainWrites();
         if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error(text("log.points.closeFailed"),e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
+        if (writer != null) writer.shutdown();
+    }
+
+    /** 關閉儲存前等背景寫入完成，逾時只記 log。 */
+    private void drainWrites() {
+        if (writer != null && !writer.drain(10_000)) getLogger().warning(text("log.writer.timeout"));
     }
 
     private void registerEvents() {
@@ -112,14 +121,15 @@ public class Main extends PluginBase implements Listener {
         saveDefaultConfig();
         reloadConfig();
         if (messages != null) messages.language(getConfig().getString("language", "zh-TW"));
+        drainWrites();
         if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error(text("log.points.closeFailed"),e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
         String format = getConfig().getNested("storage.backend", "sqlite");
         try {
             var storage = StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll());
-            provider = new BaseDataProvider(storage, format);
+            provider = new BaseDataProvider(storage, writer, format);
             var backend=dev.toka.storage.Backend.valueOf(format.toUpperCase(java.util.Locale.ROOT));
-            publicPoints=new dev.toka.pl.tokaPortal.point.PublicPoints(getDataFolder().toPath().resolve("storage").resolve(format).resolve("public-points"),backend);
+            publicPoints=new dev.toka.pl.tokaPortal.point.PublicPoints(getDataFolder().toPath().resolve("storage").resolve(format).resolve("public-points"),backend,writer);
             getLogger().info(text("log.points.loaded", publicPoints.points().size()));
             int homes = storage.load().getList("homes").size();
             getLogger().info(text("log.homes.loaded", homes));
