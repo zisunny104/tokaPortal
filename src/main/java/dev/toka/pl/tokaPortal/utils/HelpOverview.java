@@ -49,7 +49,9 @@ public final class HelpOverview {
             }
         }
         int perPage = Math.max(3, Main.getInstance().getConfig().getInt("help-lines-per-page", 8));
-        Pager.Page<String> page = Pager.of(lines, perPage, Pager.parse(args.length > 1 ? args[1] : null, 1));
+        // "all" shows every line at once, with no pages
+        boolean all = args.length > 1 && (args[1].equalsIgnoreCase("all"));
+        Pager.Page<String> page = Pager.of(lines, all ? Math.max(1, lines.size()) : perPage, Pager.parse(args.length > 1 ? args[1] : null, 1));
         sender.sendMessage(Main.text("help.overview.title"));
         for (String line : page.lines()) {
             sender.sendMessage(line);
