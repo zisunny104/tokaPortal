@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /** Optional, reflective access to the original zero API. No zero classes are linked into this JAR. */
 public final class ZeroIntegration {
-    public enum Feature { PLAYERS, POINTS, POINT_MANAGEMENT, REGIONS, LAND, CITY_PASS, WILD }
+    public enum Feature { PLAYERS, REGIONS, LAND, CITY_PASS }
     private static final String PREFIX = "prj.toka.zero.";
     private static final EnumSet<Feature> available = EnumSet.noneOf(Feature.class);
     private static Plugin zero;
@@ -52,16 +52,6 @@ public final class ZeroIntegration {
                     {"player.PlayerInfo", "isTopQuanXian"}, {"player.PlayerInfo", "isHighQuanXian"},
                     {"player.PlayerInfo", "isPortalStatus"}, {"player.PlayerInfo", "getRegionInfo"},
                     {"player.PlayerInfo", "getRegion"}});
-            check(Feature.POINTS, new String[][] {
-                    {"ser.portal.teleportPoint.teleportPoint", "getPoint", "java.lang.String"},
-                    {"ser.portal.teleportPoint.teleportPoint", "getPoints"},
-                    {"ser.portal.teleportPoint.teleportPoint", "getLocation"},
-                    {"ser.portal.teleportPoint.teleportPoint", "getInfo"},
-                    {"ser.portal.teleportPoint.teleportPoint", "getType"},
-                    {"ser.portal.teleportPoint.teleportPoint", "getCreator"}});
-            check(Feature.POINT_MANAGEMENT, new String[][] {
-                    {"ser.portal.teleportPoint.teleportPoint", "setTeleportPoint", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "cn.nukkit.level.Location"},
-                    {"ser.portal.teleportPoint.teleportPoint", "delTeleportPoint", PREFIX + "ser.portal.teleportPoint.teleportPoint"}});
             check(Feature.REGIONS, new String[][] {
                     {"ser.region.Region", "getRegion", "java.lang.String"}, {"ser.region.Region", "getRegions"},
                     {"ser.region.Region", "getName"}, {"ser.region.Region", "getTpr"}, {"ser.region.Region", "getInfo"}});
@@ -70,16 +60,13 @@ public final class ZeroIntegration {
                     {"ser.land.Land", "toLand", PREFIX + "ser.land.Land", "cn.nukkit.Player"},
                     {"ser.land.Land", "getLandNameListByOwner", "cn.nukkit.Player"}});
             check(Feature.CITY_PASS, new String[][] {{"player.citypass.CityPass", "sendCityPassForm", "cn.nukkit.Player"}});
-            check(Feature.WILD, new String[][] {
-                    {"player.Players", "getPlayerInfo", "cn.nukkit.Player"},
-                    {"player.PlayerInfo", "getBossBarLength"}, {"player.PlayerInfo", "reBossBarLength"}});
         }
         if (zero == null && !finalAttempt) {
             Main.getInstance().getLogger().info("§7等待 zero 載入，稍後再檢查整合");
             return;
         }
         if (zero == null) {
-            Main.getInstance().getLogger().warning("§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、隨機傳送等）");
+            Main.getInstance().getLogger().warning("§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、區域及城市通）");
             return;
         }
         Main.getInstance().getLogger().info("§b載入 zero 可用整合共 §a" + available.size() + " §b個：§f" + available);
@@ -99,7 +86,6 @@ public final class ZeroIntegration {
                 Method method = type.getMethod(signature[1], params);
                 Class<?> expected = switch (signature[1]) {
                     case "getPlayerInfo" -> load("player.PlayerInfo");
-                    case "getPoint" -> load("ser.portal.teleportPoint.teleportPoint");
                     case "getRegion" -> load("ser.region.Region");
                     case "getLand" -> load("ser.land.Land");
                     case "getLocation", "getTpr" -> Location.class;
@@ -174,43 +160,6 @@ public final class ZeroIntegration {
         public boolean isPortalStatus() { return delegate != null && Boolean.TRUE.equals(get("isPortalStatus")); }
         public String getRegionInfo() { Object value = get("getRegionInfo"); return value == null ? "目前位置" : value.toString(); }
         public Region getRegion() { Object value = get("getRegion"); return value == null ? null : new Region(value); }
-        public double getBossBarLength() {
-            Object info = invoke(Feature.WILD, null, "player.Players", "getPlayerInfo", player);
-            Object value = info == null ? null : invoke(Feature.WILD, info, "player.PlayerInfo", "getBossBarLength");
-            return value instanceof Number ? ((Number) value).doubleValue() : 0;
-        }
-        public void reBossBarLength() {
-            Object info = invoke(Feature.WILD, null, "player.Players", "getPlayerInfo", player);
-            if (info != null) invoke(Feature.WILD, info, "player.PlayerInfo", "reBossBarLength");
-        }
-    }
-
-    public static final class teleportPoint {
-        private final Object delegate;
-        private teleportPoint(Object delegate) { this.delegate = delegate; }
-        private Object get(String method) { return invoke(Feature.POINTS, delegate, "ser.portal.teleportPoint.teleportPoint", method); }
-        public Location getLocation() { return (Location) get("getLocation"); }
-        public String getInfo() { return Objects.toString(get("getInfo"), ""); }
-        public String getType() { return Objects.toString(get("getType"), ""); }
-        public String getCreator() { return Objects.toString(get("getCreator"), ""); }
-        public static teleportPoint getPoint(String name) {
-            Object value = invoke(Feature.POINTS, null, "ser.portal.teleportPoint.teleportPoint", "getPoint", name);
-            return value == null ? null : new teleportPoint(value);
-        }
-        public static Map<Object, teleportPoint> getPoints() {
-            Map<Object, teleportPoint> result = new LinkedHashMap<>();
-            Object value = invoke(Feature.POINTS, null, "ser.portal.teleportPoint.teleportPoint", "getPoints");
-            if (value instanceof Map<?, ?> map) map.forEach((key, point) -> result.put(key, new teleportPoint(point)));
-            return result;
-        }
-        public static boolean setTeleportPoint(String name, String creator, String type, String info, Location location) {
-            invoke(Feature.POINT_MANAGEMENT, null, "ser.portal.teleportPoint.teleportPoint", "setTeleportPoint", name, creator, type, info, location);
-            return has(Feature.POINT_MANAGEMENT);
-        }
-        public static boolean delTeleportPoint(teleportPoint point) {
-            invoke(Feature.POINT_MANAGEMENT, null, "ser.portal.teleportPoint.teleportPoint", "delTeleportPoint", point.delegate);
-            return has(Feature.POINT_MANAGEMENT);
-        }
     }
 
     public static final class Region {

@@ -17,7 +17,7 @@ public class SpawnCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINTS)) return false;
+
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);

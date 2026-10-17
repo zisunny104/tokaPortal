@@ -17,6 +17,8 @@ public class Main extends PluginBase implements Listener {
 
     private static Main instance;
     private static IDataProvider provider;
+    private dev.toka.pl.tokaPortal.point.PublicPoints publicPoints;
+    public dev.toka.pl.tokaPortal.point.PublicPoints getPublicPoints(){return publicPoints;}
     private dev.toka.pl.tokaPortal.wild.WildService wildService;
     public dev.toka.pl.tokaPortal.wild.WildService getWildService(){return wildService;}
 
@@ -51,6 +53,7 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onDisable() {
         if(wildService!=null)wildService.close();
+        if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error("傳送點資料關閉失敗",e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
     }
 
@@ -79,12 +82,16 @@ public class Main extends PluginBase implements Listener {
     public void reload() {
         saveDefaultConfig();
         reloadConfig();
+        if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error("傳送點資料關閉失敗",e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
         String format = getConfig().getNested("storage.backend", "sqlite");
         try {
             var storage = StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll());
-            int homes = storage.load().getList("homes").size();
             provider = new BaseDataProvider(storage, format);
+            var backend=dev.toka.storage.Backend.valueOf(format.toUpperCase(java.util.Locale.ROOT));
+            publicPoints=new dev.toka.pl.tokaPortal.point.PublicPoints(getDataFolder().toPath().resolve("storage").resolve(format).resolve("public-points"),backend);
+            getLogger().info("§b載入傳送點共 §a"+publicPoints.points().size()+" §b個");
+            int homes = storage.load().getList("homes").size();
             getLogger().info("§b載入住家共 §a" + homes + " §b個");
         } catch (java.io.IOException | RuntimeException e) {
             throw new IllegalStateException("住家資料無法開啟；請檢查設定與資料檔，勿刪除原始資料。", e);

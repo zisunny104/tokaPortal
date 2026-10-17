@@ -12,7 +12,6 @@ import java.util.*;
 public final class TokaHomeStorage implements HomeStorage {
     private final DocumentStore store;
     public TokaHomeStorage(Path directory,Backend backend)throws IOException {
-        if(backend==Backend.SQLITE)try{Class.forName("org.sqlite.JDBC",true,TokaHomeStorage.class.getClassLoader());}catch(ClassNotFoundException error){throw new IOException("SQLite driver 不可用。",error);}
         store=DocumentStore.open(new StoreConfig(backend,directory,1));
     }
     @Override public ConfigSection load()throws IOException {

@@ -5,7 +5,7 @@ name: tokaPortal
 main: dev.toka.pl.tokaPortal.Main
 
 #插件版本
-version: "2.2.1"
+version: "2.2.2"
 
 #核心API版本
 api: ["1.0.11"]
@@ -23,3 +23,8 @@ description: "[prjToka]傳送插件"
 #depend: []
 softdepend: [zero, tokaDisplay]
 
+
+permissions:
+  tokaPortal.points.manage:
+    description: 管理公共傳送點
+    default: op

@@ -18,7 +18,7 @@ import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.*;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
 
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint;
+import dev.toka.pl.tokaPortal.point.teleportPoint;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Region;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.*;
@@ -41,7 +41,7 @@ public class PortalWindow implements Listener {
         if (ZeroIntegration.has(REGIONS)) window.addButton(new ElementButton(BUTTON_PORTAL_REGION_LIST));
         if (ZeroIntegration.has(LAND)) window.addButton(new ElementButton(BUTTON_PORTAL_LAND_LIST));
         window.addButton(new ElementButton(BUTTON_PORTAL_PLAYER_LIST));
-        if (ZeroIntegration.has(POINTS)) {
+        {
             window.addButton(new ElementButton(BUTTON_PORTAL_SHOPBOX_LIST));
             window.addButton(new ElementButton(BUTTON_PORTAL_TELEPORT_LIST));
         }
@@ -51,7 +51,7 @@ public class PortalWindow implements Listener {
     }
 
     private static void sendPortalTeleportPointListWindow(Player player) {
-        if (!ZeroIntegration.require(player, POINTS)) return;
+
         FormWindowSimple window = new FormWindowSimple(TITLE_PORTAL_TELEPORT_LIST, "傳送點列表 \n點擊進行傳送");
         window.addButton(new ElementButton(BUTTON_BACK));
         for (teleportPoint point : teleportPoint.getPoints().values()) {
@@ -63,7 +63,7 @@ public class PortalWindow implements Listener {
     }
 
     private static void sendPortalShopBoxListWindow(Player player) {
-        if (!ZeroIntegration.require(player, POINTS)) return;
+
         FormWindowSimple window = new FormWindowSimple(TITLE_PORTAL_SHOPBOX_LIST, "點擊進行傳送");
         window.addButton(new ElementButton(BUTTON_BACK));
         for (teleportPoint point : teleportPoint.getPoints().values()) {
@@ -181,7 +181,7 @@ public class PortalWindow implements Listener {
                         break;
 
                         case TITLE_PORTAL_TELEPORT_LIST: {
-                            if (!ZeroIntegration.require(player, POINTS)) break;
+
                             if (button.equals(BUTTON_BACK)) {
                                 sendPortalMainWindow(player);
                             }
@@ -194,7 +194,7 @@ public class PortalWindow implements Listener {
                         }
 
                         case TITLE_PORTAL_SHOPBOX_LIST: {
-                            if (!ZeroIntegration.require(player, POINTS)) break;
+
                             if (button.equals(BUTTON_BACK)) {
                                 sendPortalMainWindow(player);
                             }

@@ -6,10 +6,10 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.level.Location;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint;
+import dev.toka.pl.tokaPortal.point.teleportPoint;
 
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint.*;
+import static dev.toka.pl.tokaPortal.point.teleportPoint.*;
 
 public class PortalCommand extends Command {
 
@@ -27,9 +27,7 @@ public class PortalCommand extends Command {
                 switch (args[0].toLowerCase()) {
                     case "tpp":
                     case "point": {
-                        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(player,
-                                dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINTS,
-                                dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINT_MANAGEMENT)) return false;
+                        if (!player.hasPermission("tokaPortal.points.manage")) { player.sendMessage("[傳送]權限不足。"); return false; }
                         if (args.length < 2) { player.sendMessage("/portal point <set|del> <名稱> [類型]"); return false; }
                         if (args[1] != null) {
                             switch (args[1].toLowerCase()) {

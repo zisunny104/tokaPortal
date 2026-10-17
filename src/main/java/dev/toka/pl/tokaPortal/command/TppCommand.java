@@ -5,11 +5,11 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.Player;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint;
+import dev.toka.pl.tokaPortal.point.teleportPoint;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.toPoint;
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint.getPoint;
+import static dev.toka.pl.tokaPortal.point.teleportPoint.getPoint;
 
 public class TppCommand extends Command {
     public TppCommand() {
@@ -19,7 +19,7 @@ public class TppCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.POINTS)) return false;
+
         if (!(sender instanceof Player)) { sender.sendMessage("[傳送]請在遊戲內進行"); return false; }
         Player player = (Player) sender;
         PlayerInfo pli = getPlayerInfo(player);

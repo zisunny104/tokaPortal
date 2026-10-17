@@ -9,7 +9,7 @@ import dev.toka.pl.tokaPortal.event.PlayerPortalEvent;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint;
+import dev.toka.pl.tokaPortal.point.teleportPoint;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Region;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import static cn.nukkit.potion.Effect.getEffect;
 import static dev.toka.pl.tokaPortal.Main.getProvider;
 import static dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalTpaAcceptWindow;
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.teleportPoint.getPoint;
+import static dev.toka.pl.tokaPortal.point.teleportPoint.getPoint;
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Region.getRegion;
 import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.callEvent;
 
@@ -39,7 +39,7 @@ public class Portal implements Listener {
     }
 
     public static void toPoint(String pointName, Player player) {
-        if (!ZeroIntegration.require(player, POINTS)) return;
+
         toPoint(getPoint(pointName), player);
     }
 
