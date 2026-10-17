@@ -130,19 +130,27 @@ public class PortalCommand extends Command {
         }
     }
 
-    /** /portal legacy list [頁] | claim <名稱> <玩家>：管理尚未對應 UUID 的舊名稱住家（OP，console 可用）。 */
+    /** 住家或傳送點的 legacy 名稱群組，供清單合併顯示。 */
+    private record LegacyLine(String name, int count, boolean disputed, boolean point) {}
+
+    /** /portal legacy list [頁] | claim <名稱> <玩家>：管理尚未對應 UUID 的舊名稱住家與傳送點（OP，console 可用）。 */
     private void legacy(CommandSender sender, String[] args) {
         if (!sender.isOp()) { sender.sendMessage(Main.text("err.noPermission")); return; }
         var provider = Main.getProvider();
         String sub = args.length > 1 ? args[1].toLowerCase() : "";
         if (provider == null || (!sub.equals("list") && !sub.equals("claim"))) { sender.sendMessage(Main.text("msg.legacy.usage")); return; }
+        var points = Main.getInstance().getPublicPoints();
         if (sub.equals("list")) {
-            var groups = provider.legacyGroups();
+            var groups = new java.util.ArrayList<LegacyLine>();
+            for (var group : provider.legacyGroups()) groups.add(new LegacyLine(group.name(), group.homes(), group.disputed(), false));
+            if (points != null) for (var group : points.legacyGroups()) groups.add(new LegacyLine(group.name(), group.homes(), group.disputed(), true));
+            groups.sort(java.util.Comparator.comparing((LegacyLine line) -> line.name().toLowerCase(java.util.Locale.ROOT)).thenComparing(LegacyLine::point));
             if (groups.isEmpty()) { sender.sendMessage(Main.text("msg.legacy.empty")); return; }
             var page = dev.toka.i18n.Pager.of(groups, 10, dev.toka.i18n.Pager.parse(args.length > 2 ? args[2] : null, 1));
             sender.sendMessage(Main.text("msg.legacy.header", groups.size()));
             for (var group : page.lines()) {
-                sender.sendMessage(Main.text(group.disputed() ? "msg.legacy.lineDisputed" : "msg.legacy.line", group.name(), group.homes()));
+                sender.sendMessage(Main.text(group.disputed() ? "msg.legacy.lineDisputed" : "msg.legacy.line", group.name(), group.count(),
+                        Main.text(group.point() ? "msg.legacy.typePoint" : "msg.legacy.typeHome")));
             }
             if (page.pages() > 1) sender.sendMessage(Main.text("ui.page.footer", page.page(), page.pages(), "/portal legacy list"));
             return;
@@ -155,8 +163,10 @@ public class PortalCommand extends Command {
             if (found.isEmpty()) { sender.sendMessage(Main.text("err.player.notFound", target)); return; }
             String shown = Main.getInstance().getServer().getOnlinePlayers().values().stream()
                     .filter(online -> online.getUniqueId().equals(found.get())).map(Player::getName).findFirst().orElse(target);
-            int claimed = current.claimLegacy(legacyName, found.get(), shown);
-            sender.sendMessage(claimed > 0 ? Main.text("msg.legacy.claimed", legacyName, shown, claimed) : Main.text("err.legacy.notFound", legacyName));
+            int homes = current.claimLegacy(legacyName, found.get(), shown);
+            var currentPoints = Main.getInstance().getPublicPoints();
+            int claimedPoints = currentPoints == null ? 0 : currentPoints.claimLegacy(legacyName, found.get(), shown);
+            sender.sendMessage(homes + claimedPoints > 0 ? Main.text("msg.legacy.claimed", legacyName, shown, homes, claimedPoints) : Main.text("err.legacy.notFound", legacyName));
         });
     }
 }

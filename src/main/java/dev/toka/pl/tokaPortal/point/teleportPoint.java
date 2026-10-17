@@ -15,7 +15,10 @@ public final class teleportPoint {
  /** 建立者 UUID；舊資料沒有則為 null。 */
  public java.util.UUID getOwner(){return row.has("owner")?HomePoint.parseUuid(row.get("owner").getAsString()):null;}
  /** 有 owner 以 UUID 比對，舊資料才比對建立者名稱。 */
- public boolean isCreator(cn.nukkit.Player player){java.util.UUID owner=getOwner();return owner!=null?owner.equals(player.getUniqueId()):getCreator().equalsIgnoreCase(player.getName());}
+ public boolean isCreator(cn.nukkit.Player player){return isCreator(player.getUniqueId(),player.getName());}
+ public boolean isCreator(java.util.UUID id,String name){java.util.UUID owner=getOwner();return owner!=null?owner.equals(id):getCreator().equalsIgnoreCase(name);}
+ /** 尚未對應 UUID 的舊名稱傳送點。 */
+ public boolean isLegacy(){return getOwner()==null;}
  public Location getLocation(){var level=Server.getInstance().getLevelByName(row.get("world").getAsString());if(level==null)return null;return new Location(row.get("x").getAsDouble(),row.get("y").getAsDouble(),row.get("z").getAsDouble(),row.get("yaw").getAsDouble(),row.get("pitch").getAsDouble(),level);}
  public static Map<Object,teleportPoint> getPoints(){return Main.getInstance().getPublicPoints().points();}
  public static teleportPoint getPoint(String name){return getPoints().get(name);}

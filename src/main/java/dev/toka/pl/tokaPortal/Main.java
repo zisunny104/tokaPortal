@@ -78,7 +78,7 @@ public class Main extends PluginBase implements Listener {
         reload();
         ownerMigration = new dev.toka.pl.tokaPortal.provider.OwnerMigration(this);
         // 其他插件（tokaEconomy、tokaProfiles）啟用後再解析名稱
-        getServer().getScheduler().scheduleDelayedTask(this, () -> { if (provider != null) ownerMigration.start(provider); }, 20);
+        getServer().getScheduler().scheduleDelayedTask(this, () -> { if (provider != null) ownerMigration.start(provider, publicPoints); }, 20);
 
         wildService=new dev.toka.pl.tokaPortal.wild.WildService(this);
         getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);
@@ -132,7 +132,7 @@ public class Main extends PluginBase implements Listener {
         if (provider != null) { provider.close(false); provider = null; }
         String format = getConfig().getNested("storage.backend", "sqlite");
         try {
-            var storage = StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll());
+            var storage = StorageManager.openConfigured(getDataFolder().toPath(), getConfig().getAll(), messages);
             provider = new BaseDataProvider(storage, writer, format);
             var backend=dev.toka.storage.Backend.valueOf(format.toUpperCase(java.util.Locale.ROOT));
             publicPoints=new dev.toka.pl.tokaPortal.point.PublicPoints(getDataFolder().toPath().resolve("storage").resolve(format).resolve("public-points"),backend,writer);
@@ -144,7 +144,7 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
-    /** 登入：更新住家的最後已知名稱，並取回同名的 legacy 住家。 */
+    /** 登入：更新住家與傳送點的最後已知名稱，並取回同名的 legacy 住家與傳送點。 */
     @EventHandler
     public void onPlayerJoin(cn.nukkit.event.player.PlayerJoinEvent event) {
         if (provider == null) return;
@@ -152,6 +152,10 @@ public class Main extends PluginBase implements Listener {
         var joined = provider.onPlayerJoin(player.getUniqueId(), player.getName());
         if (joined.claimed() > 0) getLogger().info(text("log.homes.claimed", player.getName(), joined.claimed()));
         if (joined.disputed()) getLogger().warning(text("log.homes.joinDispute", player.getName()));
+        if (publicPoints == null) return;
+        var points = publicPoints.onPlayerJoin(player.getUniqueId(), player.getName());
+        if (points.claimed() > 0) getLogger().info(text("log.points.claimed", player.getName(), points.claimed()));
+        if (points.disputed()) getLogger().warning(text("log.points.joinDispute", player.getName()));
     }
 
     @EventHandler

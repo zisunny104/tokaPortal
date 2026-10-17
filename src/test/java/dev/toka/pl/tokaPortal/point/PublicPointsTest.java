@@ -43,4 +43,58 @@ class PublicPointsTest {
    assertThrows(IllegalArgumentException.class,()->points.replaceIfEmptyOrEqual(root.toString()));assertEquals(0,points.points().size());
   }
  }
+
+ private static final java.util.UUID A=java.util.UUID.fromString("00000000-0000-0000-0000-00000000000a"),B=java.util.UUID.fromString("00000000-0000-0000-0000-00000000000b");
+ private static String row(String name,String creator,String owner){
+  return "{\"name\":\""+name+"\",\"creator\":\""+creator+"\",\""+"type\":\"point\",\"info\":\"\",\"world\":\"w\",\"x\":1,\"y\":64,\"z\":2,\"yaw\":0,\"pitch\":0"+(owner==null?"":",\"owner\":\""+owner+"\"")+"}";
+ }
+ private static PublicPoints open(String... rows)throws Exception{
+  PublicPoints points=new PublicPoints(Files.createTempDirectory(Path.of("target"),"public-points-legacy-"),Backend.JSON);
+  points.replaceIfEmptyOrEqual("{\"schema\":1,\"points\":["+String.join(",",rows)+"]}");return points;
+ }
+ @Test void migrationAssignsResolvedNamesAndKeepsTheOthersLegacy()throws Exception{
+  try(PublicPoints points=open(row("p1","Alice",null),row("p2","alice",null),row("p3","Ghost",null))){
+   var result=points.assignOwners(java.util.Map.of("alice",A));
+   assertEquals(2,result.assigned());assertEquals(0,result.disputed());
+   assertEquals(A,points.points().get("p1").getOwner());assertEquals(A,points.points().get("p2").getOwner());
+   assertNull(points.points().get("p3").getOwner());assertEquals("Ghost",points.points().get("p3").getCreator());
+   assertEquals(1,points.legacyGroups().size());
+  }
+ }
+ @Test void disputedNamesAreNotAssignedOrClaimedOnJoin()throws Exception{
+  try(PublicPoints points=open(row("p1","Bob",null),row("p2","bob",B.toString()))){
+   var result=points.assignOwners(java.util.Map.of("bob",A));
+   assertEquals(0,result.assigned());assertEquals(1,result.disputed());assertEquals(java.util.List.of("Bob"),result.disputedNames());
+   assertTrue(points.legacyGroups().getFirst().disputed());
+   var joined=points.onPlayerJoin(A,"Bob");
+   assertEquals(0,joined.claimed());assertTrue(joined.disputed());assertNull(points.points().get("p1").getOwner());
+   assertEquals(1,points.claimLegacy("BOB",A,"Bob"));assertEquals(A,points.points().get("p1").getOwner());
+  }
+ }
+ @Test void joiningClaimsSameNameIgnoringCaseAndUpdatesTheName()throws Exception{
+  try(PublicPoints points=open(row("p1","carol",null),row("p2","Old",A.toString()))){
+   var joined=points.onPlayerJoin(B,"Carol");
+   assertEquals(1,joined.claimed());assertFalse(joined.disputed());
+   assertEquals(B,points.points().get("p1").getOwner());assertEquals("Carol",points.points().get("p1").getCreator());
+   assertEquals(1,points.onPlayerJoin(A,"New").renamed());assertEquals("New",points.points().get("p2").getCreator());
+   assertEquals(0,points.onPlayerJoin(A,"New").renamed());
+  }
+ }
+ @Test void ownerIsDecidedByUuidOnceSetAndByNameForLegacy()throws Exception{
+  try(PublicPoints points=open(row("p1","Alice",A.toString()),row("p2","Bob",null))){
+   assertFalse(points.points().get("p1").isCreator(B,"Alice"));
+   assertTrue(points.points().get("p1").isCreator(A,"Renamed"));
+   assertTrue(points.points().get("p2").isCreator(B,"bob"));
+  }
+ }
+ @Test void migrationIsWrittenThroughTheQueueAndSurvivesReload()throws Exception{
+  Path dir=Files.createTempDirectory(Path.of("target"),"public-points-queue-");
+  var writer=new dev.toka.pl.tokaPortal.provider.storage.WriteQueue((key,error)->fail(key,error));
+  try(PublicPoints points=new PublicPoints(dir,Backend.JSON,writer)){
+   points.replaceIfEmptyOrEqual("{\"schema\":1,\"points\":["+row("p1","Dave",null)+"]}");
+   points.assignOwners(java.util.Map.of("dave",A));assertTrue(writer.drain(5000));
+  }
+  try(PublicPoints points=new PublicPoints(dir,Backend.JSON)){assertEquals(A,points.points().get("p1").getOwner());assertEquals("Dave",points.points().get("p1").getCreator());}
+  writer.shutdown();
+ }
 }
