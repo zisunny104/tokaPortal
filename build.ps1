@@ -5,6 +5,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Push-Location $PSScriptRoot
+$pom = [xml](Get-Content -Raw (Join-Path $PSScriptRoot 'pom.xml')); $n = $pom.project.artifactId; $v = $pom.project.version
 $previousJava = $env:JAVA_HOME
 $previousPath = $env:PATH
 try {
@@ -24,10 +25,10 @@ try {
     & $Maven @common package
     if ($LASTEXITCODE) { throw 'Build failed. See Maven errors above.' }
     New-Item -ItemType Directory -Force output | Out-Null
-    Copy-Item -LiteralPath 'target/tokaPortal-2.5.1.jar' -Destination 'output/tokaPortal-2.5.1.jar'
+    Copy-Item -LiteralPath "target/$n-$v.jar" -Destination "output/$n-$v.jar"
     $sharedOutput = Join-Path (Split-Path $PSScriptRoot -Parent) 'plugin-modernization/output'
     New-Item -ItemType Directory -Force $sharedOutput | Out-Null
-    Copy-Item -LiteralPath 'target/tokaPortal-2.5.1.jar' -Destination (Join-Path $sharedOutput 'tokaPortal-2.5.1.jar')
+    Copy-Item -LiteralPath "target/$n-$v.jar" -Destination (Join-Path $sharedOutput "$n-$v.jar")
 } finally {
     $env:JAVA_HOME = $previousJava
     $env:PATH = $previousPath
