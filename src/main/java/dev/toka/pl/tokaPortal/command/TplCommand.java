@@ -27,7 +27,7 @@ public class TplCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tpl"); return true; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("help") && getLand(args[0]) == null) { Main.help(sender, "tpl"); return true; }
         if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.LAND)) return false;
         if (!sender.isPlayer()) {
             sender.sendMessage(Main.text("err.playerOnly"));

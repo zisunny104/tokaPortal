@@ -32,7 +32,7 @@ public class TpaCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tpa"); return true; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("help") && Server.getInstance().getPlayer(args[0]) == null) { Main.help(sender, "tpa"); return true; }
         if (sender.isPlayer()) {
             Player player = (Player) sender;
             if (args.length > 0) {

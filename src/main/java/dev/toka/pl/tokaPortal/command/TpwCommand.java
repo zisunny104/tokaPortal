@@ -33,7 +33,7 @@ public class TpwCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tpw"); return true; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("help") && Server.getInstance().getLevelByName(args[0]) == null) { Main.help(sender, "tpw"); return true; }
         if (!(sender instanceof Player)) { sender.sendMessage(Main.text("err.playerOnly")); return false; }
         Player player = (Player) sender;
         if (args.length > 0) {

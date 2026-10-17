@@ -43,7 +43,7 @@ public class TphCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "tph"); return true; }
+        if (args.length > 0 && args[0].equalsIgnoreCase("help") && getProvider().getHomePoint(args[0]) == null) { Main.help(sender, "tph"); return true; }
         if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.PLAYERS, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.REGIONS)) return false;
         if (!(sender instanceof Player)) {
             sender.sendMessage(Main.text("err.playerOnly"));
