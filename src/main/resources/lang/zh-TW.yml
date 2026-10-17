@@ -58,11 +58,11 @@ param:
 # ---------------------------------------------------------------
 help:
   back:
-    - "§6§l/back 說明"
+    - "§6=== §f§l/back 說明§r §6==="
     - "§e/back §7- §b返回前次傳送地點"
     - "§e/back help §7- §b顯示這份說明"
   home:
-    - "§6§l/home 說明（僅管理員）"
+    - "§6=== §f§l/home 說明（僅管理員）§r §6==="
     - "§e/home §7- §b開啟住家列表並傳送"
     - "§e/home list §7- §b開啟住家列表並傳送"
     - "§e/home edit §7- §b開啟住家編輯列表"
@@ -70,18 +70,18 @@ help:
     - "§e/home del [名稱] §7- §b刪除住家；不寫名稱會開啟編輯列表"
     - "§e/home help §7- §b顯示這份說明"
   next:
-    - "§6§l/next 說明"
+    - "§6=== §f§l/next 說明§r §6==="
     - "§e/next §7- §b前往下個傳送地點"
     - "§e/next help §7- §b顯示這份說明"
   # /portal help 的總覽。title=標題；needs=缺少功能時加在該行後面（${0}=缺少的功能）；other.*=其他 toka 插件已安裝時才顯示的指令
   overview:
-    title: "§6§l傳送系統指令總覽"
+    title: "§6=== §f§l傳送系統指令總覽§r §6==="
     needs: "§e〔未啟用：${0}〕"
     other:
       worlds: "§e/worlds help §7- §b世界管理（掛載、卸載、更名；OP）"
       sign: "§e/sign help §7- §b告示牌（傳送牌、狀態牌等）的建立與維護"
   portal:
-    - "§6§l/portal 說明"
+    - "§6=== §f§l/portal 說明§r §6==="
     - "§e/portal §7- §b開啟傳送系統選單"
     - "§e/portal point set <名稱> [類型] §7- §b在目前位置建立公共傳送點（需要權限）"
     - "§e/portal point del <名稱> §7- §b刪除公共傳送點（建立者或 OP）"
@@ -89,34 +89,34 @@ help:
     - "§e/next §7- §b前往下個傳送地點"
     - "§e/portal help §7- §b顯示這份說明"
   spawn:
-    - "§6§l/spawn 說明"
+    - "§6=== §f§l/spawn 說明§r §6==="
     - "§e/spawn §7- §b回到重生點"
     - "§e/spawn help §7- §b顯示這份說明"
   tpa:
-    - "§6§l/tpa 說明"
+    - "§6=== §f§l/tpa 說明§r §6==="
     - "§e/tpa <玩家代號> §7- §b傳送到指定玩家身邊（依權限可能需要對方同意）"
     - "§e/tpa help §7- §b顯示這份說明"
   tph:
-    - "§6§l/tph 說明（僅管理員）"
+    - "§6=== §f§l/tph 說明（僅管理員）§r §6==="
     - "§e/tph <住家名稱> §7- §b傳送到指定住家"
     - "§e/tph §7- §b開啟住家列表"
     - "§e/tph help §7- §b顯示這份說明"
   tpl:
-    - "§6§l/tpl 說明"
+    - "§6=== §f§l/tpl 說明§r §6==="
     - "§e/tpl <領地名稱> §7- §b傳送到指定領地"
     - "§e/tpl §7- §b開啟領地列表"
     - "§e/tpl help §7- §b顯示這份說明"
   tpp:
-    - "§6§l/tpp 說明"
+    - "§6=== §f§l/tpp 說明§r §6==="
     - "§e/tpp <傳送點名稱> §7- §b傳送到指定傳送點"
     - "§e/tpp §7- §b開啟傳送系統選單"
     - "§e/tpp help §7- §b顯示這份說明"
   tpw:
-    - "§6§l/tpw 說明（僅 OP）"
+    - "§6=== §f§l/tpw 說明（僅 OP）§r §6==="
     - "§e/tpw <世界名稱> §7- §b傳送到指定世界；世界未載入時會先載入"
     - "§e/tpw help §7- §b顯示這份說明"
   wild:
-    - "§6§l/wild 說明"
+    - "§6=== §f§l/wild 說明§r §6==="
     - "§e/wild §7- §b在 §a${0}§b 內隨機傳送，冷卻 §a${1}§b 秒"
     - "§e/wild help §7- §b顯示這份說明"
 
@@ -130,24 +130,22 @@ err:
   # ${0}=zero 功能代碼（PLAYERS、REGIONS、LAND、CITY_PASS）
   featureOff: "§7[傳送]§r§c此功能已關閉：缺少或不相容的 zero §a${0} §cAPI。"
   worldNotLoaded: "§7[傳送]§r§c目的地世界尚未載入，無法傳送。"
-  portalCooldown:
-    - "§7[傳送]§r§c請等待冷卻時間結束後,"
-    - "§c再次進行傳送"
+  portalCooldown: "§7[傳送]§r§c傳送冷卻中"
   history:
     none: "§7[傳送]§r§c尚無傳送紀錄。"
     noTarget: "§7[傳送]§r§c沒有可前往的傳送紀錄。"
     worldNotLoaded: "§7[傳送]§r§c紀錄的世界尚未載入。"
   tpa:
-    pending: "§7[傳送]§r§c對方仍有待處理的傳送請求，請稍後再試。"
+    pending: "§7[傳送]§r§c對方仍有待處理的傳送請求。"
   home:
     nameEmpty: "§7[傳送]§r§c住家名稱不得為空!"
-    reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，請換一個住家名稱!"
-    exists: "§7[傳送]§r§c已存在此名稱的住家，請更換一個名稱後再試。"
+    reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，不能當住家名稱。"
+    exists: "§7[傳送]§r§c已存在同名住家。"
     regionDenied: "§7[傳送]§r§c此區域無法設置住家。"
-    saveFailed: "§7[傳送]§r§c資料儲存失敗，住家未建立。請聯絡管理員。"
-    deleteFailed: "§7[傳送]§r§c資料儲存失敗，住家未刪除。請聯絡管理員。"
+    saveFailed: "§7[傳送]§r§c資料儲存失敗，住家未建立。"
+    deleteFailed: "§7[傳送]§r§c資料儲存失敗，住家未刪除。"
     delNotFound: "§7[傳送]§r§c找不到要刪除的住家!"
-    unknown: "§7[傳送]§r§c發生未知的錯誤!本次並未造成任何修改。"
+    unknown: "§7[傳送]§r§c發生未知錯誤，未做任何修改。"
     # ${0}=住家名稱
     notFound: "§7[傳送]§r§c住家 §a${0} §c無法傳送(不存在)"
   land:
@@ -156,12 +154,12 @@ err:
   point:
     createDisabled: "§7[傳送]§r§c傳送點建立失敗，整合功能已關閉。"
     duplicate: "§7[傳送]§r§c傳送點建立失敗(重名)"
-    reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，請換一個傳送點名稱!"
-    nameInvalid: "§7[傳送]§r§c傳送點建立失敗 請輸入有效名稱"
+    reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，不能當傳送點名稱。"
+    nameInvalid: "§7[傳送]§r§c傳送點建立失敗：名稱無效"
     deleteDisabled: "§7[傳送]§r§c傳送點刪除失敗，整合功能已關閉。"
-    deleteDenied: "§7[傳送]§r§c傳送點刪除失敗 權限不足"
-    deleteNotFound: "§7[傳送]§r§c傳送點刪除失敗 傳送點不存在"
-    deleteNameInvalid: "§7[傳送]§r§c傳送點刪除失敗 請輸入有效名稱"
+    deleteDenied: "§7[傳送]§r§c傳送點刪除失敗：權限不足"
+    deleteNotFound: "§7[傳送]§r§c傳送點刪除失敗：傳送點不存在"
+    deleteNameInvalid: "§7[傳送]§r§c傳送點刪除失敗：名稱無效"
     # ${0}=傳送點名稱
     cannotTeleport: "§7[傳送]§r§c傳送點 §a${0} §c無法傳送"
   world:
@@ -170,11 +168,11 @@ err:
   wild:
     worldOnly: "§7[傳送]§r§c此世界不能使用 /wild，可用世界：§a${0}"
     # ${0}=剩餘秒數
-    cooldown: "§7[傳送]§r§c請等待 §a${0} §c秒後再使用"
-    cancelled: "§7[傳送]§r§c傳送被取消，沒有扣除冷卻"
-    noSafeSpot: "§7[傳送]§r§e暫時找不到安全落點，沒有扣除冷卻，請稍後再試"
+    cooldown: "§7[傳送]§r§c冷卻中，剩餘 §a${0} §c秒"
+    cancelled: "§7[傳送]§r§c傳送被取消，未扣冷卻"
+    noSafeSpot: "§7[傳送]§r§e找不到安全落點，未扣冷卻"
   # 住家資料無法開啟（啟動失敗時的例外訊息）
-  storageOpen: "住家資料無法開啟；請檢查設定與資料檔，勿刪除原始資料。"
+  storageOpen: "住家資料無法開啟，請檢查設定與資料檔。"
 
 # ---------------------------------------------------------------
 # 玩家訊息
@@ -190,7 +188,7 @@ msg:
     # ${0}=目標玩家名稱
     arrived: "§7[傳送]§r§a您已傳送到玩家 ${0} 身旁"
     # ${0}=目標玩家名稱
-    sent: "§7[傳送]§r§b您已發送傳送要求給 §a${0} §b請等待對方回應"
+    sent: "§7[傳送]§r§b已向 §a${0} §b發送傳送要求"
     # ${0}=拒絕的玩家名稱
     declined: "§7[傳送]§r§e玩家 §a${0} §e取消你的傳送要求"
   history:
@@ -241,7 +239,7 @@ ui:
     perPage: "每頁顯示幾項"
   # 搜尋後沒有符合項目時的說明。${0}=關鍵字
   search:
-    none: "沒有名稱含有「${0}」的項目，請按最下方的選項重新搜尋"
+    none: "沒有名稱含有「${0}」的項目，可按最下方選項重新搜尋"
   page:
     # 分頁視窗的標題。${0}=原標題 ${1}=頁碼 ${2}=總頁數
     title: "${0} §7(${1}/${2})"
@@ -347,7 +345,7 @@ log:
     saveFailed: "§c住家儲存失敗"
     deleteFailed: "§c住家刪除失敗"
   zero:
-    waiting: "§b等待 zero 載入，稍後再檢查整合"
+    waiting: "§b等待 zero 載入"
     missing: "§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、區域及城市通）"
     # ${0}=可用整合數量、${1}=可用整合清單
     loaded: "§b載入 zero 可用整合共 §a${0} §b個：§a${1}"
