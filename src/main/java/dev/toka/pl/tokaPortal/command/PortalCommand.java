@@ -45,12 +45,23 @@ public class PortalCommand extends Command {
                                             type = args[3];
                                         }
 
+                                        if (!dev.toka.pl.tokaPortal.utils.Portal.isValidName(name) || !dev.toka.pl.tokaPortal.utils.Portal.isValidName(type)) {
+                                            pli.sendText(Main.text("err.point.nameInvalid"));
+                                            return false;
+                                        }
                                         if (dev.toka.pl.tokaPortal.utils.Portal.isReservedName(name)) {
                                             pli.sendText(Main.text("err.point.reservedName", name));
                                             return false;
                                         }
                                         if (getPoint(name) == null) {
-                                            if (!setTeleportPoint(name, pl, type, info, location)) {
+                                            boolean created;
+                                            try {
+                                                created = setTeleportPoint(name, pl, type, info, location);
+                                            } catch (RuntimeException e) {
+                                                Main.getInstance().getLogger().error(Main.text("log.points.saveFailed"), e);
+                                                created = false;
+                                            }
+                                            if (!created) {
                                                 player.sendMessage(Main.text("err.point.createDisabled"));
                                                 return false;
                                             }
@@ -70,7 +81,14 @@ public class PortalCommand extends Command {
                                         teleportPoint point = getPoint(name);
                                         if (point != null) {
                                             if (point.getCreator().equals(pl) || player.isOp()) {
-                                                if (!delTeleportPoint(point)) {
+                                                boolean deleted;
+                                                try {
+                                                    deleted = delTeleportPoint(point);
+                                                } catch (RuntimeException e) {
+                                                    Main.getInstance().getLogger().error(Main.text("log.points.saveFailed"), e);
+                                                    deleted = false;
+                                                }
+                                                if (!deleted) {
                                                     player.sendMessage(Main.text("err.point.deleteDisabled"));
                                                     return false;
                                                 }

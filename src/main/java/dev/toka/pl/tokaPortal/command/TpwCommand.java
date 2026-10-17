@@ -39,6 +39,10 @@ public class TpwCommand extends Command {
         if (args.length > 0) {
             Level world = Server.getInstance().getLevelByName(args[0]);
             if (player.isOp()) {
+                if (world == null && (args[0].contains("/") || args[0].contains("\\") || args[0].contains(".."))) {
+                    player.sendMessage(Main.text("err.world.cannotTeleport", args[0]));
+                    return false;
+                }
                 if (world != null) {
                     player.teleport(world.getSafeSpawn());
                     player.sendMessage(Main.text("msg.world.arrived", args[0]));

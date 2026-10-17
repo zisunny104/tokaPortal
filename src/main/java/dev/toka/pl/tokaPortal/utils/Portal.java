@@ -168,11 +168,20 @@ public class Portal implements Listener {
         return words.stream().anyMatch(word -> word.equalsIgnoreCase(clean));
     }
 
+    /** A name of 1 to 32 characters without control characters or the colour sign. */
+    public static boolean isValidName(String name) {
+        return name != null && !name.isBlank() && name.length() <= 32 && name.chars().noneMatch(c -> c < 32 || c == 127 || c == '§');
+    }
+
     public static void setHome(Player player, String name) {
         if (!canUseHome(player)) return;
         PlayerInfo pli = getPlayerInfo(player);
         if (name == null || name.isBlank()) {
             pli.sendText(Main.text("err.home.nameEmpty"));
+            return;
+        }
+        if (!isValidName(name)) {
+            pli.sendText(Main.text("err.home.nameInvalid"));
             return;
         }
         if (isReservedName(name)) {

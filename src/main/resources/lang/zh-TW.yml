@@ -139,6 +139,7 @@ err:
     pending: "§7[傳送]§r§c對方仍有待處理的傳送請求。"
   home:
     nameEmpty: "§7[傳送]§r§c住家名稱不得為空!"
+    nameInvalid: "§7[傳送]§r§c住家名稱需為 1 到 32 個字，且不能含有控制字元或 §。"
     reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，不能當住家名稱。"
     exists: "§7[傳送]§r§c已存在同名住家。"
     regionDenied: "§7[傳送]§r§c此區域無法設置住家。"
@@ -155,7 +156,7 @@ err:
     createDisabled: "§7[傳送]§r§c傳送點建立失敗，整合功能已關閉。"
     duplicate: "§7[傳送]§r§c傳送點建立失敗(重名)"
     reservedName: "§7[傳送]§r§c「§a${0}§c」是保留字，不能當傳送點名稱。"
-    nameInvalid: "§7[傳送]§r§c傳送點建立失敗：名稱無效"
+    nameInvalid: "§7[傳送]§r§c傳送點建立失敗：名稱需為 1 到 32 個字，且不能含有控制字元或 §"
     deleteDisabled: "§7[傳送]§r§c傳送點刪除失敗，整合功能已關閉。"
     deleteDenied: "§7[傳送]§r§c傳送點刪除失敗：權限不足"
     deleteNotFound: "§7[傳送]§r§c傳送點刪除失敗：傳送點不存在"
@@ -245,7 +246,6 @@ ui:
     title: "${0} §7(${1}/${2})"
     footer: "§7第 §a${0}§7/§a${1}§7 頁，用 §e${2} <頁碼>§7 換頁"
   common:
-    confirm: "確定"
     cancel: "取消"
   button:
     teleportList: "§e>>§8傳送點列表  "
@@ -295,7 +295,6 @@ ui:
       hint:
         - "點選下方住家按鈕"
         - "即可傳送至該住家"
-      dropdown: "住家列表"
       empty: "您沒有可傳送的住家"
     set:
       title: "=設定住家="
@@ -312,7 +311,6 @@ ui:
       hint:
         - "點選下方住家按鈕"
         - "即可進行編輯"
-      dropdown: "住家列表"
       empty: "您沒有可編輯的住家"
     edit:
       # ${0}=住家名稱
@@ -320,7 +318,6 @@ ui:
       prompt: "請選擇要對住家進行的動作"
       delete: "刪除住家"
       back: "返回列表"
-    back: "返回"
   # 傳送時畫面標題／副標題（title 是目的地名稱，subtitle 如下）
   title:
     unknownPoint: "§c未知傳送點"
@@ -341,6 +338,7 @@ log:
     # ${0}=傳送點數量
     loaded: "§b載入傳送點共 §a${0} §b個"
     closeFailed: "§c傳送點資料關閉失敗"
+    saveFailed: "§c傳送點儲存失敗"
   homes:
     # ${0}=住家數量
     loaded: "§b載入住家共 §a${0} §b個"

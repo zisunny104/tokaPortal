@@ -1,7 +1,6 @@
 package dev.toka.pl.tokaPortal.command;
 
 import dev.toka.pl.tokaPortal.Main;
-import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
@@ -33,7 +32,7 @@ public class TplCommand extends Command {
             sender.sendMessage(Main.text("err.playerOnly"));
             return false;
         }
-        Player player = Server.getInstance().getPlayer(sender.getName());
+        Player player = (Player) sender;
         PlayerInfo pli = getPlayerInfo(player);
         if (args.length > 0) {
             String name = args[0];
