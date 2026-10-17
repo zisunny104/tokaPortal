@@ -13,7 +13,6 @@ import dev.toka.pl.tokaPortal.provider.BaseDataProvider;
 import dev.toka.pl.tokaPortal.provider.storage.StorageManager;
 import dev.toka.pl.tokaPortal.utils.Portal;
 import dev.toka.pl.tokaPortal.utils.PortalHistory;
-import dev.toka.pl.tokaPortal.utils.PortalWindow;
 
 public class Main extends PluginBase implements Listener {
 
@@ -96,7 +95,7 @@ public class Main extends PluginBase implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new Portal(), this);
         this.getServer().getPluginManager().registerEvents(new PortalHistory(), this);
-        this.getServer().getPluginManager().registerEvents(new PortalWindow(), this);
+        dev.toka.forms.FormListener.register(this);
         this.getServer().getPluginManager().registerEvents(new CommandSuggestionUpdater(), this);
     }
 

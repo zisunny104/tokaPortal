@@ -47,3 +47,5 @@ window-items-min: 3
 window-items-max: 30
 # 清單項目超過幾項時才顯示「搜尋／排序／每頁數量」按鈕（搜尋中一定會顯示）。
 window-search-threshold: 8
+# 選單按鈕是否顯示圖示（使用遊戲內建材質）。可填 true 或 false；選單中沒有內容的項目（例如沒有領地、沒有其他玩家）一律隱藏。
+window-icons: true

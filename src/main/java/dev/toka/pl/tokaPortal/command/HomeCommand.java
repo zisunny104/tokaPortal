@@ -8,9 +8,7 @@ import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.data.CommandParamType;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
-import dev.toka.pl.tokaPortal.form.home.HomeDelForm;
-import dev.toka.pl.tokaPortal.form.home.HomeEditListForm;
-import dev.toka.pl.tokaPortal.form.home.HomeListForm;
+import dev.toka.pl.tokaPortal.form.home.HomeWindows;
 import dev.toka.pl.tokaPortal.form.home.HomeSetForm;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
 
@@ -62,20 +60,20 @@ public class HomeCommand extends Command {
                             break;
                         case "del":
                             if (args.length == 2) {
-                                player.showFormWindow(new HomeDelForm(args[1]));
+                                HomeWindows.sendDelete(player, args[1]);
                             } else {
-                                player.showFormWindow(new HomeEditListForm(player));
+                                HomeWindows.sendEditList(player);
                             }
                             break;
                         case "edit":
-                            player.showFormWindow(new HomeEditListForm(player));
+                            HomeWindows.sendEditList(player);
                             break;
                         case "list":
                         default:
-                            player.showFormWindow(new HomeListForm(player));
+                            HomeWindows.sendList(player);
                     }
                 } else {
-                    player.showFormWindow(new HomeListForm(player));
+                    HomeWindows.sendList(player);
                 }
                 return true;
             } else {

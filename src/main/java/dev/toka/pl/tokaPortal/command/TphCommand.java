@@ -8,7 +8,7 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.data.CommandParamType;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
-import dev.toka.pl.tokaPortal.form.home.HomeListForm;
+import dev.toka.pl.tokaPortal.form.home.HomeWindows;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.provider.IDataProvider;
 import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
@@ -63,7 +63,7 @@ public class TphCommand extends Command {
                 }
                 pli.sendText(Main.text("err.home.notFound", name));
             } else {
-                player.showFormWindow(new HomeListForm(player));
+                HomeWindows.sendList(player);
             }
         } else {
             player.sendMessage(Main.text("err.homeAdminOnly"));
