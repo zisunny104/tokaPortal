@@ -13,6 +13,13 @@ import java.util.*;
 import java.util.function.Function;
 
 public class BaseDataProvider implements IDataProvider {
+    /** Main-thread only: publishes counts without exposing names, positions or mutable HomePoint objects. */
+    public Map<UUID, Long> planOwnerCounts() {
+        Map<UUID, Long> counts = new HashMap<>();
+        for (HomePoint home : homes.values()) if (home.getOwner() != null) counts.merge(home.getOwner(), 1L, Long::sum);
+        return Map.copyOf(counts);
+    }
+    public long planTotalCount() { return homes.size(); }
     private final HomeStorage storage;
     private final WriteQueue writer;
     private final String name;

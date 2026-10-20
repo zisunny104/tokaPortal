@@ -81,3 +81,13 @@
 - **沒有 zero 能用嗎？** 可以，傳送選單、`/tpa`、傳送點、`/back`、`/wild` 都不受影響。
 
 目前版本 2.7.1
+
+### Plan 選用整合（2.7.2）
+
+預設 `plan.enabled: false`。開啟後，`plan.homes: true` 提供 UUID 玩家住家數及全服住家總數；`plan.public-points: true` 提供全服公開傳送點數。各項可分別關閉，不輸出座標、世界、住家名稱、建立者名稱或 legacy 身分對照。Plan 網頁閱覽權限由 Plan 管理。
+
+主執行緒依 `plan.refresh-seconds`（預設30，範圍5–3600秒）發布不可變數量快照；Plan 背景 Provider 僅讀該快照，不讀玩家、世界、儲存資料或執行傳送。UUID 玩家數不包含尚未完成身分轉換的 legacy 住家，全服總數仍包含。快照可能落後一個更新週期，Plan 本身另有收集週期。
+
+官方 `plan-api:5.7-R0.2` 僅作 provided 編譯依賴，已核對 Plan5.8 build3638 API。缺少 Plan、能力不足或停用不影響傳送功能。支援 Plan 啟用/停用及 `Main.reload()`，欄位/訊息走 tokaI18n 的 `plan` 語系區塊。一般設定修改重新啟動套用；本插件未新增 `/portal reload` 指令。
+
+Plan 以欄位文字作識別，修改語系標籤或停用欄位不會自動清除 Plan 已保存資料，請在 Plan 管理歷史資料。

@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 /** Persistent public destinations. */
 public final class PublicPoints implements AutoCloseable {
+ public synchronized long planCount(){return state.getAsJsonArray("points").size();}
  private final DocumentStore store;
  private final dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer;
  private JsonObject state;

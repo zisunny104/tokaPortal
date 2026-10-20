@@ -49,3 +49,13 @@ window-items-max: 30
 window-search-threshold: 8
 # 選單按鈕是否顯示圖示（使用遊戲內建材質）。可填 true 或 false；選單中沒有內容的項目（例如沒有領地、沒有其他玩家）一律隱藏。
 window-icons: true
+
+# 選用 Plan DataExtension，僅提供數量，不公開住家名稱、世界或座標。
+# 透過 Main.reload() 或重新啟動套用；停用後 Plan 既有資料須在 Plan 管理。
+plan:
+  enabled: false
+  homes: true
+  public-points: true
+  # 主執行緒發布快照間隔，限制 5 至 3600 秒。
+  refresh-seconds: 30
+

@@ -13,12 +13,17 @@ import dev.toka.pl.tokaPortal.provider.BaseDataProvider;
 import dev.toka.pl.tokaPortal.provider.storage.StorageManager;
 import dev.toka.pl.tokaPortal.utils.Portal;
 import dev.toka.pl.tokaPortal.utils.PortalHistory;
+import dev.toka.pl.tokaPortal.plan.*;
 
 public class Main extends PluginBase implements Listener {
 
     private static Main instance;
     private static IDataProvider provider;
     private Messages messages;
+    private PlanSettings planSettings;
+    private AutoCloseable plan;
+    private volatile PlanSnapshot planSnapshot;
+    private int planTicks;
     private dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer;
     private dev.toka.pl.tokaPortal.point.PublicPoints publicPoints;
     public dev.toka.pl.tokaPortal.point.PublicPoints getPublicPoints(){return publicPoints;}
@@ -84,10 +89,17 @@ public class Main extends PluginBase implements Listener {
         getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);
         this.registerEvents();
         this.registerCommandMap();
+        getServer().getScheduler().scheduleRepeatingTask(this, () -> {
+            if (planSettings != null && planSettings.enabled() && (planTicks += 20) >= planSettings.refreshTicks()) {
+                planTicks = 0;
+                publishPlanSnapshot();
+            }
+        }, 20);
     }
 
     @Override
     public void onDisable() {
+        closePlan(); planSnapshot = null;
         if(wildService!=null)wildService.close();
         if (ownerMigration != null) ownerMigration.stop();
         drainWrites();
@@ -124,6 +136,7 @@ public class Main extends PluginBase implements Listener {
     }
 
     public void reload() {
+        closePlan(); planSnapshot = null;
         saveDefaultConfig();
         reloadConfig();
         if (messages != null) messages.language(getConfig().getString("language", "zh-TW"));
@@ -139,9 +152,42 @@ public class Main extends PluginBase implements Listener {
             getLogger().info(text("log.points.loaded", publicPoints.points().size()));
             int homes = storage.load().getList("homes").size();
             getLogger().info(text("log.homes.loaded", homes));
+            planSettings = PlanSettings.parse(getConfig().getAll());
+            publishPlanSnapshot();
+            refreshPlan();
         } catch (java.io.IOException | RuntimeException e) {
             throw new IllegalStateException(text("err.storageOpen"), e);
         }
+    }
+
+    private void publishPlanSnapshot() {
+        if (planSettings == null || !planSettings.enabled()) { planSnapshot = null; return; }
+        if (provider instanceof BaseDataProvider base && publicPoints != null) {
+            planSnapshot = new PlanSnapshot(planSettings.homes() ? base.planOwnerCounts() : java.util.Map.of(),
+                    planSettings.homes() ? base.planTotalCount() : 0, planSettings.publicPoints() ? publicPoints.planCount() : 0);
+        }
+    }
+    private void closePlan() {
+        if (plan == null) return;
+        try { plan.close(); }
+        catch (Exception | LinkageError e) { getLogger().warning(text("plan.unavailable", e.getClass().getSimpleName())); }
+        finally { plan=null; }
+    }
+    private void refreshPlan() {
+        closePlan();
+        var plugin=getServer().getPluginManager().getPlugin("Plan");
+        if(planSettings==null || !planSettings.enabled() || plugin==null || !plugin.isEnabled())return;
+        try {
+            PlanExtension extension=new PlanExtension(planSettings,()->planSnapshot,Main::text);
+            if(extension.register()){plan=extension;getLogger().info(text("plan.ready"));}
+            else getLogger().warning(text("plan.unsupported"));
+        } catch(RuntimeException | LinkageError e){getLogger().warning(text("plan.unavailable",e.getClass().getSimpleName()));}
+    }
+    @EventHandler public void onPlanEnable(cn.nukkit.event.plugin.PluginEnableEvent event) {
+        if("Plan".equals(event.getPlugin().getName()))refreshPlan();
+    }
+    @EventHandler public void onPlanDisable(cn.nukkit.event.plugin.PluginDisableEvent event) {
+        if("Plan".equals(event.getPlugin().getName()))closePlan();
     }
 
     /** 登入：更新住家與傳送點的最後已知名稱，並取回同名的 legacy 住家與傳送點。 */

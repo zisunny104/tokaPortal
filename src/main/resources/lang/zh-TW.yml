@@ -421,3 +421,11 @@ status:
   history:
     next: "下個傳送位置"
     back: "前次傳送位置"
+
+plan:
+  playerHomes: '住家數量'
+  totalHomes: '全服住家數量'
+  publicPoints: '全服公開傳送點數量'
+  ready: 'Plan 傳送資訊整合已啟用。'
+  unsupported: 'Plan 缺少 DataExtension Builder API，已略過傳送資訊整合。'
+  unavailable: 'Plan 傳送資訊整合暫時不可用：${0}'

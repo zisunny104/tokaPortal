@@ -6,7 +6,7 @@
 
     <groupId>dev.toka.pl</groupId>
     <artifactId>tokaPortal</artifactId>
-    <version>2.7.1</version>
+    <version>2.7.2</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -17,7 +17,9 @@
         </license>
     </licenses>
 
+    <repositories><repository><id>plan-releases</id><url>https://repo.playeranalytics.net/releases</url></repository></repositories>
     <dependencies>
+        <dependency><groupId>com.djrapitops</groupId><artifactId>plan-api</artifactId><version>5.7-R0.2</version><scope>provided</scope></dependency>
         <dependency><groupId>dev.toka</groupId><artifactId>tokaStorage</artifactId><version>0.1.4</version></dependency>
         <dependency><groupId>dev.toka</groupId><artifactId>tokaI18n</artifactId><version>0.2.2</version></dependency>
         <dependency>
@@ -100,4 +102,5 @@
         </plugins>
     </build>
 </project>
+
 
