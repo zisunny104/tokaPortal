@@ -54,8 +54,9 @@ window-icons: true
 # 透過 Main.reload() 或重新啟動套用；停用後 Plan 既有資料須在 Plan 管理。
 plan:
   enabled: false
-  homes: true
-  public-points: true
+  homes: false
+  public-points: false
   # 主執行緒發布快照間隔，限制 5 至 3600 秒。
   refresh-seconds: 30
+
 
