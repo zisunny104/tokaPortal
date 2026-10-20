@@ -29,3 +29,7 @@ permissions:
     description: 管理公共傳送點
     default: op
 
+
+  tokaPortal.admin:
+    description: 管理 Plan 展示設定
+    default: op

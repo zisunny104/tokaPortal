@@ -423,6 +423,12 @@ status:
     back: "前次傳送位置"
 
 plan:
+  missing: '已要求啟用 Plan，但 Plan 尚未就緒；/${0} plan mode auto 可改為自動偵測。'
+  detected: '已偵測到 Plan，目前模式 ${0}；/${1} plan status 可查看設定。'
+  configureFailed: 'Plan 設定未完成：${0}。'
+  noPermission: '§c沒有管理 Plan 展示的權限。'
+  configured: '§aPlan 設定已儲存；/${0} plan status 可查看。'
+  usage: '§e/${0} plan status | mode <auto|enable|disable> | fields <all|none|欄位...>'
   playerHomes: '住家數量'
   totalHomes: '全服住家數量'
   publicPoints: '全服公開傳送點數量'

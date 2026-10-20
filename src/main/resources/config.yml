@@ -53,9 +53,8 @@ window-icons: true
 # 選用 Plan DataExtension，僅提供數量，不公開住家名稱、世界或座標。
 # 透過 Main.reload() 或重新啟動套用；停用後 Plan 既有資料須在 Plan 管理。
 plan:
-  enabled: false
-  homes: false
-  public-points: false
+  mode: auto # auto 自動偵測；enable 未就緒時提示；disable 不發布。
+  fields: all # all | none | 欄位清單；指令可逐項管理。
   # 主執行緒發布快照間隔，限制 5 至 3600 秒。
   refresh-seconds: 30
 

@@ -21,6 +21,7 @@ public class PortalCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        if(Main.getInstance().planCommand(sender,args))return true;
         if (args.length > 0 && args[0].equalsIgnoreCase("help")) { dev.toka.pl.tokaPortal.utils.HelpOverview.send(sender, args); return true; }
         if (args.length > 0 && args[0].equalsIgnoreCase("legacy")) { legacy(sender, args); return true; }
         if (sender.isPlayer()) {

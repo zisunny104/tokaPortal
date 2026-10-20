@@ -19,7 +19,7 @@ public final class PlanExtension implements DataExtension, AutoCloseable {
     }
     public boolean register() {
         if (!CapabilityService.getInstance().hasCapability("DATA_EXTENSION_BUILDER_API")) return false;
-        ExtensionService service=ExtensionService.getInstance();service.register(this);registered=service;return true;
+        ExtensionService service=ExtensionService.getInstance();if(service.register(this).isEmpty())return false;registered=service;return true;
     }
     public PlanSnapshot snapshot() {
         PlanSnapshot value=snapshots.get();

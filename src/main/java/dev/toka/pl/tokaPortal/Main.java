@@ -22,6 +22,7 @@ public class Main extends PluginBase implements Listener {
     private Messages messages;
     private PlanSettings planSettings;
     private AutoCloseable plan;
+    private PlanControl planControl;
     private volatile PlanSnapshot planSnapshot;
     private int planTicks;
     private dev.toka.pl.tokaPortal.provider.storage.WriteQueue writer;
@@ -168,6 +169,7 @@ public class Main extends PluginBase implements Listener {
         }
     }
     private void closePlan() {
+        if(planControl!=null)planControl.registered(false);
         if (plan == null) return;
         try { plan.close(); }
         catch (Exception | LinkageError e) { getLogger().warning(text("plan.unavailable", e.getClass().getSimpleName())); }
@@ -175,11 +177,13 @@ public class Main extends PluginBase implements Listener {
     }
     private void refreshPlan() {
         closePlan();
+        if(planControl==null)planControl=new PlanControl(this,this::refreshPlan,()->java.util.Set.of("homes","public-points"),(key,args)->text(key,args),"portal");
+        planSettings=PlanSettings.parse(getConfig().getAll());publishPlanSnapshot();
         var plugin=getServer().getPluginManager().getPlugin("Plan");
-        if(planSettings==null || !planSettings.enabled() || plugin==null || !plugin.isEnabled())return;
+        if(!planControl.shouldRegister())return;
         try {
             PlanExtension extension=new PlanExtension(planSettings,()->planSnapshot,Main::text);
-            if(extension.register()){plan=extension;getLogger().info(text("plan.ready"));}
+            if(extension.register()){plan=extension;planControl.registered(true);getLogger().info(text("plan.ready"));}
             else getLogger().warning(text("plan.unsupported"));
         } catch(RuntimeException | LinkageError e){getLogger().warning(text("plan.unavailable",e.getClass().getSimpleName()));}
     }
@@ -217,5 +221,7 @@ public class Main extends PluginBase implements Listener {
     }
 
 
+    public String planStatusJson(){return planControl.statusJson();}
+    public boolean configurePlan(String mode,String[] fields){return planControl.configure(mode,fields);}
+    public boolean planCommand(CommandSender sender,String[] args){return planControl!=null && planControl.command(sender,args,"tokaPortal.admin");}
 }
-

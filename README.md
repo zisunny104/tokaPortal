@@ -82,11 +82,20 @@
 
 ### Plan 選用整合（2.7.2）
 
-預設 `plan.enabled: false`。開啟後，`plan.homes: true` 提供 UUID 玩家住家數及全服住家總數；`plan.public-points: true` 提供全服公開傳送點數。各項可分別關閉，不輸出座標、世界、住家名稱、建立者名稱或 legacy 身分對照。Plan 網頁閱覽權限由 Plan 管理。
+預設自動接入 Plan，提供 UUID 玩家住家數、全服住家總數及公開傳送點數。可用 `plan.fields` 選擇欄位或全部關閉，不輸出座標、世界、住家名稱、建立者名稱或 legacy 身分對照。Plan 網頁閱覽權限由 Plan 管理。
 
 主執行緒依 `plan.refresh-seconds`（預設30，範圍5–3600秒）發布不可變數量快照；Plan 背景 Provider 僅讀該快照，不讀玩家、世界、儲存資料或執行傳送。UUID 玩家數不包含尚未完成身分轉換的 legacy 住家，全服總數仍包含。快照可能落後一個更新週期，Plan 本身另有收集週期。
 
-官方 `plan-api:5.7-R0.2` 僅作 provided 編譯依賴，已核對 Plan5.8 build3638 API。缺少 Plan、能力不足或停用不影響傳送功能。支援 Plan 啟用/停用及 `Main.reload()`，欄位/訊息走 tokaI18n 的 `plan` 語系區塊。一般設定修改重新啟動套用；本插件未新增 `/portal reload` 指令。
+官方 `plan-api:5.7-R0.2` 僅作 provided 編譯依賴，已核對 Plan5.8 build3638 API。缺少 Plan、能力不足或停用不影響傳送功能。支援 Plan 啟用/停用及 `Main.reload()`，欄位/訊息走 tokaI18n 的 `plan` 語系區塊。Plan 模式與欄位可用下列管理指令即時套用；其餘設定仍依原有重新載入流程。
 
 Plan 以欄位文字作識別，修改語系標籤或停用欄位不會自動清除 Plan 已保存資料，請在 Plan 管理歷史資料。
 
+
+
+### Plan 模式與管理指令
+
+預設 `plan.mode: auto`、`plan.fields: all`。`auto` 偵測到可用 Plan 就啟用；`enable` 未就緒時提示；`disable` 一定不發布。all 僅包含本插件核准的摘要欄位，沒有憑證、Discord ID 或私人座標。
+
+管理員可用 `/portal plan status`、`/portal plan mode <auto|enable|disable>`、`/portal plan fields <all|none|欄位...>`；變更保存設定且即時套用，保留其他設定及註解。舊 `plan.enabled`／逐項布林仍相容，明確設定的新 mode／fields 優先。
+
+API（主執行緒）：`planStatusJson()`、`configurePlan(String mode, String[] fields)`；null 表示該項沿用。

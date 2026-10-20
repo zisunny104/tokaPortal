@@ -5,7 +5,7 @@ public record PlanSettings(boolean enabled, boolean homes, boolean publicPoints,
         Map<?, ?> plan = root.get("plan") instanceof Map<?, ?> m ? m : Map.of();
         Object seconds = plan.get("refresh-seconds");
         int refresh = seconds instanceof Number n ? n.intValue() : 30;
-        return new PlanSettings(Boolean.TRUE.equals(plan.get("enabled")), Boolean.TRUE.equals(plan.get("homes")),
-                Boolean.TRUE.equals(plan.get("public-points")), Math.max(5, Math.min(3600, refresh)) * 20);
+        PlanControl.Options options=PlanControl.parse(root,java.util.Set.of("homes","public-points"));
+        return new PlanSettings(options.enabled(),options.has("homes"),options.has("public-points"),Math.max(5, Math.min(3600, refresh)) * 20);
     }
 }

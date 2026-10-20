@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.*;
 class PlanTest {
  @Test void settingsArePrivateAndRefreshBounded(){
-  assertFalse(PlanSettings.parse(Map.of()).enabled());
-  assertFalse(PlanSettings.parse(Map.of()).homes());
+  assertTrue(PlanSettings.parse(Map.of()).enabled());
+  assertTrue(PlanSettings.parse(Map.of()).homes());
   assertEquals(100,PlanSettings.parse(Map.of("plan",Map.of("refresh-seconds",0))).refreshTicks());
  }
  @Test void snapshotDetachedMissingAndClosedUnavailable(){
