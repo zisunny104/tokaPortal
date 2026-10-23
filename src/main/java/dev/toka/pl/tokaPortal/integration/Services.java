@@ -88,11 +88,16 @@ public final class Services {
             if (get("localizedNames") instanceof Map<?, ?> names && !names.isEmpty()) {
                 String language = Main.getInstance().getConfig().getString("language", "zh-TW");
                 Object own = names.get(language);
-                if (own != null) return own.toString();
-                for (Object value : names.values()) if (value != null && !value.toString().isBlank()) return value.toString();
+                if (own != null) return color() + own;
+                for (Object value : names.values()) if (value != null && !value.toString().isBlank()) return color() + value;
             }
             return getName();
         }
+
+        /** The name without the colour. */
+        public String getPlainInfo() { return getInfo().replaceAll("§.", ""); }
+
+        private String color() { return Objects.toString(get("color"), ""); }
 
         /** Where players sent to this region arrive; null when the region has no teleport point or its world is not loaded. */
         public Location getTpr() {
