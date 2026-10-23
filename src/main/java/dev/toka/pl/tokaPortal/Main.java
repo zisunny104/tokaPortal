@@ -72,15 +72,6 @@ public class Main extends PluginBase implements Listener {
         writer = new dev.toka.pl.tokaPortal.provider.storage.WriteQueue((key, error) -> getLogger().error(text(key), error));
         saveDefaultConfig();
         messages = new Messages(getClass().getClassLoader(), getDataFolder().toPath(), getConfig().getString("language", "zh-TW"), line -> getLogger().warning(line));
-        dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize(false);
-        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
-            // zero may be enabled after this plugin; check again once all plugins are up
-            getServer().getScheduler().scheduleDelayedTask(this, () -> {
-                if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.isLinked()) {
-                    dev.toka.pl.tokaPortal.integration.ZeroIntegration.initialize(true);
-                }
-            }, 40);
-        }
         reload();
         ownerMigration = new dev.toka.pl.tokaPortal.provider.OwnerMigration(this);
         // 其他插件（tokaEconomy、tokaProfiles）啟用後再解析名稱

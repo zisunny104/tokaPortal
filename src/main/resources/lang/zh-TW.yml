@@ -33,7 +33,7 @@ cmd:
     usage: "/tph [住家名稱]"
   tpl:
     desc: "傳送至領地"
-    usage: "/tpl <領地名稱>"
+    usage: "/tpl <領地名稱或 UUID>"
   tpp:
     desc: "顯示傳送列表"
     usage: "/tpp [傳送點名稱]"
@@ -52,6 +52,7 @@ param:
   playerName: "玩家名稱"
   worldName: "世界名稱"
   landName: "領地名稱"
+  landNameOrId: "領地名稱或 UUID"
 
 # ---------------------------------------------------------------
 # /指令 help 的多行說明（第一行為標題，之後每行一個用法）
@@ -105,7 +106,7 @@ help:
     - "§e/tph help §7- §b顯示這份說明"
   tpl:
     - "§6=== §f§l/tpl 說明§r §6==="
-    - "§e/tpl <領地名稱> §7- §b傳送到指定領地"
+    - "§e/tpl <領地名稱或 UUID> §7- §b傳送到可使用的領地；UUID 可從 /land list 查詢"
     - "§e/tpl §7- §b開啟領地列表"
     - "§e/tpl help §7- §b顯示這份說明"
   tpp:
@@ -135,8 +136,8 @@ err:
   playerOnly: "§7[傳送]§r§c請在遊戲內使用此指令"
   noPermission: "§7[傳送]§r§c權限不足"
   homeAdminOnly: "§7[傳送]§r§c住家功能僅限管理員使用。"
-  # ${0}=zero 功能代碼（PLAYERS、REGIONS、LAND、CITY_PASS）
-  featureOff: "§7[傳送]§r§c此功能已關閉：缺少或不相容的 zero §a${0} §cAPI。"
+  # ${0}=功能代碼（PLAYERS、REGIONS、LAND、CITY_PASS）
+  featureOff: "§7[傳送]§r§c此功能暫時不可用：缺少 §a${0}§c。"
   worldNotLoaded: "§7[傳送]§r§c目的地世界尚未載入，無法傳送。"
   portalCooldown: "§7[傳送]§r§c傳送冷卻中"
   history:
@@ -160,6 +161,8 @@ err:
   land:
     # ${0}=領地名稱
     notFound: "§7[傳送]§r§c領地 §a${0} §c無法傳送(不存在)"
+    ambiguous: "§7[傳送]§r§c領地名稱重複，請從 /tpl 清單選擇。"
+    unavailable: "§7[傳送]§r§c領地傳送目前不可用，請確認 tokaLand 已啟用且資料就緒。"
   point:
     createDisabled: "§7[傳送]§r§c傳送點建立失敗，整合功能已關閉。"
     duplicate: "§7[傳送]§r§c傳送點建立失敗(重名)"
@@ -391,18 +394,6 @@ log:
     joinDispute: "§e玩家 §a${0} §e登入，同名住家有爭議，不自動取回"
   writer:
     timeout: "§e背景儲存寫入逾時，部分資料可能未寫入"
-  zero:
-    waiting: "§b等待 zero 載入"
-    missing: "§e找不到 zero，已關閉依賴 zero 的功能（住家管理、住家傳送、領地、區域及城市通）"
-    # ${0}=可用整合數量、${1}=可用整合清單
-    loaded: "§b載入 zero 可用整合共 §a${0} §b個：§a${1}"
-    playersRegionsOff: "§ezero 玩家/區域 API 不可用，已關閉住家管理及住家傳送。"
-    # ${0}=功能代碼
-    featureOff: "§e已關閉 zero 功能：§a${0}"
-    # ${0}=功能代碼、${1}=錯誤原因
-    incompatible: "§ezero §a${0} §eAPI 不相容: ${1}"
-    # ${0}=功能代碼、${1}=錯誤內容
-    disabled: "§ezero 功能 §a${0} §e已關閉：${1}"
   # ${0}=玩家顯示名稱、${1}=出發地說明、${2}=出發座標與世界、${3}=目的地說明、${4}=目的座標與世界
   portalEvent: "傳送：${0} 從 ${1}(${2}) 傳送至 ${3}(${4})"
 
@@ -410,7 +401,7 @@ log:
 # 狀態字與預設名稱
 # ---------------------------------------------------------------
 status:
-  # 總覽中「缺少哪個 zero 功能」的名稱
+  # 總覽中「缺少哪個功能」的名稱
   feature:
     PLAYERS: "玩家資料"
     REGIONS: "區域"

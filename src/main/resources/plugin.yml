@@ -5,7 +5,7 @@ name: tokaPortal
 main: dev.toka.pl.tokaPortal.Main
 
 #插件版本
-version: "2.7.2"
+version: "2.8.0"
 
 #核心API版本
 api: ["1.0.11"]
@@ -21,7 +21,7 @@ description: "[prjToka]傳送插件"
 
 #插件依賴
 #depend: []
-softdepend: [zero, tokaDisplay, tokaEconomy, tokaProfiles, Plan]
+softdepend: [tokaRegions, tokaLand, tokaDisplay, tokaEconomy, tokaProfiles, Plan]
 
 
 permissions:

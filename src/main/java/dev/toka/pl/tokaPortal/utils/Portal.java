@@ -1,6 +1,7 @@
 package dev.toka.pl.tokaPortal.utils;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.event.Listener;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
@@ -8,23 +9,24 @@ import cn.nukkit.scheduler.NukkitRunnable;
 import dev.toka.pl.tokaPortal.event.PlayerPortalEvent;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 import dev.toka.pl.tokaPortal.Main;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.Services.PlayerInfo;
 import dev.toka.pl.tokaPortal.point.teleportPoint;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Region;
+import dev.toka.pl.tokaPortal.integration.Services.Region;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.*;
+import dev.toka.pl.tokaPortal.integration.Services;
+import dev.toka.pl.tokaPortal.integration.LandIntegration;
+import static dev.toka.pl.tokaPortal.integration.Services.Feature.*;
 
 import static cn.nukkit.potion.Effect.BLINDNESS;
 import static cn.nukkit.potion.Effect.getEffect;
 import static dev.toka.pl.tokaPortal.Main.getProvider;
 import static dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalTpaAcceptWindow;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
 import static dev.toka.pl.tokaPortal.point.teleportPoint.getPoint;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Region.getRegion;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.callEvent;
+import static dev.toka.pl.tokaPortal.integration.Services.Region.getRegion;
+import static dev.toka.pl.tokaPortal.integration.Services.callEvent;
 
 public class Portal implements Listener {
     public static final ArrayList<String> canAddHomeRegionList = new ArrayList<>();
@@ -71,7 +73,7 @@ public class Portal implements Listener {
     }
 
     public static void toRegion(String regionName, Player player) {
-        if (!ZeroIntegration.require(player, REGIONS)) return;
+        if (!Services.require(player, REGIONS)) return;
         toRegion(getRegion(regionName), player);
     }
 
@@ -158,6 +160,18 @@ public class Portal implements Listener {
         return false;
     }
 
+    /** Public stable-ID entry point for Land signs and other optional integrations. */
+    public static boolean toLandClaim(Player player,String claimId) {
+        if(player==null||!player.isOnline()||claimId==null||claimId.isBlank())return false;
+        LandIntegration.Lookup lookup=LandIntegration.lookup(player,claimId);
+        if(!"OK".equals(lookup.status())||lookup.target()==null){
+            player.sendMessage(Main.text("err.land.notFound",claimId));return false;
+        }
+        var target=lookup.target();var level=Server.getInstance().getLevelByName(target.world());
+        if(level==null){player.sendMessage(Main.text("err.worldNotLoaded"));return false;}
+        return portal(player,new Location(target.x(),target.y(),target.z(),target.yaw(),target.pitch(),level),target.name());
+    }
+
     /** The words in reserved-names; when the config has none the default words are used, so that the check is never off. */
     public static boolean isReservedName(String name) {
         java.util.List<String> words = Main.getInstance().getConfig().getStringList("reserved-names");
@@ -236,7 +250,7 @@ public class Portal implements Listener {
     }
 
     private static boolean canUseHome(Player player) {
-        if (!ZeroIntegration.require(player, PLAYERS, REGIONS)) return false;
+        if (!Services.require(player, PLAYERS, REGIONS)) return false;
         if (player.isOp() || getPlayerInfo(player).isTopQuanXian()) return true;
         player.sendMessage(Main.text("err.homeAdminOnly"));
         return false;

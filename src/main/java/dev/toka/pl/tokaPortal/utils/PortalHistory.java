@@ -9,14 +9,14 @@ import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.level.Location;
 import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.event.PlayerPortalEvent;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.Services.PlayerInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.callEvent;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.Services.callEvent;
 
 public class PortalHistory implements Listener {
 
@@ -27,11 +27,6 @@ public class PortalHistory implements Listener {
 
     public static boolean toHistoryLocation(Player player, String status) {
         PlayerInfo pli = getPlayerInfo(player);
-
-        if (pli.isPortalStatus()) {
-            pli.sendText(Main.text("err.portalCooldown"));
-            return false;
-        }
 
         if (portalHistoryMap.get(player) == null) {
             pli.sendText(Main.text("err.history.none"));

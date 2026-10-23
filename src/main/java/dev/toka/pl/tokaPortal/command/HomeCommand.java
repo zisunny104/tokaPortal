@@ -7,13 +7,13 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.data.CommandParamType;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
+import dev.toka.pl.tokaPortal.integration.Services;
 import dev.toka.pl.tokaPortal.form.home.HomeWindows;
 import dev.toka.pl.tokaPortal.form.home.HomeSetForm;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.Services.PlayerInfo;
 
 import static dev.toka.pl.tokaPortal.utils.Portal.setHome;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
 
 public class HomeCommand extends Command {
 
@@ -25,8 +25,8 @@ public class HomeCommand extends Command {
 
     @Override
     public CommandDataVersions generateCustomCommandData(Player player) {
-        if (!ZeroIntegration.has(ZeroIntegration.Feature.PLAYERS)
-                || !ZeroIntegration.has(ZeroIntegration.Feature.REGIONS)) return null;
+        if (!Services.has(Services.Feature.PLAYERS)
+                || !Services.has(Services.Feature.REGIONS)) return null;
         if (!player.isOp() && !getPlayerInfo(player).isTopQuanXian()) return null;
         var data = super.generateCustomCommandData(player);
         var names = CommandSuggestions.homeNames(player);
@@ -44,7 +44,7 @@ public class HomeCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
         if (args.length > 0 && args[0].equalsIgnoreCase("help")) { Main.help(sender, "home"); return true; }
-        if (!dev.toka.pl.tokaPortal.integration.ZeroIntegration.require(sender, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.PLAYERS, dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.REGIONS)) return false;
+        if (!dev.toka.pl.tokaPortal.integration.Services.require(sender, dev.toka.pl.tokaPortal.integration.Services.Feature.PLAYERS, dev.toka.pl.tokaPortal.integration.Services.Feature.REGIONS)) return false;
         if (sender instanceof Player) {
             Player player = (Player) sender;
             PlayerInfo pli = getPlayerInfo(player);

@@ -4,8 +4,9 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.plugin.Plugin;
 import dev.toka.i18n.Pager;
 import dev.toka.pl.tokaPortal.Main;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature;
+import dev.toka.pl.tokaPortal.integration.Services;
+import dev.toka.pl.tokaPortal.integration.Services.Feature;
+import dev.toka.pl.tokaPortal.integration.LandIntegration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public final class HelpOverview {
     private static final List<Entry> ENTRIES = List.of(
             new Entry("portal", 1), new Entry("portal", 2), new Entry("spawn", 1), new Entry("back", 1), new Entry("next", 1),
             new Entry("wild", 1), new Entry("home", 1, Feature.PLAYERS, Feature.REGIONS), new Entry("tph", 1, Feature.PLAYERS, Feature.REGIONS),
-            new Entry("tpl", 1, Feature.LAND), new Entry("tpp", 1), new Entry("tpw", 1), new Entry("tpa", 1));
+            new Entry("tpl", 1), new Entry("tpp", 1), new Entry("tpw", 1), new Entry("tpa", 1));
 
     /** The key after help.overview.other. and the name of the plugin that has the commands. */
     private static final String[][] OTHERS = {{"worlds", "tokaWorlds"}, {"sign", "tokaSigns"}};
@@ -38,8 +39,9 @@ public final class HelpOverview {
                 continue;
             }
             String text = help.get(entry.line());
-            String missing = java.util.Arrays.stream(entry.needs()).filter(feature -> !ZeroIntegration.has(feature))
+            String missing = java.util.Arrays.stream(entry.needs()).filter(feature -> !Services.has(feature))
                     .map(feature -> Main.text("status.feature." + feature.name())).collect(Collectors.joining("、"));
+            if(entry.command().equals("tpl")&&!LandIntegration.available())missing=Main.text("help.overview.needs","tokaLand");
             lines.add(missing.isEmpty() ? text : text + " " + Main.text("help.overview.needs", missing));
         }
         for (String[] other : OTHERS) {

@@ -3,11 +3,12 @@ package dev.toka.pl.tokaPortal.command;
 import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.Player;
 import dev.toka.pl.tokaPortal.utils.Portal;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.Services.PlayerInfo;
 
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
 
 public class SpawnCommand extends Command {
 
@@ -15,6 +16,7 @@ public class SpawnCommand extends Command {
         super("spawn", Main.text("cmd.spawn.desc"));
         this.setUsage(Main.text("cmd.spawn.usage"));
         this.commandParameters.clear();
+        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum("動作", new String[]{"help"})});
     }
 
     @Override

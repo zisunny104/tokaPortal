@@ -7,18 +7,18 @@ import dev.toka.pl.tokaPortal.form.FormTexts;
 import dev.toka.pl.tokaPortal.form.ListMenu;
 import dev.toka.pl.tokaPortal.form.Menu;
 import dev.toka.pl.tokaPortal.Main;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Land;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.Region;
+import dev.toka.pl.tokaPortal.integration.Services;
+import dev.toka.pl.tokaPortal.integration.LandIntegration;
+import dev.toka.pl.tokaPortal.integration.Services.Region;
 import dev.toka.pl.tokaPortal.point.teleportPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.Feature.*;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerNameList;
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.sendCityPassForm;
+import static dev.toka.pl.tokaPortal.integration.Services.Feature.*;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerNameList;
+import static dev.toka.pl.tokaPortal.integration.Services.sendCityPassForm;
 import static dev.toka.pl.tokaPortal.utils.Portal.*;
 
 /** The windows of the portal menu, built from the windows of the form package. */
@@ -70,10 +70,10 @@ public final class PortalWindow {
         List<ListMenu.Item> points = pointItems("point");
         List<ListMenu.Item> shopboxes = pointItems("shopbox");
         Menu menu = new Menu(Main.text("ui.portal.title"), Main.text("ui.portal.prompt"));
-        if (ZeroIntegration.has(REGIONS) && !Region.getRegions().isEmpty()) {
+        if (Services.has(REGIONS) && !Region.getRegions().isEmpty()) {
             menu.button(Main.text("ui.button.regionList"), icon(ICON_REGION), PortalWindow::sendPortalRegionListWindow);
         }
-        if (ZeroIntegration.has(LAND) && !Land.getLandNameListByOwner(player).isEmpty()) {
+        if (LandIntegration.targets(player).map(list->!list.isEmpty()).orElse(false)) {
             menu.button(Main.text("ui.button.landList"), icon(ICON_LAND), PortalWindow::sendPortalLandListWindow);
         }
         if (!getPlayerNameList(player).isEmpty()) {
@@ -85,7 +85,7 @@ public final class PortalWindow {
         if (!points.isEmpty()) {
             menu.button(Main.text("ui.button.teleportList"), icon(ICON_POINT), p -> sendPointList(p, "point", "ui.portal.pointList"));
         }
-        if (ZeroIntegration.has(CITY_PASS)) menu.button(Main.text("ui.button.pass"), icon(ICON_PASS), p -> sendCityPassForm(p));
+        if (Services.has(CITY_PASS)) menu.button(Main.text("ui.button.pass"), icon(ICON_PASS), p -> sendCityPassForm(p));
         menu.button(Main.text("ui.button.close"), icon(ICON_CLOSE), p -> {
         });
         menu.show(player);
@@ -104,25 +104,27 @@ public final class PortalWindow {
     }
 
     private static void sendPortalRegionListWindow(Player player) {
-        if (!ZeroIntegration.require(player, REGIONS)) return;
+        if (!Services.require(player, REGIONS)) return;
         List<ListMenu.Item> items = new ArrayList<>();
         for (Region region : Region.getRegions().values()) {
             items.add(ListMenu.Item.of(region.getInfo(), p -> {
-                if (ZeroIntegration.require(p, REGIONS)) toRegion(region, p);
+                if (Services.require(p, REGIONS)) toRegion(region, p);
             }));
         }
         list("ui.portal.regionList", items, PortalWindow::sendPortalMainWindow).show(player);
     }
 
     public static void sendPortalLandListWindow(Player player) {
-        if (!ZeroIntegration.require(player, LAND)) return;
         List<ListMenu.Item> items = new ArrayList<>();
-        for (String name : Land.getLandNameListByOwner(player)) {
-            items.add(ListMenu.Item.of(name, p -> {
-                Land land = Land.getLand(name);
-                if (land != null && ZeroIntegration.require(p, LAND)) Land.toLand(land, p);
+        java.util.Set<String> names=new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        LandIntegration.targets(player).ifPresent(targets->targets.forEach(target->{
+            names.add(target.name());
+            items.add(ListMenu.Item.of(target.name(),p->{
+                if(Portal.toLandClaim(p,target.id()))
+                    getPlayerInfo(p).sendText(Main.text("msg.land.arrived",target.name()));
             }));
-        }
+        }));
+        if(items.isEmpty()){player.sendMessage(Main.text(LandIntegration.available()?"ui.form.landList.empty":"err.land.unavailable"));return;}
         list("ui.portal.landList", items, PortalWindow::sendPortalMainWindow).show(player);
     }
 

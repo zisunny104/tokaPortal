@@ -4,12 +4,12 @@
 
 ## 主要功能
 
-- **傳送選單**：輸入 `/portal` 開啟選單，可選傳送點、SHOPBOX、線上玩家；有裝 zero 時還有區域、領地與城市通。
+- **傳送選單**：輸入 `/portal` 開啟選單，可選傳送點、SHOPBOX、線上玩家；領地由 tokaLand 軟依賴 API 提供。tokaLand/API 未就緒時領地傳送停用。
 - **玩家互傳**：提出傳送請求，對方在 60 秒內同意即可傳送。管理員可直接傳送。
 - **公共傳送點**：管理員在現在的位置建立，全體玩家都能從選單或指令前往。
 - **來回傳送**：每次傳送都會記錄，可用 `/back`、`/next` 在前後位置之間移動。
 - **隨機傳送**：`/wild` 在指定世界內隨機找安全落點，有冷卻時間。
-- **住家**：管理員可設定、編輯、刪除及傳送住家，需安裝 zero。
+- **住家**：管理員可設定、編輯、刪除及傳送住家，需安裝 tokaRegions。
 
 ## 玩家指令
 
@@ -20,7 +20,7 @@
 | `/tpp [傳送點名稱]` | 例：`/tpp spawn`，傳送到公共傳送點；不寫名稱開啟選單 |
 | `/spawn` | 前往名為 `spawn` 的重生點 |
 | `/back`、`/next` | 返回前一個／前往下一個傳送位置 |
-| `/tpl [領地名稱]` | 傳送到自己的領地，需安裝 zero |
+| `/tpl [領地名稱或 UUID]` | 傳送到可使用的領地；`/land list` 查 UUID，名稱重複時請用 UUID |
 | `/wild` | 在允許的世界內隨機傳送，並顯示冷卻 |
 
 所有指令都可加 `help` 查看說明，例如 `/tpa help`。
@@ -34,10 +34,10 @@
 | `/portal legacy list` | `/portal legacy list [頁]` | 列出尚未對應玩家 UUID 的舊名稱住家與傳送點，清單標示類型，主控台可用 | OP |
 | `/portal legacy claim` | `/portal legacy claim <名稱> <玩家>` | 把該舊名稱的住家與傳送點全部交給指定玩家，有爭議的也可用此指令處理 | OP |
 | `/tpw` | `/tpw <世界名稱>` | 傳送到世界的安全出生點，世界未載入會先載入 | OP |
-| `/home`、`/tph` | `/home [list｜set｜del｜edit] [名稱]`、`/tph [名稱]` | 住家管理與傳送 | OP 或 zero 最高權限 |
+| `/home`、`/tph` | `/home [list｜set｜del｜edit] [名稱]`、`/tph [名稱]` | 住家管理與傳送 | OP 或管理員身分 |
 
 `tokaPortal.points.manage` 預設只有 OP。傳送點名稱不可使用 `reserved-names` 內的字。
-`/tpa` 的規則：OP 或 zero 最高權限者直接傳送；zero 高權限者稍待片刻後傳送；其餘玩家需對方同意。
+`/tpa` 的規則：OP 或管理員身分者直接傳送；贊助者稍待片刻後傳送；其餘玩家需對方同意。
 
 ## 住家與傳送點擁有者 UUID
 
@@ -70,6 +70,7 @@
 | 方法／事件 | 參數 | 用途 |
 | --- | --- | --- |
 | `Portal.portal(player, location[, title])` | 玩家、目的地、標題 | 傳送並記錄到 `/back` 歷史；回傳是否成功 |
+| `Portal.toLandClaim(player, claimId)` | 玩家、tokaLand 穩定 ID | 重新驗證本人 UUID 權限，再透過 Portal 事件傳送；供 tokaSigns 等選用整合呼叫 |
 | `Portal.toPoint(name, player)` | 傳送點名稱、玩家 | 傳送到公共傳送點 |
 | `Portal.Tpa(from, to)` | 發起玩家、目標玩家 | 依權限提出傳送請求 |
 | `PlayerPortalEvent` | `getPlayer()`、`getFromInfo()`、`getToInfo()`、`getFrom()`、`getTo()` | 每次傳送前觸發，可取消 |
@@ -77,8 +78,9 @@
 ## 疑難排解
 
 - **`/wild` 說只能在特定世界使用？** 請在 `wild.worlds` 加入該世界的資料夾名稱。
-- **住家指令無法使用？** 住家僅限管理員，且需安裝 zero。
-- **沒有 zero 能用嗎？** 可以，傳送選單、`/tpa`、傳送點、`/back`、`/wild` 都不受影響。
+- **住家指令無法使用？** 住家僅限管理員，且需安裝 tokaRegions。
+- **領地清單只顯示部分資料？** tokaLand 只列出已確認為本人 UUID 擁有的領地；未完成身分對照的資料等待玩家登入後由 tokaProfiles 取回。
+- **沒有 tokaRegions 能用嗎？** 可以，傳送選單、`/tpa`、傳送點、`/back`、`/wild` 都不受影響。
 
 ### Plan 選用整合（2.7.2）
 

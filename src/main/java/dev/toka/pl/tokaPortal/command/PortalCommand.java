@@ -4,12 +4,13 @@ import dev.toka.pl.tokaPortal.Main;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.level.Location;
 import dev.toka.pl.tokaPortal.utils.PortalWindow;
-import dev.toka.pl.tokaPortal.integration.ZeroIntegration.PlayerInfo;
+import dev.toka.pl.tokaPortal.integration.Services.PlayerInfo;
 import dev.toka.pl.tokaPortal.point.teleportPoint;
 
-import static dev.toka.pl.tokaPortal.integration.ZeroIntegration.getPlayerInfo;
+import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
 import static dev.toka.pl.tokaPortal.point.teleportPoint.*;
 
 public class PortalCommand extends Command {
@@ -17,6 +18,9 @@ public class PortalCommand extends Command {
     public PortalCommand() {
         super("portal", Main.text("cmd.portal.desc"));
         this.setUsage(Main.text("cmd.portal.usage"));
+        this.commandParameters.clear();
+        this.commandParameters.put("actions", new CommandParameter[]{CommandParameter.newEnum("動作", new cn.nukkit.command.data.CommandEnum("TokaPortalAction", new String[]{"help","legacy","tpp","point","server"}))});
+        this.commandParameters.put("points", new CommandParameter[]{CommandParameter.newEnum("動作", new cn.nukkit.command.data.CommandEnum("TokaPortalPointAction", new String[]{"tpp","point"})),CommandParameter.newEnum("管理", new cn.nukkit.command.data.CommandEnum("TokaPortalPointManage", new String[]{"add","set","del"})),CommandParameter.newType("名稱",true,cn.nukkit.command.data.CommandParamType.STRING),CommandParameter.newType("類型",true,cn.nukkit.command.data.CommandParamType.STRING)});
     }
 
     @Override
