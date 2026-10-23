@@ -43,6 +43,12 @@ public final class Services {
         return true;
     }
 
+    /** When each player's teleport is over; a player is "in a portal" until then (the blindness a teleport gives lasts as long). */
+    private static final Map<UUID, Long> teleportingUntil = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final long TELEPORT_MILLIS = 2000;
+
+    public static void markTeleporting(Player player) { teleportingUntil.put(player.getUniqueId(), System.currentTimeMillis() + TELEPORT_MILLIS); }
+
     public static PlayerInfo getPlayerInfo(Player player) { return new PlayerInfo(player); }
 
     public static final class PlayerInfo {
@@ -54,6 +60,7 @@ public final class Services {
         public void sendText(String text) { player.sendMessage(text); }
         public boolean isTopQuanXian() { return player.isOp() || player.hasPermission(ADMIN); }
         public boolean isHighQuanXian() { return player.hasPermission(SPONSOR); }
+        public boolean isPortalStatus() { return teleportingUntil.getOrDefault(player.getUniqueId(), 0L) > System.currentTimeMillis(); }
         public String getRegionInfo() { Region region = getRegion(); return region == null ? Main.text("status.here") : region.getInfo(); }
         public Region getRegion() { return Region.at(player.getLocation()); }
     }
@@ -76,7 +83,16 @@ public final class Services {
         }
 
         public String getName() { return Objects.toString(get("name"), ""); }
-        public String getInfo() { return getName(); }
+        /** The name players read: the one written for the server's language, else any written name, else the plain name. */
+        public String getInfo() {
+            if (get("localizedNames") instanceof Map<?, ?> names && !names.isEmpty()) {
+                String language = Main.getInstance().getConfig().getString("language", "zh-TW");
+                Object own = names.get(language);
+                if (own != null) return own.toString();
+                for (Object value : names.values()) if (value != null && !value.toString().isBlank()) return value.toString();
+            }
+            return getName();
+        }
 
         /** Where players sent to this region arrive; null when the region has no teleport point or its world is not loaded. */
         public Location getTpr() {

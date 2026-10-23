@@ -151,6 +151,7 @@ public class Portal implements Listener {
                 pli, pli.getRegionInfo(), title, player.getLocation(), location);
         if (callEvent(ev)) {
             if (!player.teleport(location)) return false;
+            Services.markTeleporting(player);
             player.sendTitle(title, Main.text("ui.title.teleporting"), 1, 20, 5);
             Effect effectBLINDNESS = getEffect(BLINDNESS).setVisible(false)
                     .setAmplifier(0).setDuration(40);

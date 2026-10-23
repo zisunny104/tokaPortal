@@ -28,6 +28,11 @@ public class PortalHistory implements Listener {
     public static boolean toHistoryLocation(Player player, String status) {
         PlayerInfo pli = getPlayerInfo(player);
 
+        if (pli.isPortalStatus()) {
+            pli.sendText(Main.text("err.portalCooldown"));
+            return false;
+        }
+
         if (portalHistoryMap.get(player) == null) {
             pli.sendText(Main.text("err.history.none"));
             return false;
