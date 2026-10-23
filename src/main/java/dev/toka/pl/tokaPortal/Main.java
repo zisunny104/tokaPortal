@@ -105,6 +105,19 @@ public class Main extends PluginBase implements Listener {
         if (writer != null && !writer.drain(10_000)) getLogger().warning(text("log.writer.timeout"));
     }
 
+    /** Every teleport is written in the log and in the command channel of Discord (when tokaDiscordLink is there). */
+    @cn.nukkit.event.EventHandler(priority = cn.nukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTeleported(dev.toka.pl.tokaPortal.event.PlayerPortalEvent event) {
+        String line = event.toString();
+        getLogger().info(line);
+        var discord = getServer().getPluginManager().getPlugin("tokaDiscordLink");
+        if (discord == null || !discord.isEnabled()) return;
+        try {
+            Class.forName("dev.toka.discord.api.DiscordLink", true, discord.getClass().getClassLoader())
+                    .getMethod("sendMessage", String.class, String.class).invoke(null, cn.nukkit.utils.TextFormat.clean(line), "cmd");
+        } catch (ReflectiveOperationException | LinkageError unavailable) { /* Discord is optional */ }
+    }
+
     private void registerEvents() {
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getPluginManager().registerEvents(new Portal(), this);
