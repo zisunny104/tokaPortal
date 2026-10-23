@@ -274,7 +274,7 @@ ui:
     cancel: "取消"
   button:
     teleportList: "§e>>§8傳送點列表  "
-    shopboxList: "§e>>§8SHOPBOX傳送列表"
+    shopboxList: "§e>>§8商店傳送列表"
     regionList: "§e>>§8區域傳送列表"
     landList: "§e>>§8領地傳送列表"
     playerList: "§e>>§8線上玩家傳送"
@@ -299,9 +299,9 @@ ui:
         - "點擊進行傳送"
       empty: "目前沒有任何公共傳送點"
     shopboxList:
-      title: "=SHOPBOX列表="
+      title: "=商店列表="
       hint: "點擊進行傳送"
-      empty: "目前沒有任何 SHOPBOX 可以傳送"
+      empty: "目前沒有任何商店可以傳送"
     regionList:
       title: "=區域列表="
       hint: "點擊按鈕 進行傳送"
