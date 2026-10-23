@@ -21,7 +21,8 @@ public final class HelpOverview {
     }
 
     private static final List<Entry> ENTRIES = List.of(
-            new Entry("portal", 1), new Entry("portal", 2), new Entry("spawn", 1), new Entry("back", 1), new Entry("next", 1),
+            new Entry("portal", 1), new Entry("portal", 2), new Entry("portal", 3), new Entry("portal", 4), new Entry("portal", 5),
+            new Entry("portal", 6), new Entry("portal", 7), new Entry("spawn", 1), new Entry("back", 1), new Entry("next", 1),
             new Entry("wild", 1), new Entry("home", 1, Feature.PLAYERS, Feature.REGIONS), new Entry("tph", 1, Feature.PLAYERS, Feature.REGIONS),
             new Entry("tpl", 1), new Entry("tpp", 1), new Entry("tpw", 1), new Entry("tpa", 1));
 

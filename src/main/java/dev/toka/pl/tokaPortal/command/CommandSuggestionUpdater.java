@@ -10,6 +10,9 @@ import cn.nukkit.event.player.PlayerQuitEvent;
 import dev.toka.pl.tokaPortal.Main;
 
 public final class CommandSuggestionUpdater implements Listener {
+    /** Called when the plugin is disabled; the cached world folders must not survive a reload. */
+    public static void reset() { CommandSuggestions.reset(); }
+
     private boolean queued;
 
     private void refresh() {
@@ -18,8 +21,7 @@ public final class CommandSuggestionUpdater implements Listener {
         Main plugin = Main.getInstance();
         plugin.getServer().getScheduler().scheduleDelayedTask(plugin, () -> {
             queued = false;
-            plugin.getServer().getOnlinePlayers().values().stream()
-                    .filter(player -> player.isOnline()).forEach(player -> player.sendCommandData());
+            plugin.refreshCommandData();
         }, 1);
     }
 

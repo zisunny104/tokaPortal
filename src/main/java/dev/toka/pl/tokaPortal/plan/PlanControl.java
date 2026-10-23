@@ -46,10 +46,10 @@ public final class PlanControl {
   registered=false;Options options=options();if(!options.enabled())return false;
   var plan=plugin.getServer().getPluginManager().getPlugin("Plan");
   if(plan==null||!plan.isEnabled()){
-   if(options.mode().equals("enable"))plugin.getLogger().warning(text.apply("plan.missing",new Object[]{command}));
+   if(options.mode().equals("enable"))plugin.getLogger().warning(text.apply("log.plan.missing",new Object[]{command}));
    return false;
   }
-  if(!announced){announced=true;plugin.getLogger().info(text.apply("plan.detected",new Object[]{options.mode(),command}));}
+  if(!announced){announced=true;plugin.getLogger().info(text.apply("log.plan.detected",new Object[]{options.mode(),command}));}
   return true;
  }
  public void registered(boolean value){registered=value;}
@@ -65,7 +65,7 @@ public final class PlanControl {
    Path file=plugin.getDataFolder().toPath().resolve("config.yml");String before=Files.readString(file,StandardCharsets.UTF_8);
    String after=edit(before,nextMode,selected);write(file,after);
    plugin.reloadConfig();refresh.run();return true;
-  }catch(Exception|LinkageError e){plugin.getLogger().warning(text.apply("plan.configureFailed",new Object[]{e.getClass().getSimpleName()}));return false;}
+  }catch(Exception|LinkageError e){plugin.getLogger().warning(text.apply("log.plan.configureFailed",new Object[]{e.getClass().getSimpleName()}));return false;}
  }
  private static void write(Path file,String content)throws java.io.IOException{
   Path temporary=file.resolveSibling("."+file.getFileName()+"."+UUID.randomUUID()+".tmp");

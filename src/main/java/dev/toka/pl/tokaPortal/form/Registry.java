@@ -31,6 +31,10 @@ final class Registry {
         }
     }
 
+    static void clear() {
+        ENTRIES.clear();
+    }
+
     static void answer(PlayerFormRespondedEvent event) {
         Entry entry = ENTRIES.remove(event.getWindow());
         if (entry != null && entry.player() == event.getPlayer()) {

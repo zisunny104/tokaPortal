@@ -35,8 +35,9 @@ public class HomeCommand extends Command {
                 CommandParameter.newType(Main.text("param.newHomeName"), true, CommandParamType.STRING)};
         var del = new CommandParameter[]{CommandSuggestions.names(Main.text("param.action"), false, "TokaPortalHomeDelete", java.util.List.of("del")),
                 CommandParameter.newType(Main.text("param.homeName"), true, CommandParamType.STRING)};
-        if (names.isEmpty()) return CommandSuggestions.parameters(data, basic, set, del);
-        return CommandSuggestions.parameters(data, basic, set, del,
+        var help = CommandSuggestions.help();
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, basic, set, del, help);
+        return CommandSuggestions.parameters(data, basic, set, del, help,
                 new CommandParameter[]{CommandSuggestions.names(Main.text("param.action"), false, "TokaPortalHomeDelete", java.util.List.of("del")),
                         CommandSuggestions.names(Main.text("param.homeName"), true, "TokaPortalHomes", names)});
     }
@@ -55,7 +56,7 @@ public class HomeCommand extends Command {
                             if (args.length == 2) {
                                 setHome(player, args[1]);
                             } else {
-                                player.showFormWindow(new HomeSetForm());
+                                player.showFormWindow(new HomeSetForm(player));
                             }
                             break;
                         case "del":

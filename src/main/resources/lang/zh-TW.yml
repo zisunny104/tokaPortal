@@ -21,7 +21,7 @@ cmd:
     usage: "/next"
   portal:
     desc: "傳送系統指令"
-    usage: "/portal [point <set|del> <名稱> [類型]|legacy <list [頁]|claim <名稱> <玩家>>|help]"
+    usage: "/portal [point [add|set|del <名稱> [類型]]|legacy <list [頁]|claim <名稱> <玩家>>|plan <status|mode|fields>|server|reload|help [頁|all]]"
   spawn:
     desc: "回到重生點"
     usage: "/spawn"
@@ -53,6 +53,13 @@ param:
   worldName: "世界名稱"
   landName: "領地名稱"
   landNameOrId: "領地名稱或 UUID"
+  page: "頁碼"
+  manage: "管理"
+  pointName: "傳送點名稱"
+  pointType: "類型"
+  legacyName: "舊名稱"
+  mode: "模式"
+  field: "欄位"
 
 # ---------------------------------------------------------------
 # /指令 help 的多行說明（第一行為標題，之後每行一個用法）
@@ -84,13 +91,12 @@ help:
   portal:
     - "§6=== §f§l/portal 說明§r §6==="
     - "§e/portal §7- §b開啟傳送系統選單"
-    - "§e/portal point set <名稱> [類型] §7- §b在目前位置建立公共傳送點（需要權限）"
-    - "§e/portal point del <名稱> §7- §b刪除公共傳送點（建立者或 OP）"
-    - "§e/portal legacy list [頁] §7- §b列出尚未對應玩家 UUID 的舊名稱住家與傳送點（OP）"
-    - "§e/portal legacy claim <名稱> <玩家> §7- §b把該舊名稱的住家與傳送點全部交給指定玩家（OP）"
-    - "§e/back §7- §b返回前次傳送地點"
-    - "§e/next §7- §b前往下個傳送地點"
-    - "§e/portal help §7- §b顯示這份說明"
+    - "§e/portal point §7[add|set|del <名稱> [類型]] §7- §b公共傳送點：不寫參數開管理視窗；del 限建立者或 OP（tokaPortal.points.manage）；/tpp 可代替 point"
+    - "§e/portal legacy list [頁] | claim <名稱> <玩家> §7- §b舊名稱住家與傳送點：列出，或全部交給指定玩家（OP）"
+    - "§e/portal plan status | mode <auto|enable|disable> | fields <all|none|欄位> §7- §bPlan 展示設定（tokaPortal.admin）"
+    - "§e/portal server §7- §b跨伺服器目的地（尚未提供）"
+    - "§e/portal reload §7- §b重新讀取設定、語系與資料（tokaPortal.admin）"
+    - "§e/portal help [頁|all] §7- §b指令總覽：分頁顯示，all 一次顯示全部"
   spawn:
     - "§6=== §f§l/spawn 說明§r §6==="
     - "§e/spawn §7- §b回到重生點"
@@ -98,6 +104,7 @@ help:
   tpa:
     - "§6=== §f§l/tpa 說明§r §6==="
     - "§e/tpa <玩家代號> §7- §b傳送到指定玩家身邊（依權限可能需要對方同意）"
+    - "§e/tpa §7- §b開啟線上玩家選擇視窗"
     - "§e/tpa help §7- §b顯示這份說明"
   tph:
     - "§6=== §f§l/tph 說明（僅管理員）§r §6==="
@@ -112,7 +119,7 @@ help:
   tpp:
     - "§6=== §f§l/tpp 說明§r §6==="
     - "§e/tpp <傳送點名稱> §7- §b傳送到指定傳送點"
-    - "§e/tpp §7- §b開啟傳送系統選單"
+    - "§e/tpp §7- §b開啟傳送系統選單；管理傳送點用 /portal point"
     - "§e/tpp help §7- §b顯示這份說明"
   tpw:
     - "§6=== §f§l/tpw 說明（僅 OP）§r §6==="
@@ -183,6 +190,8 @@ err:
     cooldown: "§7[傳送]§r§c冷卻中，剩餘 §a${0} §c秒"
     cancelled: "§7[傳送]§r§c傳送被取消，未扣冷卻"
     noSafeSpot: "§7[傳送]§r§e找不到安全落點，未扣冷卻"
+  portal:
+    reloadFailed: "§7[傳送]§r§c重新載入失敗，請看後台訊息。"
   # 住家資料無法開啟（啟動失敗時的例外訊息）
   storageOpen: "住家資料無法開啟，請檢查設定與資料檔。"
 
@@ -205,8 +214,6 @@ msg:
     # ${0}=舊名稱、${1}=玩家、${2}=住家數、${3}=傳送點數
     claimed: "§7[傳送]§r§a已把舊名稱 ${0} 交給 ${1}：住家 ${2} 個、傳送點 ${3} 個"
   tpa:
-    # ${0}=用法字串（cmd.tpa.usage）
-    usage: "§7[傳送]§r§b用法：§e${0}"
     # ${0}=發出傳送的玩家名稱
     incoming: "§7[傳送]§r§b玩家 §a${0} §b即將傳送到你身邊!"
     # ${0}=目標玩家名稱
@@ -239,6 +246,7 @@ msg:
     usage: "§7[傳送]§r§7/portal point <set|del> <名稱> [類型]"
   portal:
     serverUnavailable: "§7[傳送]§r§e尚未提供跨伺服器目的地管理功能。"
+    reloaded: "§7[傳送]§r§a已重新載入設定、語系與資料。"
   world:
     # ${0}=世界名稱
     arrived: "§7[傳送]§r§a已傳送至世界 ${0}"
@@ -283,6 +291,7 @@ ui:
     options: "§l§b搜尋／排序／每頁數量"
     nextPage: "§l§e下一頁>"
     pass: "§l§b>進入城市通<"
+    pointAdmin: "§l§e>管理傳送點<"
     close: "§l§c>關閉<"
     agree: "§l§a>同意<"
     refuse: "§l§c>取消<"
@@ -314,6 +323,33 @@ ui:
       title: "=玩家列表="
       hint: "點選要傳送的玩家（對方同意後才會傳送）"
       empty: "現在沒有其他線上玩家可以傳送喔.."
+  points:
+    title: "=傳送點管理="
+    # ${0}=傳送點數量
+    prompt: "目前共有 ${0} 個公共傳送點"
+    add: "新增傳送點"
+    list: "傳送點清單"
+    listing:
+      title: "=傳送點清單="
+      hint: "點選傳送點進行管理"
+      empty: "目前沒有任何公共傳送點"
+    # ${0}=名稱 ${1}=類型
+    item: "${0} §7(${1})"
+    # ${0}=世界 ${1}=X ${2}=Y ${3}=Z
+    here: "新傳送點會建在目前位置：${0} (${1}, ${2}, ${3})"
+    name: "傳送點名稱"
+    namePlaceholder: "名稱"
+    type: "類型"
+    # ${0}=名稱
+    detail: "傳送點 ${0}"
+    # ${0}=類型 ${1}=建立者
+    detailInfo: "類型：${0}
+建立者：${1}"
+    go: "傳送過去"
+    delete: "刪除傳送點"
+    delTitle: "=刪除傳送點="
+    # ${0}=名稱
+    delConfirm: "確認要刪除傳送點 ${0} 嗎？"
   home:
     list:
       title: "=住家列表="
@@ -323,6 +359,9 @@ ui:
       empty: "您沒有可傳送的住家"
     set:
       title: "=設定住家="
+      # ${0}=世界 ${1}=X ${2}=Y ${3}=Z ${4}=已有住家數（設定檔沒有住家上限）
+      here: "目前位置：${0} (${1}, ${2}, ${3})
+已有住家：${4} 個"
       input: "設置住家名稱"
       placeholder: "住家名稱"
     del:
@@ -342,6 +381,7 @@ ui:
       title: "編輯住家[${0}]"
       prompt: "請選擇要對住家進行的動作"
       delete: "刪除住家"
+      go: "傳送到住家"
       back: "返回列表"
   # 傳送時畫面標題／副標題（title 是目的地名稱，subtitle 如下）
   title:
@@ -368,9 +408,9 @@ log:
     otherDirectory: "§c找到另一種格式的儲存資料夾，請先確認並明確搬遷"
   points:
     # 擁有者遷移結果。${0}=舊名稱數、${1}=已對應 UUID 的傳送點數、${2}=仍只有名稱的傳送點數、${3}=爭議名稱數
-    migrated: "§b傳送點擁有者遷移：舊名稱 §a${0} §b個，已對應傳送點 §a${1} §b個，仍只有名稱 §a${2} §b個，爭議 §a${3} §b個"
+    migrated: "§b傳送點遷移：舊名稱 §a${0}§b，已對應 §a${1}§b，待處理 §a${2}§b，爭議 §a${3}"
     # ${0}=名稱
-    dispute: "§e傳送點擁有者 §a${0} §e有爭議：已有不同玩家的傳送點使用此名稱，不自動處理，請用 /portal legacy claim 指定"
+    dispute: "§e傳送點名稱 §a${0} §e有爭議，請用 /portal legacy claim 指定"
     # ${0}=玩家名稱、${1}=傳送點數
     claimed: "§b玩家 §a${0} §b登入，取回舊名稱傳送點 §a${1} §b個"
     # ${0}=玩家名稱
@@ -385,13 +425,28 @@ log:
     saveFailed: "§c住家儲存失敗"
     deleteFailed: "§c住家刪除失敗"
     # 擁有者遷移結果。${0}=舊名稱數、${1}=已對應 UUID 的住家數、${2}=仍只有名稱的住家數、${3}=爭議名稱數
-    migrated: "§b住家擁有者遷移：舊名稱 §a${0} §b個，已對應住家 §a${1} §b個，仍只有名稱 §a${2} §b個，爭議 §a${3} §b個"
+    migrated: "§b住家遷移：舊名稱 §a${0}§b，已對應 §a${1}§b，待處理 §a${2}§b，爭議 §a${3}"
     # ${0}=名稱
-    dispute: "§e住家擁有者 §a${0} §e有爭議：已有不同玩家的住家使用此名稱，不自動處理，請用 /portal legacy claim 指定"
+    dispute: "§e住家名稱 §a${0} §e有爭議，請用 /portal legacy claim 指定"
     # ${0}=玩家名稱、${1}=住家數
     claimed: "§b玩家 §a${0} §b登入，取回舊名稱住家 §a${1} §b個"
     # ${0}=玩家名稱
     joinDispute: "§e玩家 §a${0} §e登入，同名住家有爭議，不自動取回"
+  # ${0}=錯誤類型
+  land:
+    unavailable: "§etokaLand 傳送 API 不可用，領地傳送暫停：§a${0}"
+  reloadFailed: "§c重新載入失敗"
+  plan:
+    # ${0}=指令名稱
+    missing: "§e要求啟用 Plan 但它尚未就緒；可用 §a/${0} plan mode auto§e 改回自動"
+    # ${0}=模式 ${1}=指令名稱
+    detected: "§b偵測到 Plan，模式 §a${0}§b；§a/${1} plan status §b可查看"
+    # ${0}=錯誤類型
+    configureFailed: "§ePlan 設定未完成：§a${0}"
+    ready: "§bPlan 傳送資訊已啟用"
+    unsupported: "§ePlan 缺少 DataExtension Builder API，略過整合"
+    # ${0}=錯誤類型
+    unavailable: "§ePlan 整合暫時不可用：§a${0}"
   writer:
     timeout: "§e背景儲存寫入逾時，部分資料可能未寫入"
   # ${0}=玩家顯示名稱、${1}=出發地說明、${2}=出發座標與世界、${3}=目的地說明、${4}=目的座標與世界
@@ -414,15 +469,9 @@ status:
     back: "前次傳送位置"
 
 plan:
-  missing: '已要求啟用 Plan，但 Plan 尚未就緒；/${0} plan mode auto 可改為自動偵測。'
-  detected: '已偵測到 Plan，目前模式 ${0}；/${1} plan status 可查看設定。'
-  configureFailed: 'Plan 設定未完成：${0}。'
   noPermission: '§c沒有管理 Plan 展示的權限。'
   configured: '§aPlan 設定已儲存；/${0} plan status 可查看。'
   usage: '§e/${0} plan status | mode <auto|enable|disable> | fields <all|none|欄位...>'
   playerHomes: '住家數量'
   totalHomes: '全服住家數量'
   publicPoints: '全服公開傳送點數量'
-  ready: 'Plan 傳送資訊整合已啟用。'
-  unsupported: 'Plan 缺少 DataExtension Builder API，已略過傳送資訊整合。'
-  unavailable: 'Plan 傳送資訊整合暫時不可用：${0}'

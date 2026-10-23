@@ -26,9 +26,9 @@ public class TpwCommand extends Command {
         var data = super.generateCustomCommandData(player);
         var names = CommandSuggestions.worldNames();
         var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.worldName"), cn.nukkit.command.data.CommandParamType.STRING)};
-        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual, CommandSuggestions.help());
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.worldName"), false, "TokaPortalWorlds", names)}, manual);
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.worldName"), false, "TokaPortalWorlds", names)}, manual, CommandSuggestions.help());
     }
 
     @Override

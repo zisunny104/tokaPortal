@@ -30,6 +30,7 @@ public class Main extends PluginBase implements Listener {
     public dev.toka.pl.tokaPortal.point.PublicPoints getPublicPoints(){return publicPoints;}
     private dev.toka.pl.tokaPortal.provider.OwnerMigration ownerMigration;
     public dev.toka.pl.tokaPortal.provider.OwnerMigration getOwnerMigration() { return ownerMigration; }
+    private final java.util.Map<String, cn.nukkit.command.Command> commands = new java.util.LinkedHashMap<>();
     private dev.toka.pl.tokaPortal.wild.WildService wildService;
     public dev.toka.pl.tokaPortal.wild.WildService getWildService(){return wildService;}
 
@@ -91,6 +92,15 @@ public class Main extends PluginBase implements Listener {
 
     @Override
     public void onDisable() {
+        // The commands were put into the map by hand, so the server does not remove them when the plugin goes.
+        var map = getServer().getCommandMap();
+        for (var command : commands.values()) {
+            map.getCommands().entrySet().removeIf(entry -> entry.getValue() == command);
+            command.unregister(map);
+        }
+        commands.clear();
+        dev.toka.pl.tokaPortal.form.FormListener.clear();
+        CommandSuggestionUpdater.reset();
         closePlan(); planSnapshot = null;
         if(wildService!=null)wildService.close();
         if (ownerMigration != null) ownerMigration.stop();
@@ -98,6 +108,22 @@ public class Main extends PluginBase implements Listener {
         if (publicPoints != null) { try {publicPoints.close();} catch(java.io.IOException e){getLogger().error(text("log.points.closeFailed"),e);} publicPoints=null;}
         if (provider != null) { provider.close(false); provider = null; }
         if (writer != null) writer.shutdown();
+        if (instance == this) instance = null;
+    }
+
+    /** Sends the command parameters again, after names they offer have changed. */
+    public void refreshCommandData() {
+        getServer().getOnlinePlayers().values().stream().filter(cn.nukkit.Player::isOnline).forEach(cn.nukkit.Player::sendCommandData);
+    }
+
+    /** Re-reads the config, the texts and the data, and renews what was built from them. */
+    public void reloadAll() {
+        reload();
+        commands.forEach((name, command) -> {
+            command.setDescription(text("cmd." + name + ".desc"));
+            command.setUsage(text("cmd." + name + ".usage"));
+        });
+        refreshCommandData();
     }
 
     /** 關閉儲存前等背景寫入完成，逾時只記 log。 */
@@ -127,17 +153,22 @@ public class Main extends PluginBase implements Listener {
     }
 
     private void registerCommandMap() {
-        this.getServer().getCommandMap().register("back", new BackCommand());
-        this.getServer().getCommandMap().register("home", new HomeCommand());
-        this.getServer().getCommandMap().register("next", new NextCommand());
-        this.getServer().getCommandMap().register("portal", new PortalCommand());
-        this.getServer().getCommandMap().register("spawn", new SpawnCommand());
-        this.getServer().getCommandMap().register("tpa", new TpaCommand());
-        this.getServer().getCommandMap().register("tph", new TphCommand());
-        this.getServer().getCommandMap().register("tpl", new TplCommand());
-        this.getServer().getCommandMap().register("tpp", new TppCommand());
-        this.getServer().getCommandMap().register("tpw", new TpwCommand());
-        this.getServer().getCommandMap().register("wild", new WildCommand());
+        register("back", new BackCommand());
+        register("home", new HomeCommand());
+        register("next", new NextCommand());
+        register("portal", new PortalCommand());
+        register("spawn", new SpawnCommand());
+        register("tpa", new TpaCommand());
+        register("tph", new TphCommand());
+        register("tpl", new TplCommand());
+        register("tpp", new TppCommand());
+        register("tpw", new TpwCommand());
+        register("wild", new WildCommand());
+    }
+
+    private void register(String name, cn.nukkit.command.Command command) {
+        getServer().getCommandMap().register(name, command);
+        commands.put(name, command);
     }
 
     public void reload() {
@@ -176,7 +207,7 @@ public class Main extends PluginBase implements Listener {
         if(planControl!=null)planControl.registered(false);
         if (plan == null) return;
         try { plan.close(); }
-        catch (Exception | LinkageError e) { getLogger().warning(text("plan.unavailable", e.getClass().getSimpleName())); }
+        catch (Exception | LinkageError e) { getLogger().warning(text("log.plan.unavailable", e.getClass().getSimpleName())); }
         finally { plan=null; }
     }
     private void refreshPlan() {
@@ -187,9 +218,9 @@ public class Main extends PluginBase implements Listener {
         if(!planControl.shouldRegister())return;
         try {
             PlanExtension extension=new PlanExtension(planSettings,()->planSnapshot,Main::text);
-            if(extension.register()){plan=extension;planControl.registered(true);getLogger().info(text("plan.ready"));}
-            else getLogger().warning(text("plan.unsupported"));
-        } catch(RuntimeException | LinkageError e){getLogger().warning(text("plan.unavailable",e.getClass().getSimpleName()));}
+            if(extension.register()){plan=extension;planControl.registered(true);getLogger().info(text("log.plan.ready"));}
+            else getLogger().warning(text("log.plan.unsupported"));
+        } catch(RuntimeException | LinkageError e){getLogger().warning(text("log.plan.unavailable",e.getClass().getSimpleName()));}
     }
     @EventHandler public void onPlanEnable(cn.nukkit.event.plugin.PluginEnableEvent event) {
         if("Plan".equals(event.getPlugin().getName()))refreshPlan();

@@ -36,9 +36,9 @@ public class TphCommand extends Command {
         var data = super.generateCustomCommandData(player);
         var names = CommandSuggestions.homeNames(player);
         var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.homeName"), true, CommandParamType.STRING)};
-        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual, CommandSuggestions.help());
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.homeName"), true, "TokaPortalHomes", names)}, manual);
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.homeName"), true, "TokaPortalHomes", names)}, manual, CommandSuggestions.help());
     }
 
     @Override

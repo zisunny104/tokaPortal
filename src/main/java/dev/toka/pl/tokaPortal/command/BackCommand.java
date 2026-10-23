@@ -14,7 +14,7 @@ public class BackCommand extends Command {
         super("back", Main.text("cmd.back.desc"));
         this.setUsage(Main.text("cmd.back.usage"));
         this.commandParameters.clear();
-        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum("動作", new String[]{"help"})});
+        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum(Main.text("param.action"), new String[]{"help"})});
     }
 
     public boolean execute(CommandSender sender, String label, String[] args) {

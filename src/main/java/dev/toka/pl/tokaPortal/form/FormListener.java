@@ -16,6 +16,12 @@ public final class FormListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(new FormListener(), plugin);
     }
 
+    /** Drops every pending window and choice when the plugin is disabled. */
+    public static void clear() {
+        Registry.clear();
+        Preferences.clear();
+    }
+
     @EventHandler
     public void onRespond(PlayerFormRespondedEvent event) {
         Registry.answer(event);

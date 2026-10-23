@@ -14,7 +14,7 @@ public class NextCommand extends Command {
         super("next", Main.text("cmd.next.desc"));
         this.setUsage(Main.text("cmd.next.usage"));
         this.commandParameters.clear();
-        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum("動作", new String[]{"help"})});
+        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum(Main.text("param.action"), new String[]{"help"})});
     }
 
     public boolean execute(CommandSender sender, String label, String[] args) {

@@ -20,16 +20,16 @@ public class TppCommand extends Command {
         super("tpp", Main.text("cmd.tpp.desc"));
         this.setUsage(Main.text("cmd.tpp.usage"));
         this.commandParameters.clear();
-        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newType("傳送點名稱", true, CommandParamType.STRING)});
+        this.commandParameters.put("def", new CommandParameter[]{CommandParameter.newType(Main.text("param.pointName"), true, CommandParamType.STRING)});
     }
 
     @Override
     public CommandDataVersions generateCustomCommandData(Player player) {
         var data=super.generateCustomCommandData(player);
         var names=teleportPoint.getPoints().keySet().stream().map(String::valueOf).sorted().toList();
-        var manual=new CommandParameter[]{CommandParameter.newType("傳送點名稱",true,CommandParamType.STRING)};
-        if(names.isEmpty())return CommandSuggestions.parameters(data,manual);
-        return CommandSuggestions.parameters(data,new CommandParameter[]{CommandSuggestions.names("傳送點名稱",true,"TokaPortalPoints",names)},manual);
+        var manual=new CommandParameter[]{CommandParameter.newType(Main.text("param.pointName"),true,CommandParamType.STRING)};
+        if(names.isEmpty())return CommandSuggestions.parameters(data,manual,CommandSuggestions.help());
+        return CommandSuggestions.parameters(data,new CommandParameter[]{CommandSuggestions.names(Main.text("param.pointName"),true,"TokaPortalPoints",names)},manual,CommandSuggestions.help());
     }
 
     @Override

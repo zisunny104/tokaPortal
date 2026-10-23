@@ -19,6 +19,10 @@ public final class Preferences {
         VIEWS.put(player, view);
     }
 
+    static void clear() {
+        VIEWS.clear();
+    }
+
     public static void forget(UUID player) {
         VIEWS.remove(player);
     }

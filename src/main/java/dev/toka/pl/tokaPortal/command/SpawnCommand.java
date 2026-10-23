@@ -16,7 +16,7 @@ public class SpawnCommand extends Command {
         super("spawn", Main.text("cmd.spawn.desc"));
         this.setUsage(Main.text("cmd.spawn.usage"));
         this.commandParameters.clear();
-        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum("動作", new String[]{"help"})});
+        this.commandParameters.put("help", new CommandParameter[]{CommandParameter.newEnum(Main.text("param.action"), new String[]{"help"})});
     }
 
     @Override

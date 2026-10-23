@@ -17,17 +17,17 @@ public class TpaCommand extends Command {
         super("tpa", Main.text("cmd.tpa.desc"));
         this.setUsage(Main.text("cmd.tpa.usage"));
         commandParameters.clear();
-        commandParameters.put("default", new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), CommandParamType.STRING)});
+        commandParameters.put("default", new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), true, CommandParamType.STRING)});
     }
 
     @Override
     public CommandDataVersions generateCustomCommandData(Player player) {
         var data = super.generateCustomCommandData(player);
         var names = CommandSuggestions.playerNames(player);
-        var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), CommandParamType.STRING)};
-        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual);
+        var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), true, CommandParamType.STRING)};
+        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual, CommandSuggestions.help());
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), false, "TokaPortalPlayers", names)}, manual);
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), true, "TokaPortalPlayers", names)}, manual, CommandSuggestions.help());
     }
 
     @Override
@@ -41,7 +41,7 @@ public class TpaCommand extends Command {
                     Tpa(player, toPlayer);
                 }
             } else {
-                sender.sendMessage(Main.text("msg.tpa.usage", Main.text("cmd.tpa.usage")));
+                dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalPlayerListWindow(player);
             }
         } else {
             sender.sendMessage(Main.text("err.playerOnly"));

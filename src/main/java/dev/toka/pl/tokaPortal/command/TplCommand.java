@@ -30,9 +30,9 @@ public class TplCommand extends Command {
         var names=new java.util.TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         LandIntegration.targets(player).ifPresent(targets->targets.forEach(target->{names.add(target.name());names.add(target.id());}));
         var manual=new CommandParameter[]{CommandParameter.newType(Main.text("param.landNameOrId"),false,CommandParamType.STRING)};
-        if(names.isEmpty())return CommandSuggestions.parameters(data,manual);
+        if(names.isEmpty())return CommandSuggestions.parameters(data,manual,CommandSuggestions.help());
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.landName"),false,"TokaPortalLands",new java.util.ArrayList<>(names))},manual);
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.landName"),false,"TokaPortalLands",new java.util.ArrayList<>(names))},manual,CommandSuggestions.help());
     }
 
     @Override

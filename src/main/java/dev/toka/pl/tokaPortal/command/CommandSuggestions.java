@@ -30,6 +30,12 @@ final class CommandSuggestions {
         return found;
     }
 
+    /** Forgets the scanned folders so a reloaded plugin starts fresh. */
+    static synchronized void reset() {
+        folderNames = List.of();
+        folderScanAt = 0;
+    }
+
     static List<String> worldNames() {
         Server server = Server.getInstance();
         Set<String> names = new TreeSet<>();
@@ -47,6 +53,21 @@ final class CommandSuggestions {
         if (Main.getProvider() == null) return List.of();
         return Arrays.stream(Main.getProvider().getHomePointsByCreator(player))
                 .map(HomePoint::getName).sorted().toList();
+    }
+
+    /** A parameter that offers fixed words; the words must be lower case. */
+    static CommandParameter fixed(String label, boolean optional, String enumName, String... values) {
+        return CommandParameter.newEnum(label, optional, new CommandEnum(enumName, values));
+    }
+
+    /** The overload that completes the word help. */
+    static CommandParameter[] help() {
+        return new CommandParameter[]{fixed(Main.text("param.action"), false, "TokaPortalHelp", "help")};
+    }
+
+    static List<String> pointNames() {
+        if (Main.getInstance().getPublicPoints() == null) return List.of();
+        return Main.getInstance().getPublicPoints().points().keySet().stream().map(String::valueOf).sorted().toList();
     }
 
     static CommandParameter names(String label, boolean optional, String enumName, List<String> values) {

@@ -31,6 +31,8 @@ public final class PortalWindow {
     private static final String ICON_PASS = "textures/items/emerald";
     private static final String ICON_CLOSE = "textures/ui/cancel";
     public static final String ICON_HOME = "textures/items/bed_red";
+    public static final String ICON_EDIT = "textures/items/book_writable";
+    private static final String ICON_MANAGE = "textures/ui/settings_glyph_color_2x";
 
     private PortalWindow() {
     }
@@ -85,6 +87,7 @@ public final class PortalWindow {
         if (!points.isEmpty()) {
             menu.button(Main.text("ui.button.teleportList"), icon(ICON_POINT), p -> sendPointList(p, "point", "ui.portal.pointList"));
         }
+        if (player.hasPermission("tokaPortal.points.manage")) menu.button(Main.text("ui.button.pointAdmin"), icon(ICON_MANAGE), dev.toka.pl.tokaPortal.form.PointWindows::open);
         if (Services.has(CITY_PASS)) menu.button(Main.text("ui.button.pass"), icon(ICON_PASS), p -> sendCityPassForm(p));
         menu.button(Main.text("ui.button.close"), icon(ICON_CLOSE), p -> {
         });
@@ -128,7 +131,7 @@ public final class PortalWindow {
         list("ui.portal.landList", items, PortalWindow::sendPortalMainWindow).show(player);
     }
 
-    private static void sendPortalPlayerListWindow(Player player) {
+    public static void sendPortalPlayerListWindow(Player player) {
         List<ListMenu.Item> items = new ArrayList<>();
         for (String name : getPlayerNameList(player)) {
             items.add(ListMenu.Item.of(name, p -> {

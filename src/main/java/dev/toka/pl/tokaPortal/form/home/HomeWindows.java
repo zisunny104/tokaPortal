@@ -37,14 +37,15 @@ public final class HomeWindows {
 
     /** The homes of the player to edit; back goes to the list to teleport. */
     public static void sendEditList(Player player) {
-        PortalWindow.list("ui.home.editList", items(player, null, home -> p -> sendEdit(p, home.getName())), HomeWindows::sendList).show(player);
+        PortalWindow.list("ui.home.editList", items(player, PortalWindow.icon(PortalWindow.ICON_EDIT), home -> p -> sendEdit(p, home.getName())), HomeWindows::sendList).show(player);
     }
 
     /** The actions for one home: back to the list, or delete. */
     public static void sendEdit(Player player, String name) {
         new Menu(Main.text("ui.home.edit.title", name), Main.text("ui.home.edit.prompt"))
                 .button(Main.text("ui.home.edit.back"), HomeWindows::sendEditList)
-                .button(Main.text("ui.home.edit.delete"), p -> sendDelete(p, name))
+                .button(Main.text("ui.home.edit.go"), PortalWindow.icon(PortalWindow.ICON_HOME), p -> toPoint(getProvider().getHomePoint(name), p))
+                .button(Main.text("ui.home.edit.delete"), PortalWindow.icon("textures/ui/cancel"), p -> sendDelete(p, name))
                 .show(player);
     }
 

@@ -56,7 +56,7 @@ public final class LandIntegration {
                 throw new NoSuchMethodException(methodName+" has an incompatible signature");
             return JsonParser.parseString((String)method.invoke(null,args)).getAsJsonObject();
         }catch(ReflectiveOperationException|LinkageError|RuntimeException failure){
-            if(!warned){warned=true;Main.getInstance().getLogger().warning("tokaLand 傳送 API 不可用；領地傳送功能暫停："+failure.getClass().getSimpleName());}
+            if(!warned){warned=true;Main.getInstance().getLogger().warning(Main.text("log.land.unavailable",failure.getClass().getSimpleName()));}
             return null;
         }
     }
