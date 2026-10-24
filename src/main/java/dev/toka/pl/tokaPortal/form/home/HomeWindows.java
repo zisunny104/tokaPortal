@@ -42,7 +42,7 @@ public final class HomeWindows {
 
     /** The actions for one home: back to the list, or delete. */
     public static void sendEdit(Player player, String name) {
-        new Menu(Main.text("ui.home.edit.title", name), Main.text("ui.home.edit.prompt"))
+        new Menu(Main.text("ui.home.edit.title", name), "")
                 .button(Main.text("ui.home.edit.back"), HomeWindows::sendEditList)
                 .button(Main.text("ui.home.edit.go"), PortalWindow.icon(PortalWindow.ICON_HOME), p -> toPoint(getProvider().getHomePoint(name), p))
                 .button(Main.text("ui.home.edit.delete"), PortalWindow.icon("textures/ui/cancel"), p -> sendDelete(p, name))

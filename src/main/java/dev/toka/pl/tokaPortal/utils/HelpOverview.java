@@ -21,10 +21,10 @@ public final class HelpOverview {
     }
 
     private static final List<Entry> ENTRIES = List.of(
-            new Entry("portal", 1), new Entry("portal", 2), new Entry("portal", 3), new Entry("portal", 4), new Entry("portal", 5),
-            new Entry("portal", 6), new Entry("portal", 7), new Entry("spawn", 1), new Entry("back", 1), new Entry("next", 1),
-            new Entry("wild", 1), new Entry("home", 1, Feature.PLAYERS, Feature.REGIONS), new Entry("tph", 1, Feature.PLAYERS, Feature.REGIONS),
-            new Entry("tpl", 1), new Entry("tpp", 1), new Entry("tpw", 1), new Entry("tpa", 1));
+            new Entry("portal", 1), new Entry("spawn", 1), new Entry("back", 1), new Entry("next", 1), new Entry("wild", 1), new Entry("tpa", 1),
+            new Entry("tpp", 1), new Entry("tpl", 1), new Entry("home", 1, Feature.PLAYERS, Feature.REGIONS), new Entry("tph", 1, Feature.PLAYERS, Feature.REGIONS),
+            new Entry("tpw", 1), new Entry("portal", 2), new Entry("portal", 3), new Entry("portal", 4), new Entry("portal", 5),
+            new Entry("portal", 6), new Entry("portal", 7));
 
     /** The key after help.overview.other. and the name of the plugin that has the commands. */
     private static final String[][] OTHERS = {{"worlds", "tokaWorlds"}, {"sign", "tokaSigns"}};
@@ -52,9 +52,7 @@ public final class HelpOverview {
             }
         }
         int perPage = Math.max(3, Main.getInstance().getConfig().getInt("help-lines-per-page", 8));
-        // "all" shows every line at once, with no pages
-        boolean all = args.length > 1 && (args[1].equalsIgnoreCase("all"));
-        Pager.Page<String> page = Pager.of(lines, all ? Math.max(1, lines.size()) : perPage, Pager.parse(args.length > 1 ? args[1] : null, 1));
+        Pager.Page<String> page = Pager.of(lines, perPage, Pager.parse(args.length > 1 ? args[1] : null, 1));
         sender.sendMessage(Main.text("help.overview.title"));
         for (String line : page.lines()) {
             sender.sendMessage(line);

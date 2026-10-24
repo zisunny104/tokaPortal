@@ -71,7 +71,7 @@ public final class PortalWindow {
     public static void sendPortalMainWindow(Player player) {
         List<ListMenu.Item> points = pointItems("point");
         List<ListMenu.Item> shopboxes = pointItems("shopbox");
-        Menu menu = new Menu(Main.text("ui.portal.title"), Main.text("ui.portal.prompt"));
+        Menu menu = new Menu(Main.text("ui.portal.title"), "");
         if (Services.has(REGIONS) && !Region.getRegions().isEmpty()) {
             menu.button(Main.text("ui.button.regionList"), icon(ICON_REGION), PortalWindow::sendPortalRegionListWindow);
         }
@@ -109,8 +109,13 @@ public final class PortalWindow {
     private static void sendPortalRegionListWindow(Player player) {
         if (!Services.require(player, REGIONS)) return;
         List<ListMenu.Item> items = new ArrayList<>();
-        for (Region region : Region.getRegions().values()) {
-            items.add(ListMenu.Item.of(region.getInfo(), p -> {
+        var regions = Region.getRegions().values();
+        // Two regions can share a display name, so the code is added only where the name alone is ambiguous.
+        var seen = new java.util.HashMap<String, Integer>();
+        for (Region region : regions) seen.merge(region.getPlainInfo(), 1, Integer::sum);
+        for (Region region : regions) {
+            String shown = seen.get(region.getPlainInfo()) > 1 ? region.getInfo() + " §7(" + region.getName() + ")" : region.getInfo();
+            items.add(ListMenu.Item.of(shown, p -> {
                 if (Services.require(p, REGIONS)) toRegion(region, p);
             }));
         }

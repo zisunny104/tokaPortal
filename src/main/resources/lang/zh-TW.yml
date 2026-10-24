@@ -21,7 +21,7 @@ cmd:
     usage: "/next"
   portal:
     desc: "傳送系統指令"
-    usage: "/portal [point [add|set|del <名稱> [類型]]|legacy <list [頁]|claim <名稱> <玩家>>|plan <status|mode|fields>|server|reload|help [頁|all]]"
+    usage: "/portal [point [add|set|del <名稱> [類型]]|legacy <list [頁]|claim <名稱> <玩家>>|plan <status|mode|fields>|server|reload|help [頁]]"
   spawn:
     desc: "回到重生點"
     usage: "/spawn"
@@ -96,7 +96,7 @@ help:
     - "§e/portal plan status | mode <auto|enable|disable> | fields <all|none|欄位> §7- §bPlan 展示設定（tokaPortal.admin）"
     - "§e/portal server §7- §b跨伺服器目的地（尚未提供）"
     - "§e/portal reload §7- §b重新讀取設定、語系與資料（tokaPortal.admin）"
-    - "§e/portal help [頁|all] §7- §b指令總覽：分頁顯示，all 一次顯示全部"
+    - "§e/portal help [頁] §7- §b指令總覽，分頁顯示"
   spawn:
     - "§6=== §f§l/spawn 說明§r §6==="
     - "§e/spawn §7- §b回到重生點"
@@ -279,7 +279,7 @@ ui:
     title: "${0} §7(${1}/${2})"
     footer: "§7第 §a${0}§7/§a${1}§7 頁，用 §e${2} <頁碼>§7 換頁"
   common:
-    cancel: "取消"
+    cancel: "§c取消"
   button:
     teleportList: "§e>>§8傳送點列表  "
     shopboxList: "§e>>§8商店傳送列表"
@@ -297,7 +297,6 @@ ui:
     refuse: "§l§c>取消<"
   portal:
     title: "=傳送系統="
-    prompt: "請選擇傳送目的"
     tpaTitle: "=傳送同意="
     # ${0}=要求傳送的玩家名稱
     tpaPrompt: "玩家 ${0} 想要傳送到你身邊"
@@ -379,7 +378,6 @@ ui:
     edit:
       # ${0}=住家名稱
       title: "編輯住家[${0}]"
-      prompt: "請選擇要對住家進行的動作"
       delete: "刪除住家"
       go: "傳送到住家"
       back: "返回列表"
