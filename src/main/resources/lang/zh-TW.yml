@@ -263,8 +263,8 @@ ui:
   # 分頁頁尾（tokaI18n 的 Pager 慣例）。${0}=頁碼 ${1}=總頁數 ${2}=指令
   # 清單的搜尋、排序、每頁數量視窗（清單項目多時才出現）。${0}=清單全部項目數
   options:
-    title: "=清單選項="
-    hint: "共有 ${0} 項。關鍵字留空表示不篩選；設定會保留到您離開伺服器。"
+    title: "清單選項"
+    hint: "共 ${0} 項，關鍵字留空表示不篩選。"
     query: "搜尋關鍵字"
     queryHint: "輸入名稱的一部分"
     sort: "排序方式"
@@ -276,64 +276,62 @@ ui:
     none: "沒有名稱含有「${0}」的項目，可按最下方選項重新搜尋"
   page:
     # 分頁視窗的標題。${0}=原標題 ${1}=頁碼 ${2}=總頁數
-    title: "${0} §7(${1}/${2})"
+    title: "${0} (${1}/${2})"
     footer: "§7第 §a${0}§7/§a${1}§7 頁，用 §e${2} <頁碼>§7 換頁"
   common:
     cancel: "§c取消"
   button:
-    teleportList: "§e>>§8傳送點列表  "
-    shopboxList: "§e>>§8商店傳送列表"
-    regionList: "§e>>§8區域傳送列表"
-    landList: "§e>>§8領地傳送列表"
-    playerList: "§e>>§8線上玩家傳送"
-    back: "§l§e>返回前頁<"
-    prevPage: "§l§e<上一頁"
-    options: "§l§b搜尋／排序／每頁數量"
-    nextPage: "§l§e下一頁>"
-    pass: "§l§b>進入城市通<"
-    pointAdmin: "§l§e>管理傳送點<"
-    close: "§l§c>關閉<"
-    agree: "§l§a>同意<"
-    refuse: "§l§c>取消<"
+    teleportList: "§b傳送點列表"
+    shopboxList: "§b商店傳送列表"
+    regionList: "§b區域傳送列表"
+    landList: "§b領地傳送列表"
+    playerList: "§b線上玩家傳送"
+    back: "返回"
+    prevPage: "上一頁"
+    options: "§b搜尋／排序／每頁數量"
+    nextPage: "下一頁"
+    pass: "§b進入城市通"
+    pointAdmin: "§b管理傳送點"
+    close: "§c關閉"
+    agree: "§b同意"
+    refuse: "§c取消"
   portal:
-    title: "=傳送系統="
+    title: "傳送系統"
     tpaTitle: "=傳送同意="
     # ${0}=要求傳送的玩家名稱
     tpaPrompt: "玩家 ${0} 想要傳送到你身邊"
     pointList:
-      title: "=傳送點列表="
-      hint:
-        - "傳送點列表 "
-        - "點擊進行傳送"
+      title: "傳送點列表"
+      hint: ""
       empty: "目前沒有任何公共傳送點"
     shopboxList:
-      title: "=商店列表="
-      hint: "點擊進行傳送"
+      title: "商店列表"
+      hint: ""
       empty: "目前沒有任何商店可以傳送"
     regionList:
-      title: "=區域列表="
-      hint: "點擊按鈕 進行傳送"
+      title: "區域列表"
+      hint: ""
       empty: "目前沒有任何區域可以傳送"
     landList:
-      title: "=領地列表="
-      hint: "點選要傳送的領地"
+      title: "領地列表"
+      hint: ""
       empty: "您沒有可傳送的領地"
     playerList:
-      title: "=玩家列表="
-      hint: "點選要傳送的玩家（對方同意後才會傳送）"
+      title: "玩家列表"
+      hint: ""
       empty: "現在沒有其他線上玩家可以傳送喔.."
   points:
-    title: "=傳送點管理="
+    title: "傳送點管理"
     # ${0}=傳送點數量
     prompt: "目前共有 ${0} 個公共傳送點"
     add: "新增傳送點"
     list: "傳送點清單"
     listing:
-      title: "=傳送點清單="
-      hint: "點選傳送點進行管理"
+      title: "傳送點清單"
+      hint: ""
       empty: "目前沒有任何公共傳送點"
     # ${0}=名稱 ${1}=類型
-    item: "${0} §7(${1})"
+    item: "${0}（${1}）"
     # ${0}=世界 ${1}=X ${2}=Y ${3}=Z
     here: "新傳送點會建在目前位置：${0} (${1}, ${2}, ${3})"
     name: "傳送點名稱"
@@ -351,29 +349,25 @@ ui:
     delConfirm: "確認要刪除傳送點 ${0} 嗎？"
   home:
     list:
-      title: "=住家列表="
-      hint:
-        - "點選下方住家按鈕"
-        - "即可傳送至該住家"
+      title: "住家列表"
+      hint: ""
       empty: "您沒有可傳送的住家"
     set:
-      title: "=設定住家="
+      title: "設定住家"
       # ${0}=世界 ${1}=X ${2}=Y ${3}=Z ${4}=已有住家數（設定檔沒有住家上限）
       here: "目前位置：${0} (${1}, ${2}, ${3})
 已有住家：${4} 個"
       input: "設置住家名稱"
       placeholder: "住家名稱"
     del:
-      title: "=刪除住家="
+      title: "刪除住家"
       # ${0}=住家名稱
       confirm: "確認要刪除住家' ${0} '嗎?"
       # 確認視窗的確認鈕（取消鈕用 ui.common.cancel；關閉視窗視為取消）
       button: "§c刪除住家"
     editList:
-      title: "=編輯住家="
-      hint:
-        - "點選下方住家按鈕"
-        - "即可進行編輯"
+      title: "編輯住家"
+      hint: ""
       empty: "您沒有可編輯的住家"
     edit:
       # ${0}=住家名稱
