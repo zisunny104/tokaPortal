@@ -69,11 +69,18 @@ public final class PointWindows {
             sendList(player);
             return;
         }
-        new Menu(Main.text("ui.points.detail", name), Main.text("ui.points.detailInfo", point.getType(), point.getCreator()))
+        new Menu(Main.text("ui.points.detail", name), Main.text("ui.points.detailInfo", point.getType(), point.getCreator(), point.getName(), point.getInfo(),
+                point.getOwner() == null ? Main.text("ui.points.legacyOwner") : point.getOwner().toString(), where(point)))
                 .back(PortalWindow.texts(), PointWindows::sendList)
                 .button(Main.text("ui.points.go"), PortalWindow.icon(ICON_LIST), p -> Portal.toPoint(point, p))
                 .button(Main.text("ui.points.delete"), PortalWindow.icon("textures/ui/cancel"), p -> sendDelete(p, name))
                 .show(player);
+    }
+
+    /** The world and the block the point is at, as plain text */
+    private static String where(teleportPoint point) {
+        var at = point.getLocation();
+        return at == null || at.getLevel() == null ? "-" : at.getLevel().getFolderName() + " " + at.getFloorX() + ", " + at.getFloorY() + ", " + at.getFloorZ();
     }
 
     private static void sendDelete(Player player, String name) {
