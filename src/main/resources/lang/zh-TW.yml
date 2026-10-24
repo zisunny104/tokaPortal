@@ -86,7 +86,7 @@ help:
     title: "§6=== §f§l傳送系統指令總覽§r §6==="
     needs: "§e〔未啟用：${0}〕"
     other:
-      worlds: "§e/worlds help §7- §b世界管理（掛載、卸載、更名；OP）"
+      worlds: "§e/world help §7- §b世界管理（掛載、卸載、更名；OP）"
       sign: "§e/sign help §7- §b告示牌（傳送牌、狀態牌等）的建立與維護"
   portal:
     - "§6=== §f§l/portal 說明§r §6==="
