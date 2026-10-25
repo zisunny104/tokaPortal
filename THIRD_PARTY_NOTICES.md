@@ -31,11 +31,6 @@
 
 此查核核對官方倉庫 LICENSE，未對歷史 1.5.2.1-PN 的所有檔案做逐一來源追溯。
 
-## zero
-
-僅確認程式以反射使用 `prj.toka.zero` API。尚未取得 zero 的實際 JAR、原始碼或授權文件，授權未定。
-未將 zero 程式碼或 JAR 包入 tokaPortal；未來拆分或複製 zero 程式碼前，需先核對其授權及第三方來源。
-
 ## SQLite JDBC
 
 - 上游：https://github.com/xerial/sqlite-jdbc/tree/3.53.4.0

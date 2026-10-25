@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
 import dev.toka.pl.tokaPortal.Main;
-import dev.toka.pl.tokaPortal.point.PublicPoints;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -13,7 +12,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
 /**
- * 住家與公共傳送點擁有者遷移：把只有名稱的項目對應到 UUID。順序為線上玩家、tokaProfiles、tokaEconomy、伺服器的離線查詢；
+ * 住家與公共傳送點擁有者的名稱解析：把只有名稱的項目對應到 UUID。順序為線上玩家、tokaProfiles、tokaEconomy、伺服器的離線查詢；
  * 前三者不讀磁碟，在主執行緒做，離線查詢（讀玩家檔）在背景執行緒做，結果回主執行緒套用。
  * tokaProfiles、tokaEconomy 以反射軟相依，未安裝或 API 不可用就略過。
  */
@@ -51,42 +50,6 @@ public final class OwnerMigration {
             return;
         }
         lookupAsync(List.of(name), found -> done.accept(Optional.ofNullable(found.get(name.toLowerCase(Locale.ROOT)))));
-    }
-
-    /** 啟動時對 legacy 住家與公共傳送點做一次遷移，結果寫 log。points 可為 null。 */
-    public void start(IDataProvider provider, PublicPoints points) {
-        Map<String, String> homeNames = new LinkedHashMap<>();
-        for (IDataProvider.LegacyGroup group : provider.legacyGroups()) homeNames.put(group.name().toLowerCase(Locale.ROOT), group.name());
-        Map<String, String> pointNames = new LinkedHashMap<>();
-        if (points != null) for (IDataProvider.LegacyGroup group : points.legacyGroups()) pointNames.put(group.name().toLowerCase(Locale.ROOT), group.name());
-        if (homeNames.isEmpty() && pointNames.isEmpty()) return;
-        Map<String, String> names = new LinkedHashMap<>(homeNames);
-        pointNames.forEach(names::putIfAbsent);
-        Map<String, UUID> resolved = new HashMap<>();
-        List<String> remaining = new ArrayList<>();
-        for (Map.Entry<String, String> entry : names.entrySet()) {
-            Optional<UUID> id = resolveFast(entry.getValue());
-            if (id.isPresent()) resolved.put(entry.getKey(), id.get());
-            else remaining.add(entry.getValue());
-        }
-        lookupAsync(remaining, found -> {
-            resolved.putAll(found);
-            // 背景查詢期間 provider 可能已換掉或關閉，套用時只看目前的
-            IDataProvider current = Main.getProvider();
-            if (current != null && !homeNames.isEmpty()) {
-                IDataProvider.Assigned result = current.assignOwners(resolved);
-                int left = current.legacyGroups().stream().mapToInt(IDataProvider.LegacyGroup::homes).sum();
-                plugin.getLogger().info(Main.text("log.homes.migrated", homeNames.size(), result.assigned(), left, result.disputed()));
-                for (String name : result.disputedNames()) plugin.getLogger().warning(Main.text("log.homes.dispute", name));
-            }
-            PublicPoints currentPoints = plugin.getPublicPoints();
-            if (currentPoints != null && !pointNames.isEmpty()) {
-                IDataProvider.Assigned result = currentPoints.assignOwners(resolved);
-                int left = currentPoints.legacyGroups().stream().mapToInt(IDataProvider.LegacyGroup::homes).sum();
-                plugin.getLogger().info(Main.text("log.points.migrated", pointNames.size(), result.assigned(), left, result.disputed()));
-                for (String name : result.disputedNames()) plugin.getLogger().warning(Main.text("log.points.dispute", name));
-            }
-        });
     }
 
     /** 背景查詢離線玩家；回呼在主執行緒，鍵為小寫名稱，查不到的不放入。 */

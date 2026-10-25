@@ -4,7 +4,6 @@ import cn.nukkit.level.Location;
 import dev.toka.pl.tokaPortal.point.HomePoint;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -24,9 +23,6 @@ public interface IDataProvider {
 
     /** 尚無 UUID 的 legacy 住家，依名稱分組。 */
     List<LegacyGroup> legacyGroups();
-
-    /** 套用名稱（小寫）對 UUID 的解析結果；同名已有不同 UUID 的住家視為爭議，不處理。 */
-    Assigned assignOwners(Map<String, UUID> resolved);
 
     /** 管理員指定：把該名稱（不分大小寫）的 legacy 住家全部交給玩家。 @return 取回的住家數 */
     int claimLegacy(String name, UUID owner, String ownerName);
@@ -50,7 +46,6 @@ public interface IDataProvider {
 
     record LegacyGroup(String name, int homes, boolean disputed) {}
 
-    record Assigned(int assigned, int disputed, List<String> disputedNames) {}
 
     record Joined(int renamed, int claimed, boolean disputed) {}
 }

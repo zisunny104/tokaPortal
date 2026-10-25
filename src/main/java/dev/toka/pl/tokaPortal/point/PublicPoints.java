@@ -88,17 +88,6 @@ public final class PublicPoints implements AutoCloseable {
   count.forEach((key,n)->groups.add(new dev.toka.pl.tokaPortal.provider.IDataProvider.LegacyGroup(shown.get(key),n[0],disputed(key,null))));
   return groups;
  }
- /** 套用名稱（小寫）對 UUID 的解析結果；同名已有不同 UUID 的傳送點視為爭議，不處理。 */
- public synchronized dev.toka.pl.tokaPortal.provider.IDataProvider.Assigned assignOwners(Map<String,java.util.UUID> resolved){
-  int assigned=0,conflicts=0;java.util.List<String> names=new ArrayList<>();Set<String> seen=new HashSet<>();
-  JsonObject next=state.deepCopy();
-  for(JsonElement item:next.getAsJsonArray("points")){JsonObject row=item.getAsJsonObject();if(ownerOf(row)!=null)continue;
-   String key=lower(creatorOf(row));java.util.UUID id=resolved.get(key);if(id==null)continue;
-   if(disputed(key,id)){if(seen.add(key)){conflicts++;names.add(creatorOf(row));}continue;}
-   row.addProperty("owner",id.toString());assigned++;}
-  if(assigned>0)save(next);
-  return new dev.toka.pl.tokaPortal.provider.IDataProvider.Assigned(assigned,conflicts,names);
- }
  /** 管理員指定：把該名稱（不分大小寫）的 legacy 傳送點全部交給玩家。 */
  public synchronized int claimLegacy(String name,java.util.UUID owner,String ownerName){
   int claimed=0;JsonObject next=state.deepCopy();

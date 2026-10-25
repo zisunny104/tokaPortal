@@ -118,26 +118,6 @@ public class BaseDataProvider implements IDataProvider {
                 && !home.getOwner().equals(candidate) && lower(home.getOwnerName()).equals(lowerName));
     }
 
-    @Override public Assigned assignOwners(Map<String, UUID> resolved) {
-        int assigned = 0, disputed = 0;
-        List<String> disputedNames = new ArrayList<>();
-        Set<String> seen = new HashSet<>();
-        for (HomePoint home : homes.values()) {
-            if (!home.isLegacy()) continue;
-            String key = lower(home.getOwnerName());
-            UUID id = resolved.get(key);
-            if (id == null) continue;
-            if (isDisputed(key, id)) {
-                if (seen.add(key)) { disputed++; disputedNames.add(home.getOwnerName()); }
-                continue;
-            }
-            home.claim(id, home.getOwnerName());
-            assigned++;
-        }
-        if (assigned > 0) persist(homes);
-        return new Assigned(assigned, disputed, disputedNames);
-    }
-
     @Override public int claimLegacy(String name, UUID owner, String ownerName) {
         int claimed = 0;
         for (HomePoint home : homes.values()) {

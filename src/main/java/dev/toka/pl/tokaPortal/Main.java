@@ -75,8 +75,6 @@ public class Main extends PluginBase implements Listener {
         messages = new Messages(getClass().getClassLoader(), getDataFolder().toPath(), getConfig().getString("language", "zh-TW"), line -> getLogger().warning(line));
         reload();
         ownerMigration = new dev.toka.pl.tokaPortal.provider.OwnerMigration(this);
-        // 其他插件（tokaEconomy、tokaProfiles）啟用後再解析名稱
-        getServer().getScheduler().scheduleDelayedTask(this, () -> { if (provider != null) ownerMigration.start(provider, publicPoints); }, 20);
 
         wildService=new dev.toka.pl.tokaPortal.wild.WildService(this);
         getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);

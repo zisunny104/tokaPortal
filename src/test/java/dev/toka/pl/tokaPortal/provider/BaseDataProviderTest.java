@@ -111,32 +111,6 @@ class BaseDataProviderTest {
         assertEquals(0, provider.getHomePointsByOwner(BOB).length);
     }
 
-    @Test void migrationAssignsResolvedOwnersAndKeepsTheRest() {
-        var result = provider.assignOwners(Map.of("bob", BOB));
-        assertEquals(2, result.assigned());
-        assertEquals(0, result.disputed());
-        assertEquals(2, provider.getHomePointsByOwner(BOB).length);
-        assertEquals(BOB.toString(), saved("b1").get("owner"));
-        assertEquals("Bob", saved("b1").get("creator"));
-        // 沒解析到的維持 legacy，只剩 dave，而且有爭議
-        var groups = provider.legacyGroups();
-        assertEquals(1, groups.size());
-        assertEquals("dave", groups.get(0).name());
-        assertTrue(groups.get(0).disputed());
-    }
-
-    @Test void disputedNameIsNotAssignedAutomatically() {
-        // dave 對應到的 UUID 與已持有同名住家的 Dave 不同：爭議
-        var result = provider.assignOwners(Map.of("dave", OTHER));
-        assertEquals(0, result.assigned());
-        assertEquals(1, result.disputed());
-        assertEquals(List.of("dave"), result.disputedNames());
-        assertTrue(provider.getHomePoint("d2").isLegacy());
-        // 解析到的就是原持有者本人：不算爭議
-        assertEquals(1, provider.assignOwners(Map.of("dave", DAVE)).assigned());
-        assertEquals(DAVE, provider.getHomePoint("d2").getOwner());
-    }
-
     @Test void joiningPlayerReclaimsLegacyHomesByName() {
         var joined = provider.onPlayerJoin(BOB, "BOB");
         assertEquals(2, joined.claimed());

@@ -52,19 +52,8 @@ class PublicPointsTest {
   PublicPoints points=new PublicPoints(Files.createTempDirectory(Path.of("target"),"public-points-legacy-"),Backend.JSON);
   points.replaceIfEmptyOrEqual("{\"schema\":1,\"points\":["+String.join(",",rows)+"]}");return points;
  }
- @Test void migrationAssignsResolvedNamesAndKeepsTheOthersLegacy()throws Exception{
-  try(PublicPoints points=open(row("p1","Alice",null),row("p2","alice",null),row("p3","Ghost",null))){
-   var result=points.assignOwners(java.util.Map.of("alice",A));
-   assertEquals(2,result.assigned());assertEquals(0,result.disputed());
-   assertEquals(A,points.points().get("p1").getOwner());assertEquals(A,points.points().get("p2").getOwner());
-   assertNull(points.points().get("p3").getOwner());assertEquals("Ghost",points.points().get("p3").getCreator());
-   assertEquals(1,points.legacyGroups().size());
-  }
- }
- @Test void disputedNamesAreNotAssignedOrClaimedOnJoin()throws Exception{
+ @Test void disputedNamesAreNotClaimedOnJoin()throws Exception{
   try(PublicPoints points=open(row("p1","Bob",null),row("p2","bob",B.toString()))){
-   var result=points.assignOwners(java.util.Map.of("bob",A));
-   assertEquals(0,result.assigned());assertEquals(1,result.disputed());assertEquals(java.util.List.of("Bob"),result.disputedNames());
    assertTrue(points.legacyGroups().getFirst().disputed());
    var joined=points.onPlayerJoin(A,"Bob");
    assertEquals(0,joined.claimed());assertTrue(joined.disputed());assertNull(points.points().get("p1").getOwner());
@@ -87,12 +76,12 @@ class PublicPointsTest {
    assertTrue(points.points().get("p2").isCreator(B,"bob"));
   }
  }
- @Test void migrationIsWrittenThroughTheQueueAndSurvivesReload()throws Exception{
+ @Test void claimIsWrittenThroughTheQueueAndSurvivesReload()throws Exception{
   Path dir=Files.createTempDirectory(Path.of("target"),"public-points-queue-");
   var writer=new dev.toka.pl.tokaPortal.provider.storage.WriteQueue((key,error)->fail(key,error));
   try(PublicPoints points=new PublicPoints(dir,Backend.JSON,writer)){
    points.replaceIfEmptyOrEqual("{\"schema\":1,\"points\":["+row("p1","Dave",null)+"]}");
-   points.assignOwners(java.util.Map.of("dave",A));assertTrue(writer.drain(5000));
+   points.claimLegacy("Dave",A,"Dave");assertTrue(writer.drain(5000));
   }
   try(PublicPoints points=new PublicPoints(dir,Backend.JSON)){assertEquals(A,points.points().get("p1").getOwner());assertEquals("Dave",points.points().get("p1").getCreator());}
   writer.shutdown();
