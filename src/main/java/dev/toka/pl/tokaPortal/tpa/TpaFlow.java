@@ -125,7 +125,8 @@ public final class TpaFlow {
             case HERE -> "ui.bar.tpa.here";
             case FORCE -> "ui.bar.tpa.force";
         };
-        TopBar.show(to, Main.text(key, from.getName(), request.left()), (float) request.left() / request.total());
+        TopBar.show(to, Main.text(key, from.getName(), request.left()), (float) request.left() / request.total(),
+                TopBar.color(request.kind() == Kind.FORCE, request.left(), request.total()));
     }
 
     /** The traveller goes to the destination through the portal path, with its event and checks. */

@@ -116,4 +116,16 @@ class TpaLogicTest {
         assertEquals(2, ended.get());
         assertEquals(0, requests.size());
     }
+
+    @Test
+    void barColourFollowsTheTimeLeftAndBlinksAtTheEnd() {
+        assertEquals("GREEN", TopBar.color(false, 20, 20));
+        assertEquals("YELLOW", TopBar.color(false, 9, 20));
+        assertEquals("RED", TopBar.color(false, 5, 20));
+        assertEquals("WHITE", TopBar.color(false, 4, 20));
+        assertEquals("RED", TopBar.color(false, 3, 20));
+        assertEquals("PURPLE", TopBar.color(true, 9, 10));
+        assertEquals("RED", TopBar.color(true, 4, 10));
+        assertEquals("PURPLE", TopBar.color(true, 3, 10));
+    }
 }
