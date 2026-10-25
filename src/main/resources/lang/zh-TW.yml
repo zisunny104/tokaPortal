@@ -124,6 +124,7 @@ help:
   tpahere:
     - "§6=== §f§l/tpahere 說明§r §6==="
     - "§e/tpahere <玩家代號> §7- §b請指定玩家傳送到你身邊（對方用 /tpaccept 同意）"
+    - "§e/tpahere <玩家代號> force §7- §b（管理員）倒數後把對方帶到你身邊，對方可用 /tpdeny 阻止，不受勿擾影響"
     - "§e/tpahere help §7- §b顯示這份說明"
   tpaccept:
     - "§6=== §f§l/tpaccept 說明§r §6==="
@@ -190,6 +191,7 @@ err:
     dnd: "§7[傳送]§r§c對方勿擾中"
     senderBusy: "§7[傳送]§r§c你還有未結束的傳送請求，可用 /tpcancel 取消。"
     noRequest: "§7[傳送]§r§c目前沒有傳送請求。"
+    pullDenied: "§7[傳送]§r§e沒有權限強制把人帶過來。"
     forcedNoAccept: "§7[傳送]§r§e這是強制傳送，無需同意；要阻止請用 /tpdeny。"
     noSent: "§7[傳送]§r§c你沒有發出的傳送請求。"
     gone: "§7[傳送]§r§c對方已離線。"
@@ -264,6 +266,7 @@ msg:
     sentHere: "§7[傳送]§r§b已請 §a${0} §b傳送到你身邊"
     # ${0}=目標玩家名稱、${1}=等待秒數
     forced: "§7[傳送]§r§b將在 §a${1} §b秒後傳送到 §a${0} §b身邊"
+    pulled: "§7[傳送]§r§b將在 §a${1} §b秒後把 §a${0} §b帶到你身邊"
     # ${0}=目標玩家名稱
     expired: "§7[傳送]§r§e給 §a${0} §e的傳送要求已逾時"
     denied: "§7[傳送]§r§b已拒絕傳送要求"
@@ -354,6 +357,7 @@ ui:
       ask: "§a${0} §b想傳送到你身邊 §7— §f/tpaccept §b同意，§f/tpdeny §b拒絕 §e${1}"
       here: "§a${0} §b想要你傳送到他身邊 §7— §f/tpaccept §b同意，§f/tpdeny §b拒絕 §e${1}"
       force: "§a${0} §b將在 §e${1} §b秒後傳送到你身邊 §7— §f/tpdeny §b阻止"
+      pull: "§a${0} §b將在 §e${1} §b秒後把你帶到他身邊 §7— §f/tpdeny §b阻止"
   portal:
     title: "傳送系統"
     tpaTitle: "=傳送同意="

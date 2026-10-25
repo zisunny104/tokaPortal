@@ -9,7 +9,7 @@ import java.util.UUID;
 /** The pending requests, one per target and one per sender, by player id. Whatever ends a request runs its end hook once. */
 public final class TpaRequests {
     /** ASK: the sender goes to the target. HERE: the target goes to the sender. FORCE: the sender goes to the target unless stopped. */
-    public enum Kind { ASK, HERE, FORCE }
+    public enum Kind { ASK, HERE, FORCE, PULL }
 
     public enum Result { OK, SELF, TARGET_BUSY, SENDER_BUSY }
 

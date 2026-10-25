@@ -26,7 +26,8 @@ public class TpaHereCommand extends Command {
         var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), false, CommandParamType.STRING)};
         if (names.isEmpty()) return CommandSuggestions.parameters(data, manual, CommandSuggestions.help());
         return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), false, "TokaPortalPlayers", names)}, manual, CommandSuggestions.help());
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), false, "TokaPortalPlayers", names)},
+                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), false, "TokaPortalPlayers", names), CommandParameter.newEnum("force", true, new String[]{"force"})}, manual, CommandSuggestions.help());
     }
 
     @Override
@@ -41,8 +42,9 @@ public class TpaHereCommand extends Command {
             return false;
         }
         Player target = Server.getInstance().getPlayer(args[0]);
+        boolean force = args.length > 1 && args[1].equalsIgnoreCase("force");
         if (target == null) player.sendMessage(Main.text("err.player.notFound", args[0]));
-        else TpaFlow.request(player, target, true);
+        else TpaFlow.request(player, target, true, force);
         return true;
     }
 }

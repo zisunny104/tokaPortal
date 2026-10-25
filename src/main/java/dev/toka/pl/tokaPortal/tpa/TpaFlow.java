@@ -60,12 +60,24 @@ public final class TpaFlow {
         return requests.forTarget(target.getUniqueId());
     }
 
-    /** /tpa (here=false) and /tpahere (here=true). */
+    /** /tpa (here=false) and /tpahere (here=true): always a question for the other player. */
     public static void request(Player from, Player to, boolean here) {
+        request(from, to, here, false);
+    }
+
+    /**
+     * /tpahere with the word force: a player of the force or silent tier brings the other player over. The other one is not asked and
+     * do-not-disturb does not stop it, but there is always the countdown with its bar, and /tpdeny stops it.
+     */
+    public static void request(Player from, Player to, boolean here, boolean force) {
         if (from == null || to == null || !from.isOnline() || !to.isOnline()) return;
         PlayerInfo fromInfo = getPlayerInfo(from);
         if (from.getUniqueId().equals(to.getUniqueId())) {
             fromInfo.sendText(Main.text("err.tpa.self"));
+            return;
+        }
+        if (here && force && fromInfo.tpaTier() == TpaRules.Tier.NORMAL) {
+            fromInfo.sendText(Main.text("err.tpa.pullDenied"));
             return;
         }
         var tier = here ? TpaRules.Tier.NORMAL : fromInfo.tpaTier();
@@ -73,12 +85,12 @@ public final class TpaFlow {
             silent(from, to);
             return;
         }
-        if (tier == TpaRules.Tier.NORMAL && dnd.isOn(to.getUniqueId(), System.currentTimeMillis())) {
+        if (tier == TpaRules.Tier.NORMAL && !(here && force) && dnd.isOn(to.getUniqueId(), System.currentTimeMillis())) {
             fromInfo.sendText(Main.text("err.tpa.dnd"));
             return;
         }
-        Kind kind = here ? Kind.HERE : tier == TpaRules.Tier.FORCE ? Kind.FORCE : Kind.ASK;
-        int seconds = kind == Kind.FORCE ? TpaRules.forceDelay(config("tpa.force.delay-seconds", TpaRules.FORCE_DEFAULT))
+        Kind kind = here ? (force ? Kind.PULL : Kind.HERE) : tier == TpaRules.Tier.FORCE ? Kind.FORCE : Kind.ASK;
+        int seconds = kind == Kind.FORCE || kind == Kind.PULL ? TpaRules.forceDelay(config("tpa.force.delay-seconds", TpaRules.FORCE_DEFAULT))
                 : TpaRules.requestSeconds(config("tpa.request.seconds", TpaRules.REQUEST_DEFAULT));
         Request request = new Request(from.getUniqueId(), to.getUniqueId(), kind, seconds);
         switch (requests.add(request)) {
@@ -98,9 +110,10 @@ public final class TpaFlow {
             case ASK -> fromInfo.sendText(Main.text("msg.tpa.sent", to.getName()));
             case HERE -> fromInfo.sendText(Main.text("msg.tpa.sentHere", to.getName()));
             case FORCE -> fromInfo.sendText(Main.text("msg.tpa.forced", to.getName(), request.total()));
+            case PULL -> fromInfo.sendText(Main.text("msg.tpa.pulled", to.getName(), request.total()));
         }
         bar(request, from, to);
-        if (request.kind() != Kind.FORCE && plugin.getConfig().getBoolean("tpa.request.window", false)) PortalWindow.sendPortalTpaAcceptWindow(to);
+        if (request.kind() != Kind.FORCE && request.kind() != Kind.PULL && plugin.getConfig().getBoolean("tpa.request.window", false)) PortalWindow.sendPortalTpaAcceptWindow(to);
     }
 
     private static void tick(Request request) {
@@ -116,6 +129,7 @@ public final class TpaFlow {
         }
         requests.remove(request);
         if (request.kind() == Kind.FORCE) go(from, to);
+        else if (request.kind() == Kind.PULL) go(to, from);
         else getPlayerInfo(from).sendText(Main.text("msg.tpa.expired", to.getName()));
     }
 
@@ -124,9 +138,10 @@ public final class TpaFlow {
             case ASK -> "ui.bar.tpa.ask";
             case HERE -> "ui.bar.tpa.here";
             case FORCE -> "ui.bar.tpa.force";
+            case PULL -> "ui.bar.tpa.pull";
         };
         TopBar.show(to, Main.text(key, from.getName(), request.left()), (float) request.left() / request.total(),
-                TopBar.color(request.kind() == Kind.FORCE, request.left(), request.total()));
+                TopBar.color(request.kind() == Kind.FORCE || request.kind() == Kind.PULL, request.left(), request.total()));
     }
 
     /** The traveller goes to the destination through the portal path, with its event and checks. */
@@ -149,7 +164,7 @@ public final class TpaFlow {
             if (expected == null) getPlayerInfo(target).sendText(Main.text("err.tpa.noRequest"));
             return;
         }
-        if (request.kind() == Kind.FORCE) {
+        if (request.kind() == Kind.FORCE || request.kind() == Kind.PULL) {
             getPlayerInfo(target).sendText(Main.text("err.tpa.forcedNoAccept"));
             return;
         }
