@@ -90,7 +90,7 @@ class LanguageFileTest {
     @Test
     void everyCommandHasDescriptionUsageAndHelp() throws IOException {
         Set<String> keys = leafKeys();
-        for (String command : List.of("back", "home", "next", "portal", "spawn", "tpa", "tph", "tpl", "tpp", "tpw", "wild")) {
+        for (String command : List.of("back", "home", "next", "portal", "spawn", "tpa", "tpahere", "tpaccept", "tpdeny", "tpcancel", "dnd", "tph", "tpl", "tpp", "tpw", "wild")) {
             assertTrue(keys.contains("cmd." + command + ".desc"), command);
             assertTrue(keys.contains("cmd." + command + ".usage"), command);
             assertTrue(keys.contains("help." + command), command);

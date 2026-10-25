@@ -37,9 +37,8 @@ public class TpaCommand extends Command {
             Player player = (Player) sender;
             if (args.length > 0) {
                 Player toPlayer = Server.getInstance().getPlayer(args[0]);
-                if (toPlayer != null) {
-                    Tpa(player, toPlayer);
-                }
+                if (toPlayer != null) Tpa(player, toPlayer);
+                else player.sendMessage(Main.text("err.player.notFound", args[0]));
             } else {
                 dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalPlayerListWindow(player);
             }

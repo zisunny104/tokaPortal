@@ -5,7 +5,7 @@ name: tokaPortal
 main: dev.toka.pl.tokaPortal.Main
 
 #插件版本
-version: "2.9.7"
+version: "2.9.8"
 
 #核心API版本
 api: ["1.0.11"]
@@ -29,6 +29,18 @@ permissions:
     description: 管理公共傳送點
     default: op
 
+
+  tokaportal.tpa.silent:
+    description: "/tpa 靜默傳送：不通知對方、立刻傳送，抵達後隱身一小段時間（管理員身分與 OP 本來就有）"
+    default: op
+
+  tokaportal.tpa.force:
+    description: "/tpa 強制傳送：不徵求同意，對方頂端顯示倒數，可用 /tpdeny 阻止（贊助者身分本來就有）"
+    default: false
+
+  tokaportal.dnd.unlimited:
+    description: "/dnd 勿擾不限時間（一般玩家有 dnd.max-minutes 的上限）"
+    default: false
 
   tokaPortal.admin:
     description: "管理 Plan 展示設定並重新載入設定"

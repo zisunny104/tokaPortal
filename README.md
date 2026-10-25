@@ -16,7 +16,11 @@
 | 指令 | 說明 |
 | --- | --- |
 | `/portal` | 開啟傳送選單；`/portal help` 查看所有指令 |
-| `/tpa <玩家代號>` | 例：`/tpa Steve`，向 Steve 提出傳送請求，對方同意後傳送 |
+| `/tpa <玩家代號>` | 例：`/tpa Steve`，向 Steve 提出傳送請求；不寫名稱開啟玩家選單 |
+| `/tpahere <玩家代號>` | 請對方傳送到你身邊，流程與 `/tpa` 相同，方向相反 |
+| `/tpaccept`、`/tpdeny` | 同意／拒絕別人對你的傳送請求 |
+| `/tpcancel` | 取消你自己發出的傳送請求 |
+| `/dnd [on｜off]` | 勿擾：開啟時別人的傳送請求直接被拒絕，不寫參數切換；只存在記憶體，離線即解除 |
 | `/tpp [傳送點名稱]` | 例：`/tpp spawn`，傳送到公共傳送點；不寫名稱開啟選單 |
 | `/spawn` | 前往名為 `spawn` 的重生點 |
 | `/back`、`/next` | 返回前一個／前往下一個傳送位置 |
@@ -37,7 +41,22 @@
 | `/home`、`/tph` | `/home [list｜set｜del｜edit] [名稱]`、`/tph [名稱]` | 住家管理與傳送 | OP 或管理員身分 |
 
 `tokaPortal.points.manage` 預設只有 OP。傳送點名稱不可使用 `reserved-names` 內的字。
-`/tpa` 的規則：OP 或管理員身分者直接傳送；贊助者稍待片刻後傳送；其餘玩家需對方同意。
+## 玩家傳送（/tpa）
+
+請求不會彈出視窗打斷對方：對方螢幕頂端出現倒數條（與重啟、清理倒數相同的做法，有 tokaDisplay 用其訊息列，否則用動作列），寫明誰想傳送，以及 `/tpaccept` 同意、`/tpdeny` 拒絕。
+倒數結束請求作廢，並通知發送者；雙方任一方離線、插件停用或重新載入，請求與倒數條都會結束。每位玩家同時只有一個待處理的請求，也只能發出一個；不能對自己發。
+設定 `tpa.request.window: true` 可另外彈出同意視窗（舊做法）。
+
+勿擾中的玩家收不到請求，發送者只會看到「對方勿擾中」。一般玩家每次最多開 `dnd.max-minutes` 分鐘，到時自動關閉；有 `tokaportal.dnd.unlimited` 不限時間。勿擾不影響自己發請求。
+
+| 層級 | 條件（任一） | 行為 |
+| --- | --- | --- |
+| 一般 | 其餘玩家 | 請求，對方同意才傳送，受勿擾影響 |
+| 強制 | 權限 `tokaportal.tpa.force`，或贊助者身分 `toka.identity.sponsor` | 不徵求同意；對方頂端倒數 `tpa.force.delay-seconds` 秒，期間可用 `/tpdeny` 阻止，否則傳送；不受勿擾阻擋 |
+| 靜默 | 權限 `tokaportal.tpa.silent`，或 OP／管理員身分 `toka.identity.admin` | 立刻傳送，不通知對方、沒有倒數、不受勿擾影響；抵達後隱身 `tpa.silent.invisible-seconds` 秒 |
+
+強制與靜默只用在 `/tpa`；`/tpahere` 所有人都需對方同意。`tokaportal.tpa.silent` 預設 OP，`tokaportal.tpa.force`、`tokaportal.dnd.unlimited` 預設無人；身分群組要用節點授權時，把節點加進該群組即可。
+所有傳送都經過 `Portal.portal(...)`，`PlayerPortalEvent` 照常觸發，其他插件的限制仍有效。
 
 ## 住家與傳送點擁有者 UUID
 
@@ -60,6 +79,11 @@
 | `wild.attempts` | `16` | 找不到安全落點時的重試次數 |
 | `wild.show-cooldown` | `true` | 冷卻中以血條顯示進度，需安裝 tokaDisplay |
 | `wild.bar-color` | `cooldown` | 冷卻血條顏色 |
+| `tpa.request.seconds` | `20` | 請求等待秒數，限 15–30 |
+| `tpa.request.window` | `false` | 是否另外彈出同意視窗 |
+| `tpa.force.delay-seconds` | `10` | 強制傳送的倒數秒數，限 3–60 |
+| `tpa.silent.invisible-seconds` | `30` | 靜默傳送抵達後隱身秒數，限 1–600 |
+| `dnd.max-minutes` | `30` | 一般玩家每次勿擾最長分鐘數 |
 | `help-lines-per-page` | `8` | `/portal help` 每頁行數 |
 | `window-items-per-page` | `10` | 選單清單每頁項目數（玩家可自行調整，範圍 3–30） |
 | `window-search-threshold` | `8` | 項目超過此數才顯示搜尋／排序按鈕 |
@@ -72,7 +96,7 @@
 | `Portal.portal(player, location[, title])` | 玩家、目的地、標題 | 傳送並記錄到 `/back` 歷史；回傳是否成功 |
 | `Portal.toLandClaim(player, claimId)` | 玩家、tokaLand 穩定 ID | 重新驗證本人 UUID 權限，再透過 Portal 事件傳送；供 tokaSigns 等選用整合呼叫 |
 | `Portal.toPoint(name, player)` | 傳送點名稱、玩家 | 傳送到公共傳送點 |
-| `Portal.Tpa(from, to)` | 發起玩家、目標玩家 | 依權限提出傳送請求 |
+| `Portal.Tpa(from, to)` | 發起玩家、目標玩家 | 依發起者層級提出請求、強制或靜默傳送 |
 | `PlayerPortalEvent` | `getPlayer()`、`getFromInfo()`、`getToInfo()`、`getFrom()`、`getTo()` | 每次傳送前觸發，可取消 |
 
 ## 疑難排解

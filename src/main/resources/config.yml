@@ -36,6 +36,28 @@ wild:
   # 冷卻中血條的顏色：tokaDisplay 的 7 種顏色之一，或它 config.yml 裡 colors 的別名；空白則用預設顏色。
   bar-color: cooldown
 
+# /tpa（玩家傳送玩家）設定。
+tpa:
+  request:
+    # 請求等待秒數：15 到 30 的整數（超出會自動調整），預設 20。顯示在對方螢幕頂端的倒數條，時間到請求自動作廢。
+    seconds: 20
+    # 是否另外彈出同意視窗（舊做法）。預設 false，只用頂端倒數條，不打斷對方；可填 true 或 false。
+    window: false
+  force:
+    # 強制傳送（權限 tokaportal.tpa.force，或贊助者身分 toka.identity.sponsor）的等待秒數：3 到 60 的整數，預設 10。
+    # 這段時間對方頂端會顯示倒數，可用 /tpdeny 阻止；時間到且未阻止就傳送。勿擾（/dnd）擋不住強制傳送。
+    delay-seconds: 10
+  silent:
+    # 靜默傳送（權限 tokaportal.tpa.silent，或 OP／管理員身分 toka.identity.admin）抵達後隱身的秒數：1 到 600 的整數，預設 30。
+    # 靜默傳送不通知對方、沒有倒數、不受勿擾影響。
+    invisible-seconds: 30
+
+# 勿擾（/dnd）：開啟時別人對你發的 /tpa、/tpahere 會直接被拒絕。只存在記憶體，離線或重啟即解除。
+dnd:
+  # 一般玩家每次開啟最多維持幾分鐘，時間到自動關閉（至少 1，預設 30）。
+  # 擁有權限 tokaportal.dnd.unlimited 的玩家不受限制。
+  max-minutes: 30
+
 # /portal help 總覽每頁顯示幾行（最少 3）。
 help-lines-per-page: 8
 

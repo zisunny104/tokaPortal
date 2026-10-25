@@ -11,6 +11,8 @@ import dev.toka.pl.tokaPortal.integration.Services;
 import dev.toka.pl.tokaPortal.integration.LandIntegration;
 import dev.toka.pl.tokaPortal.integration.Services.Region;
 import dev.toka.pl.tokaPortal.point.teleportPoint;
+import dev.toka.pl.tokaPortal.tpa.TpaFlow;
+import dev.toka.pl.tokaPortal.tpa.TpaRequests;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,28 +149,17 @@ public final class PortalWindow {
         list("ui.portal.playerList", items, PortalWindow::sendPortalMainWindow).show(player);
     }
 
-    /** Asks the player to agree to the request; closing the window or the cancel button declines it. */
+    /** Asks the player to agree to the request (the option tpa.request.window); closing the window or the cancel button declines it. */
     public static void sendPortalTpaAcceptWindow(Player player) {
-        Player requester = Portal.getTpaFrom(player);
+        var request = TpaFlow.pending(player);
+        if (request == null) return;
+        Player requester = Server.getInstance().getOnlinePlayers().get(request.sender());
         if (requester == null) return;
-        new Confirm(Main.text("ui.portal.tpaTitle"), Main.text("ui.portal.tpaPrompt", requester.getName()),
+        String prompt = request.kind() == TpaRequests.Kind.HERE ? "ui.portal.tpaPromptHere" : "ui.portal.tpaPrompt";
+        new Confirm(Main.text("ui.portal.tpaTitle"), Main.text(prompt, requester.getName()),
                 Main.text("ui.button.agree"), Main.text("ui.button.refuse"))
-                .onConfirm(p -> {
-                    Player from = Portal.getTpaFrom(p);
-                    if (from != requester) return;
-                    if (!from.isOnline()) {
-                        delTpaMap(p);
-                        return;
-                    }
-                    if (portal(from, p.getLocation(), p.getName())) getPlayerInfo(from).sendText(Main.text("msg.tpa.arrived", p.getName()));
-                    delTpaMap(p);
-                })
-                .onCancel(p -> {
-                    Player from = Portal.getTpaFrom(p);
-                    if (from != requester) return;
-                    if (from.isOnline()) getPlayerInfo(from).sendText(Main.text("msg.tpa.declined", p.getName()));
-                    delTpaMap(p);
-                })
+                .onConfirm(p -> TpaFlow.accept(p, request))
+                .onCancel(p -> TpaFlow.deny(p, request))
                 .show(player);
     }
 }

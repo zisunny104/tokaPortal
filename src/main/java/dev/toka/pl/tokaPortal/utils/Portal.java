@@ -5,16 +5,15 @@ import cn.nukkit.Server;
 import cn.nukkit.event.Listener;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.scheduler.NukkitRunnable;
 import dev.toka.pl.tokaPortal.event.PlayerPortalEvent;
 import dev.toka.pl.tokaPortal.point.HomePoint;
+import dev.toka.pl.tokaPortal.tpa.TpaFlow;
 import dev.toka.pl.tokaPortal.Main;
 import dev.toka.pl.tokaPortal.integration.Services.PlayerInfo;
 import dev.toka.pl.tokaPortal.point.teleportPoint;
 import dev.toka.pl.tokaPortal.integration.Services.Region;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import dev.toka.pl.tokaPortal.integration.Services;
 import dev.toka.pl.tokaPortal.integration.LandIntegration;
 import static dev.toka.pl.tokaPortal.integration.Services.Feature.*;
@@ -22,7 +21,6 @@ import static dev.toka.pl.tokaPortal.integration.Services.Feature.*;
 import static cn.nukkit.potion.Effect.BLINDNESS;
 import static cn.nukkit.potion.Effect.getEffect;
 import static dev.toka.pl.tokaPortal.Main.getProvider;
-import static dev.toka.pl.tokaPortal.utils.PortalWindow.sendPortalTpaAcceptWindow;
 import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
 import static dev.toka.pl.tokaPortal.point.teleportPoint.getPoint;
 import static dev.toka.pl.tokaPortal.integration.Services.Region.getRegion;
@@ -30,7 +28,6 @@ import static dev.toka.pl.tokaPortal.integration.Services.callEvent;
 
 public class Portal implements Listener {
     public static final ArrayList<String> canAddHomeRegionList = new ArrayList<>();
-    private static final HashMap<Player, Player> tpaMap = new HashMap<>();
 
     static {//可以新增住家的區域(Region)列表
         canAddHomeRegionList.add("v1");
@@ -88,53 +85,13 @@ public class Portal implements Listener {
         portal(player, region.getTpr(), region.getInfo());
     }
 
+    /** Asks the target for the teleport of the sender; the tier of the sender decides how (see TpaFlow). */
     public static void Tpa(Player fromPlayer, Player toPlayer) {
-        if (fromPlayer == null || toPlayer == null || !fromPlayer.isOnline() || !toPlayer.isOnline()) return;
-        PlayerInfo fromPli = getPlayerInfo(fromPlayer);
-        PlayerInfo toPli = getPlayerInfo(toPlayer);
-        if (fromPli.isTopQuanXian()) {
-            toPli.sendText(Main.text("msg.tpa.incoming", fromPlayer.getName()));
-            if (portal(fromPlayer, toPlayer.getLocation(), toPlayer.getName()))
-                fromPli.sendText(Main.text("msg.tpa.arrived", toPlayer.getName()));
-            return;
-        }
-        if (fromPli.isHighQuanXian()) {
-            fromPli.sendText(Main.text("msg.tpa.soon", toPlayer.getName()));
-            toPli.sendText(Main.text("msg.tpa.incoming", fromPlayer.getName()));
-            (new NukkitRunnable() {
-                public void run() {
-                    if (!fromPlayer.isOnline() || !toPlayer.isOnline()) return;
-                    if (portal(fromPlayer, toPlayer.getLocation(), toPli.getName()))
-                        fromPli.sendText(Main.text("msg.tpa.arrived", toPlayer.getName()));
-                    this.cancel();
-                }
-            }).runTaskLater(Main.getInstance(), 30);
-        } else {
-            if (tpaMap.containsKey(toPlayer)) {
-                fromPli.sendText(Main.text("err.tpa.pending"));
-                return;
-            }
-            tpaMap.put(toPlayer, fromPlayer);
-            fromPli.sendText(Main.text("msg.tpa.sent", toPlayer.getName()));
-            sendPortalTpaAcceptWindow(toPlayer);
-            Main.getInstance().getServer().getScheduler().scheduleDelayedTask(Main.getInstance(), () -> {
-                if (tpaMap.get(toPlayer) == fromPlayer) tpaMap.remove(toPlayer);
-            }, 1200);
-        }
-
-    }
-
-    public static Player getTpaFrom(Player toPlayer) {
-        return tpaMap.get(toPlayer);
-    }
-
-    public static void delTpaMap(Player toPlayer) {
-        tpaMap.remove(toPlayer);
+        TpaFlow.request(fromPlayer, toPlayer, false);
     }
 
     public static void clearPlayer(Player player) {
-        tpaMap.remove(player);
-        tpaMap.values().removeIf(player::equals);
+        TpaFlow.playerQuit(player);
     }
 
     public static boolean portal(Player player, Location location) {

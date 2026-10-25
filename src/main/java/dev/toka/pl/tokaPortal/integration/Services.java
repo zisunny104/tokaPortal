@@ -19,6 +19,8 @@ public final class Services {
     public enum Feature { PLAYERS, REGIONS, CITY_PASS }
 
     public static final String ADMIN = "toka.identity.admin", SPONSOR = "toka.identity.sponsor";
+    /** Silent teleport (no notice, invisible after) and forced teleport (the target may stop it) of /tpa. */
+    public static final String TPA_SILENT = "tokaportal.tpa.silent", TPA_FORCE = "tokaportal.tpa.force";
 
     private Services() {}
 
@@ -59,7 +61,12 @@ public final class Services {
         public String getNameTag() { return player.getNameTag(); }
         public void sendText(String text) { player.sendMessage(text); }
         public boolean isTopQuanXian() { return player.isOp() || player.hasPermission(ADMIN); }
-        public boolean isHighQuanXian() { return player.hasPermission(SPONSOR); }
+        /** How /tpa treats this player: the administrator identity and operators teleport silently, the sponsor identity forced; both can also be granted by node. */
+        public dev.toka.pl.tokaPortal.tpa.TpaRules.Tier tpaTier() {
+            return dev.toka.pl.tokaPortal.tpa.TpaRules.tier(
+                    dev.toka.pl.tokaPortal.tpa.TpaRules.silent(player.isOp(), player.hasPermission(TPA_SILENT), player.hasPermission(ADMIN)),
+                    dev.toka.pl.tokaPortal.tpa.TpaRules.force(player.hasPermission(TPA_FORCE), player.hasPermission(SPONSOR)));
+        }
         public boolean isPortalStatus() { return teleportingUntil.getOrDefault(player.getUniqueId(), 0L) > System.currentTimeMillis(); }
         public String getRegionInfo() { Region region = getRegion(); return region == null ? Main.text("status.here") : region.getInfo(); }
         public Region getRegion() { return Region.at(player.getLocation()); }

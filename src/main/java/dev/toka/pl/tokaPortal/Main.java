@@ -82,6 +82,7 @@ public class Main extends PluginBase implements Listener {
         getServer().getScheduler().scheduleRepeatingTask(this,()->wildService.render(),20);
         this.registerEvents();
         this.registerCommandMap();
+        dev.toka.pl.tokaPortal.tpa.TpaFlow.start(this);
         getServer().getScheduler().scheduleRepeatingTask(this, () -> {
             if (planSettings != null && planSettings.enabled() && (planTicks += 20) >= planSettings.refreshTicks()) {
                 planTicks = 0;
@@ -100,6 +101,7 @@ public class Main extends PluginBase implements Listener {
         }
         commands.clear();
         dev.toka.pl.tokaPortal.form.FormListener.clear();
+        dev.toka.pl.tokaPortal.tpa.TpaFlow.shutdown();
         CommandSuggestionUpdater.reset();
         closePlan(); planSnapshot = null;
         if(wildService!=null)wildService.close();
@@ -118,6 +120,7 @@ public class Main extends PluginBase implements Listener {
 
     /** Re-reads the config, the texts and the data, and renews what was built from them. */
     public void reloadAll() {
+        dev.toka.pl.tokaPortal.tpa.TpaFlow.cancelAll();
         reload();
         commands.forEach((name, command) -> {
             command.setDescription(text("cmd." + name + ".desc"));
@@ -159,6 +162,11 @@ public class Main extends PluginBase implements Listener {
         register("portal", new PortalCommand());
         register("spawn", new SpawnCommand());
         register("tpa", new TpaCommand());
+        register("tpahere", new TpaHereCommand());
+        register("tpaccept", new TpAcceptCommand());
+        register("tpdeny", new TpDenyCommand());
+        register("tpcancel", new TpCancelCommand());
+        register("dnd", new DndCommand());
         register("tph", new TphCommand());
         register("tpl", new TplCommand());
         register("tpp", new TppCommand());
