@@ -337,19 +337,19 @@ ui:
   common:
     cancel: "§c取消"
   button:
-    teleportList: "§b傳送點列表"
-    shopboxList: "§b商店傳送列表"
-    regionList: "§b區域傳送列表"
-    landList: "§b領地傳送列表"
-    playerList: "§b線上玩家傳送"
+    teleportList: "傳送點列表"
+    shopboxList: "商店傳送列表"
+    regionList: "區域傳送列表"
+    landList: "領地傳送列表"
+    playerList: "線上玩家傳送"
     back: "返回"
     prevPage: "上一頁"
-    options: "§b搜尋／排序／每頁數量"
+    options: "搜尋／排序／每頁數量"
     nextPage: "下一頁"
-    pass: "§b進入城市通"
-    pointAdmin: "§b管理傳送點"
+    pass: "進入城市通"
+    pointAdmin: "管理傳送點"
     close: "§c關閉"
-    agree: "§b同意"
+    agree: "同意"
     refuse: "§c取消"
   # 螢幕頂端的倒數條。${0}=玩家名稱、${1}=剩餘秒數
   bar:

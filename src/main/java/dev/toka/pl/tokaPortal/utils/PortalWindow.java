@@ -99,7 +99,7 @@ public final class PortalWindow {
     private static List<ListMenu.Item> pointItems(String type) {
         List<ListMenu.Item> items = new ArrayList<>();
         for (teleportPoint point : teleportPoint.getPoints().values()) {
-            if (point.getType().equals(type)) items.add(new ListMenu.Item(point.getInfo(), null, p -> Portal.toPoint(point, p)));
+            if (point.getType().equals(type)) items.add(new ListMenu.Item(point.getInfo().replaceAll("§.", ""), null, p -> Portal.toPoint(point, p)));
         }
         return items;
     }
@@ -116,7 +116,7 @@ public final class PortalWindow {
         var seen = new java.util.HashMap<String, Integer>();
         for (Region region : regions) seen.merge(region.getPlainInfo(), 1, Integer::sum);
         for (Region region : regions) {
-            String shown = seen.get(region.getPlainInfo()) > 1 ? region.getInfo() + " §7(" + region.getName() + ")" : region.getInfo();
+            String shown = seen.get(region.getPlainInfo()) > 1 ? region.getPlainInfo() + " (" + region.getName() + ")" : region.getPlainInfo();
             items.add(ListMenu.Item.of(shown, p -> {
                 if (Services.require(p, REGIONS)) toRegion(region, p);
             }));

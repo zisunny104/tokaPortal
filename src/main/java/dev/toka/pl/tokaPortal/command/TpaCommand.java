@@ -23,11 +23,9 @@ public class TpaCommand extends Command {
     @Override
     public CommandDataVersions generateCustomCommandData(Player player) {
         var data = super.generateCustomCommandData(player);
-        var names = CommandSuggestions.playerNames(player);
-        var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), true, CommandParamType.STRING)};
-        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual, CommandSuggestions.help());
-        return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), true, "TokaPortalPlayers", names)}, manual, CommandSuggestions.help());
+        // the client completes the names of the players online by itself, so the list is never stale
+        var target = new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), true, CommandParamType.TARGET)};
+        return CommandSuggestions.parameters(data, target, CommandSuggestions.help());
     }
 
     @Override

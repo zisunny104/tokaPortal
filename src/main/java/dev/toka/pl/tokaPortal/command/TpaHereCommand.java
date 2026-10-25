@@ -22,12 +22,10 @@ public class TpaHereCommand extends Command {
     @Override
     public CommandDataVersions generateCustomCommandData(Player player) {
         var data = super.generateCustomCommandData(player);
-        var names = CommandSuggestions.playerNames(player);
-        var manual = new CommandParameter[]{CommandParameter.newType(Main.text("param.playerName"), false, CommandParamType.STRING)};
-        if (names.isEmpty()) return CommandSuggestions.parameters(data, manual, CommandSuggestions.help());
-        return CommandSuggestions.parameters(data,
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), false, "TokaPortalPlayers", names)},
-                new CommandParameter[]{CommandSuggestions.names(Main.text("param.playerName"), false, "TokaPortalPlayers", names), CommandParameter.newEnum("force", true, new String[]{"force"})}, manual, CommandSuggestions.help());
+        // the client completes the names of the players online by itself, so the list is never stale
+        var target = CommandParameter.newType(Main.text("param.playerName"), false, CommandParamType.TARGET);
+        return CommandSuggestions.parameters(data, new CommandParameter[]{target},
+                new CommandParameter[]{target, CommandSuggestions.fixed(Main.text("param.action"), false, "TokaPortalForce", "force")}, CommandSuggestions.help());
     }
 
     @Override
