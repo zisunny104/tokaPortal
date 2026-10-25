@@ -2,6 +2,7 @@ package dev.toka.pl.tokaPortal.form;
 
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementDropdown;
+import cn.nukkit.form.element.ElementHeader;
 import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.response.FormResponseCustom;
@@ -39,6 +40,7 @@ public final class PointWindows {
     private static void sendAdd(Player player) {
         FormWindowCustom window = new FormWindowCustom(Main.text("ui.points.add"));
         var at = player.getLocation();
+        window.addElement(new ElementHeader(Main.text("ui.points.add")));
         window.addElement(new ElementLabel(Main.text("ui.points.here", at.getLevel().getName(),
                 String.format("%,d", at.getFloorX()), String.format("%,d", at.getFloorY()), String.format("%,d", at.getFloorZ()))));
         window.addElement(new ElementInput(Main.text("ui.points.name"), Main.text("ui.points.namePlaceholder")));
@@ -48,8 +50,8 @@ public final class PointWindows {
                 open(p);
                 return;
             }
-            String name = response.getInputResponse(1) == null ? "" : response.getInputResponse(1).strip();
-            var type = response.getDropdownResponse(2);
+            String name = response.getInputResponse(2) == null ? "" : response.getInputResponse(2).strip();
+            var type = response.getDropdownResponse(3);
             PortalCommand.addPoint(p, name, TYPES.get(type == null ? 0 : Math.min(type.getElementID(), TYPES.size() - 1)));
             open(p);
         });
