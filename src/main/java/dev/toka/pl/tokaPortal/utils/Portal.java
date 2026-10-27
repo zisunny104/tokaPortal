@@ -82,6 +82,10 @@ public class Portal implements Listener {
             player.sendTitle(Main.text("ui.title.unknownRegion"), Main.text("ui.title.cannotTeleport"));
             return;
         }
+        if (!region.hasTeleportPoint()) {
+            player.sendMessage(Main.text("err.regionNoTeleport", region.getInfo()));
+            return;
+        }
         portal(player, region.getTpr(), region.getInfo());
     }
 

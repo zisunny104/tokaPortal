@@ -106,6 +106,9 @@ public final class Services {
 
         private String color() { return Objects.toString(get("color"), ""); }
 
+        /** Whether an administrator has set a teleport point for the region. */
+        public boolean hasTeleportPoint() { return get("teleport") != null; }
+
         /** Where players sent to this region arrive; null when the region has no teleport point or its world is not loaded. */
         public Location getTpr() {
             Object point = get("teleport"), world = get("world");

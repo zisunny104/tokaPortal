@@ -179,6 +179,8 @@ err:
   # ${0}=功能代碼（PLAYERS、REGIONS、LAND、CITY_PASS）
   featureOff: "§7[傳送]§r§c此功能暫時不可用：缺少 §a${0}§c。"
   worldNotLoaded: "§7[傳送]§r§c目的地世界尚未載入，無法傳送。"
+  # ${0} = 區域名稱
+  regionNoTeleport: "§7[傳送]§r§c區域 §a${0} §c還沒有設定傳送點；管理員請站在要傳送到的位置輸入 §a/region settp§c。"
   portalCooldown: "§7[傳送]§r§c傳送冷卻中"
   history:
     none: "§7[傳送]§r§c尚無傳送紀錄。"
