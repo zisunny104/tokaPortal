@@ -55,6 +55,12 @@ cmd:
   tpw:
     desc: "傳送到世界"
     usage: "/tpw <世界名稱>"
+  tpr:
+    desc: "傳送到區域"
+    usage: "/tpr <區域名稱或代碼>"
+  tpauto:
+    desc: "自動同意傳送請求"
+    usage: "/tpauto [on|off|default]"
   wild:
     desc: "指定世界內隨機傳送"
     usage: "/wild"
@@ -66,6 +72,7 @@ param:
   homeName: "住家名稱"
   playerName: "玩家名稱"
   worldName: "世界名稱"
+  regionName: "區域名稱或代碼"
   landName: "領地名稱"
   landNameOrId: "領地名稱或 UUID"
   page: "頁碼"
@@ -158,6 +165,17 @@ help:
     - "§6=== §f§l/tpw 說明（僅 OP）§r §6==="
     - "§e/tpw <世界名稱> §7- §b傳送到指定世界；世界未載入時會先載入"
     - "§e/tpw help §7- §b顯示這份說明"
+  tpr:
+    - "§6=== §f§l/tpr 說明§r §6==="
+    - "§e/tpr <區域名稱或代碼> §7- §b傳送到該區域的傳送點，和 tpr 告示牌相同；區域要先設定傳送點"
+    - "§e/tpr help §7- §b顯示這份說明"
+  tpauto:
+    - "§6=== §f§l/tpauto 說明§r §6==="
+    - "§e/tpauto §7- §b查看目前是否自動同意別人傳送到你身旁（或把你帶過去）"
+    - "§e/tpauto on §7- §b自動同意，不用再按同意"
+    - "§e/tpauto off §7- §b每次都要你確認"
+    - "§e/tpauto default §7- §b跟隨伺服器預設"
+    - "§e/tpauto help §7- §b顯示這份說明"
   wild:
     - "§6=== §f§l/wild 說明§r §6==="
     - "§e/wild §7- §b在 §a${0}§b 內隨機傳送，冷卻 §a${1}§b 秒"
@@ -180,6 +198,8 @@ err:
   featureOff: "§7[傳送]§r§c此功能暫時不可用：缺少 §a${0}§c。"
   worldNotLoaded: "§7[傳送]§r§c目的地世界尚未載入，無法傳送。"
   # ${0} = 區域名稱
+  # ${0}=輸入的名稱、${1}=可傳送的區域
+  regionUnknown: "§7[傳送]§r§c找不到區域 §a${0}§c；可傳送的區域：§a${1}"
   regionNoTeleport: "§7[傳送]§r§c區域 §a${0} §c還沒有設定傳送點；管理員請站在要傳送到的位置輸入 §a/region settp§c。"
   portalCooldown: "§7[傳送]§r§c傳送冷卻中"
   history:
@@ -258,6 +278,8 @@ msg:
     # ${0}=舊名稱、${1}=玩家、${2}=住家數、${3}=傳送點數
     claimed: "§7[傳送]§r§a已把舊名稱 ${0} 交給 ${1}：住家 ${2} 個、傳送點 ${3} 個"
   tpa:
+    # ${0}=發出請求的玩家名稱
+    autoAccepted: "§7[傳送]§r§b已自動同意 §a${0} §b的傳送請求"
     # ${0}=目標玩家名稱
     arrived: "§7[傳送]§r§a您已傳送到玩家 ${0} 身旁"
     # ${0}=目標玩家名稱
@@ -275,6 +297,17 @@ msg:
     # ${0}=取消的玩家名稱
     withdrawn: "§7[傳送]§r§e玩家 §a${0} §e取消了傳送要求"
     stopped: "§7[傳送]§r§b已取消傳送要求"
+  tpauto:
+    # ${0}=目前設定（開啟或關閉）、${1}=來源（你的設定或伺服器預設）
+    status: "§7[傳送]§r§b自動同意目前§a${0}§b（${1}）"
+    "on": "§7[傳送]§r§b已開啟自動同意：別人傳送到你身旁或帶你過去時不再詢問"
+    "off": "§7[傳送]§r§b已關閉自動同意：每次都會詢問你"
+    # ${0}=目前伺服器預設（開啟或關閉）
+    default: "§7[傳送]§r§b已改為跟隨伺服器預設（目前預設：§a${0}§b）"
+    onWord: "開啟"
+    offWord: "關閉"
+    ownWord: "你的設定"
+    defaultWord: "伺服器預設"
   dnd:
     # ${0}=最多分鐘數
     # on、off 是 YAML 的布林字，key 一定要加引號
@@ -500,6 +533,7 @@ log:
     unavailable: "§ePlan 整合暫時不可用：§a${0}"
   # ${0}=指令名稱、${1}=佔用此名稱的指令所屬外掛
   commandTaken: "§e指令 §a/${0} §e已被 §a${1} §e使用，本外掛的 §a/${0} §e只能用 §a/tokaportal:${0}"
+  autoSaveFailed: "§c自動同意設定儲存失敗"
   writer:
     timeout: "§e背景儲存寫入逾時，部分資料可能未寫入"
   # ${0}=玩家顯示名稱、${1}=出發地說明、${2}=出發座標與世界、${3}=目的地說明、${4}=目的座標與世界

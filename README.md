@@ -21,6 +21,8 @@
 | `/tpaccept`、`/tpdeny` | 同意／拒絕別人對你的傳送請求 |
 | `/tpcancel` | 取消你自己發出的傳送請求 |
 | `/dnd [on｜off]` | 勿擾：開啟時別人的傳送請求直接被拒絕，不寫參數切換；只存在記憶體，離線即解除 |
+| `/tpauto [on｜off｜default]` | 自動同意別人的 `/tpa`、`/tpahere`：`on` 自動同意、`off` 每次確認、`default` 跟隨伺服器預設（`config.yml` 的 `tpa.auto-accept.default`，預設 false）；不寫參數看目前狀態；勿擾開啟時仍會拒絕；設定存在 `tpa-auto.txt` |
+| `/tpr <區域名稱或代碼>` | 傳送到該區域的傳送點，等同 tpr 告示牌；區域要先用 `/region settp` 設定傳送點 |
 | `/tpp [傳送點名稱]` | 例：`/tpp spawn`，傳送到公共傳送點；不寫名稱開啟選單 |
 | `/spawn` | 前往名為 `spawn` 的重生點 |
 | `/back`、`/next` | 返回前一個／前往下一個傳送位置 |

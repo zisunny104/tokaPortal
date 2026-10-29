@@ -23,6 +23,7 @@ import static dev.toka.pl.tokaPortal.integration.Services.getPlayerInfo;
 public final class TpaFlow {
     private static final TpaRequests requests = new TpaRequests();
     private static final DoNotDisturb dnd = new DoNotDisturb();
+    private static final AutoAccept auto = new AutoAccept();
     private static TaskHandler dndTask;
 
     private TpaFlow() {
@@ -31,6 +32,7 @@ public final class TpaFlow {
     public static void start(Main plugin) {
         if (dndTask != null) dndTask.cancel();
         dndTask = plugin.getServer().getScheduler().scheduleRepeatingTask(plugin, TpaFlow::tickDnd, 20);
+        try { auto.load(autoFile()); } catch (java.io.IOException failure) { plugin.getLogger().error(Main.text("log.autoSaveFailed"), failure); }
     }
 
     /** onDisable: forget every request and every do-not-disturb without a word. */
@@ -89,6 +91,12 @@ public final class TpaFlow {
             fromInfo.sendText(Main.text("err.tpa.dnd"));
             return;
         }
+        if (tier == TpaRules.Tier.NORMAL && !(here && force) && auto.effective(to.getUniqueId(), serverAutoDefault())) {
+            if (here) go(to, from);
+            else go(from, to);
+            getPlayerInfo(to).sendText(Main.text("msg.tpa.autoAccepted", from.getName()));
+            return;
+        }
         Kind kind = here ? (force ? Kind.PULL : Kind.HERE) : tier == TpaRules.Tier.FORCE ? Kind.FORCE : Kind.ASK;
         int seconds = kind == Kind.FORCE || kind == Kind.PULL ? TpaRules.forceDelay(config("tpa.force.delay-seconds", TpaRules.FORCE_DEFAULT))
                 : TpaRules.requestSeconds(config("tpa.request.seconds", TpaRules.REQUEST_DEFAULT));
@@ -99,6 +107,39 @@ public final class TpaFlow {
             case SELF -> fromInfo.sendText(Main.text("err.tpa.self"));
             case OK -> begin(request, from, to);
         }
+    }
+
+    private static java.nio.file.Path autoFile() {
+        return Main.getInstance().getDataFolder().toPath().resolve("tpa-auto.txt");
+    }
+
+    /** The server default of automatic acceptance (config tpa.auto-accept.default). */
+    public static boolean serverAutoDefault() {
+        return Main.getInstance().getConfig().getBoolean("tpa.auto-accept.default", false);
+    }
+
+    /** /tpauto [on|off|default]; no argument tells the current state. */
+    public static void auto(Player player, String argument) {
+        PlayerInfo info = getPlayerInfo(player);
+        UUID id = player.getUniqueId();
+        boolean fallback = serverAutoDefault();
+        if (argument != null) {
+            String word = argument.toLowerCase(java.util.Locale.ROOT);
+            auto.set(id, word.equals("on") ? Boolean.TRUE : word.equals("off") ? Boolean.FALSE : null);
+            try { auto.save(autoFile()); } catch (java.io.IOException failure) { Main.getInstance().getLogger().error(Main.text("log.autoSaveFailed"), failure); }
+            switch (word) {
+                case "on" -> info.sendText(Main.text("msg.tpauto.on"));
+                case "off" -> info.sendText(Main.text("msg.tpauto.off"));
+                default -> info.sendText(Main.text("msg.tpauto.default", wording(fallback)));
+            }
+            return;
+        }
+        boolean own = auto.choice(id) != null;
+        info.sendText(Main.text("msg.tpauto.status", wording(auto.effective(id, fallback)), Main.text(own ? "msg.tpauto.ownWord" : "msg.tpauto.defaultWord")));
+    }
+
+    private static String wording(boolean on) {
+        return Main.text(on ? "msg.tpauto.onWord" : "msg.tpauto.offWord");
     }
 
     private static void begin(Request request, Player from, Player to) {

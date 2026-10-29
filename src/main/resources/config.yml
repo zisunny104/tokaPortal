@@ -47,6 +47,10 @@ tpa:
     # 強制傳送（權限 tokaportal.tpa.force，或贊助者身分 toka.identity.sponsor）的等待秒數：3 到 60 的整數，預設 10。
     # 這段時間對方頂端會顯示倒數，可用 /tpdeny 阻止；時間到且未阻止就傳送。勿擾（/dnd）擋不住強制傳送。
     delay-seconds: 10
+  auto-accept:
+    # 伺服器預設是否自動同意別人的 /tpa（傳送到你身旁）與 /tpahere（把你帶過去）：false＝要確認（預設），true＝自動同意。
+    # 玩家可用 /tpauto on、off 覆寫自己的設定，/tpauto default 回到這個預設；勿擾（/dnd）開啟時仍會拒絕。
+    default: false
   silent:
     # 靜默傳送（權限 tokaportal.tpa.silent，或 OP／管理員身分 toka.identity.admin）抵達後隱身的秒數：1 到 600 的整數，預設 30。
     # 靜默傳送不通知對方、沒有倒數、不受勿擾影響。

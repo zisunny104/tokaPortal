@@ -169,6 +169,8 @@ public class Main extends PluginBase implements Listener {
         register("tpl", new TplCommand());
         register("tpp", new TppCommand());
         register("tpw", new TpwCommand());
+        register("tpr", new dev.toka.pl.tokaPortal.command.TprCommand());
+        register("tpauto", new dev.toka.pl.tokaPortal.command.TpAutoCommand());
         register("wild", new WildCommand());
     }
 
