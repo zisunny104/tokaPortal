@@ -498,6 +498,8 @@ log:
     unsupported: "§ePlan 缺少 DataExtension Builder API，略過整合"
     # ${0}=錯誤類型
     unavailable: "§ePlan 整合暫時不可用：§a${0}"
+  # ${0}=指令名稱、${1}=佔用此名稱的指令所屬外掛
+  commandTaken: "§e指令 §a/${0} §e已被 §a${1} §e使用，本外掛的 §a/${0} §e只能用 §a/tokaportal:${0}"
   writer:
     timeout: "§e背景儲存寫入逾時，部分資料可能未寫入"
   # ${0}=玩家顯示名稱、${1}=出發地說明、${2}=出發座標與世界、${3}=目的地說明、${4}=目的座標與世界

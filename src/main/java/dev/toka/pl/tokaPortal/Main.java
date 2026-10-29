@@ -173,7 +173,10 @@ public class Main extends PluginBase implements Listener {
     }
 
     private void register(String name, cn.nukkit.command.Command command) {
-        getServer().getCommandMap().register(name, command);
+        var map = getServer().getCommandMap();
+        map.register("tokaPortal", command);
+        var holder = map.getCommand(name);
+        if (holder != command) getLogger().warning(text("log.commandTaken", name, holder instanceof cn.nukkit.command.PluginCommand<?> other ? other.getPlugin().getName() : String.valueOf(holder)));
         commands.put(name, command);
     }
 
